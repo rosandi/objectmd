@@ -138,6 +138,7 @@ public:
 	virtual void   PrepareSendBuffers(OMD_INT mode);
 	virtual void   SendReceiveData(void** sendpack, void** recvpack, OMD_SIZET unitlength);
 	virtual void   SendReceive(OMD_INT mode);
+	virtual bool   CheckCellShift(OMD_INT b, OMD_FLOAT& xshift,OMD_FLOAT& yshift, OMD_FLOAT& zshift);
 	virtual void   UnpackSpace();
 	virtual void   UnpackForce();
 	virtual void   UnpackAux(OMD_INT aidx);

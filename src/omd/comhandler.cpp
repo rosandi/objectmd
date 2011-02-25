@@ -225,74 +225,81 @@ void CommunicationHandler::CollectSendRecvNumber() {
 	// FIXME! check statuses here
 }
 
-void CommunicationHandler::UnpackSpace() {
-	OMD_INT rank=GetRank();
 
+bool CommunicationHandler::CheckCellShift(OMD_INT b, OMD_FLOAT& xshift,OMD_FLOAT& yshift, OMD_FLOAT& zshift) {
+	OMD_INT rank=GetRank();
 	// my grid coordinate
 	OMD_INT mx=System->ProcInfo.CellX[rank];
 	OMD_INT my=System->ProcInfo.CellY[rank];
 	OMD_INT mz=System->ProcInfo.CellZ[rank];
+	
+	// neigboring cell coordinate relative to the current cell
+	OMD_INT nx=b%3;
+	OMD_INT ny=(b/3)%3;
+	OMD_INT nz=(b/9)%3;
+	
+	bool do_shift=false;
+	
+	// this occurs only in periodic boundary condition,
+	// wraps on a single processor
+	if(System->GetNeighborRank(b)==rank) {
+		
+		xshift=(nx==0)?(-System->ProcInfo.Box.lx):((nx==2)?System->ProcInfo.Box.lx:0.0);
+		yshift=(ny==0)?(-System->ProcInfo.Box.ly):((ny==2)?System->ProcInfo.Box.ly:0.0);
+		zshift=(nz==0)?(-System->ProcInfo.Box.lz):((nz==2)?System->ProcInfo.Box.lz:0.0);
+		do_shift=true;
+		
+	} else {
+		
+		// this happens only if PERIODIC_X|Y|Z
+		// otherwise neighbor rank b < 0...
+		
+		if(mx==0&&nx==0)
+		{xshift=-System->ProcInfo.Box.lx; do_shift=true;}
+		else if((mx==(OMD_INT)System->ClusterNX-1)&&(nx==2))
+		{xshift=System->ProcInfo.Box.lx; do_shift=true;}
+		else xshift=0.0;
+		
+		if(my==0&&ny==0)
+		{yshift=-System->ProcInfo.Box.ly;do_shift=true;}
+		else if((my==(OMD_INT)System->ClusterNY-1)&&(ny==2))
+		{yshift=System->ProcInfo.Box.ly;do_shift=true;}
+		else yshift=0.0;
+		
+		if(mz==0&&nz==0)
+		{zshift=-System->ProcInfo.Box.lz;do_shift=true;}
+		else if((mz==(OMD_INT)System->ClusterNZ-1)&&(nz==2))
+		{zshift=System->ProcInfo.Box.lz;do_shift=true;}
+		else zshift=0.0;
+		
+	}
+	
+	return do_shift;
+}
+
+
+void CommunicationHandler::UnpackSpace() {
+	OMD_INT rank=GetRank();
 	OMD_SIZET newna=System->LocalAtomNumber;
-
+	OMD_FLOAT xshift, yshift, zshift;
 	System->AtomStorage.Cut(System->LocalAtomNumber);
-
+	
 	// appending all received atoms from other procs...
 	for(OMD_INT b=0;b<27;b++) {
-
+		
 		if(System->GetNeighborRank(b)<0||b==MYSELF||RecvNumber[b]==0) continue;
-
-		// neigboring cell coordinate relative to the current cell
-		OMD_INT nx=b%3;
-		OMD_INT ny=(b/3)%3;
-		OMD_INT nz=(b/9)%3;
-		OMD_FLOAT xshift, yshift, zshift;
-		bool do_shift=false;
-
-		// this occurs only in periodic boundary condition,
-		// wraps on a single processor
-		if(System->GetNeighborRank(b)==rank) {
-
-			xshift=(nx==0)?(-System->ProcInfo.Box.lx):((nx==2)?System->ProcInfo.Box.lx:0.0);
-			yshift=(ny==0)?(-System->ProcInfo.Box.ly):((ny==2)?System->ProcInfo.Box.ly:0.0);
-			zshift=(nz==0)?(-System->ProcInfo.Box.lz):((nz==2)?System->ProcInfo.Box.lz:0.0);
-			do_shift=true;
-
-		} else {
-
-			// this happens only if PERIODIC_X|Y|Z
-			// otherwise neighbor rank b < 0...
-
-			if(mx==0&&nx==0)
-				{xshift=-System->ProcInfo.Box.lx; do_shift=true;}
-			else if((mx==(OMD_INT)System->ClusterNX-1)&&(nx==2))
-				{xshift=System->ProcInfo.Box.lx; do_shift=true;}
-			else xshift=0.0;
-
-			if(my==0&&ny==0)
-				{yshift=-System->ProcInfo.Box.ly;do_shift=true;}
-			else if((my==(OMD_INT)System->ClusterNY-1)&&(ny==2))
-				{yshift=System->ProcInfo.Box.ly;do_shift=true;}
-			else yshift=0.0;
-
-			if(mz==0&&nz==0)
-				{zshift=-System->ProcInfo.Box.lz;do_shift=true;}
-			else if((mz==(OMD_INT)System->ClusterNZ-1)&&(nz==2))
-				{zshift=System->ProcInfo.Box.lz;do_shift=true;}
-			else zshift=0.0;
-
-		}
-
-		if(do_shift){
+		
+		if(CheckCellShift(b,xshift,yshift,zshift)) {
 			for(OMD_INT c=0;c<RecvNumber[b];c++){
 				SpaceRecvBuffer[b][c].x+=xshift;
 				SpaceRecvBuffer[b][c].y+=yshift;
 				SpaceRecvBuffer[b][c].z+=zshift;
 			}
 		}
-
+		
 		PackageSpace* X=SpaceRecvBuffer[b];
 		System->AtomStorage.Expand(newna+RecvNumber[b]);
-
+		
 		for(OMD_INT c=0;c<RecvNumber[b];c++) {
 			Atom* A=System->AtomPtr(c+newna);
 			A->id=X->id;
@@ -307,10 +314,9 @@ void CommunicationHandler::UnpackSpace() {
 			A->vz=X->vz;
 			X++;
 		}
-
+		
 		newna+=RecvNumber[b];
 	}
-
 }
 
 void CommunicationHandler::UnpackForce() {
