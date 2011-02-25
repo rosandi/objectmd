@@ -1,0 +1,3 @@
+on single processor mode SIGINT and SIGTERM can be used without problem.
+on multi processor mode (MPI), the mpi library blocks these two signals.
+SIGUSR1/SIGUSR2 must be used in this case.

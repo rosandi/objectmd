@@ -1,0 +1,11 @@
+element Platinum
+mass 195.078
+number 78
+structure fcc
+lattice_constant 3.924
+debye_temperature 240
+
+potential.eam platinum
+potential.pair pt.lj
+potential.argon.pair ar-pt.zbl
+potential.xenon.pair xe-pt.zbl

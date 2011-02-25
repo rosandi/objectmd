@@ -1,0 +1,272 @@
+###############EXPLAINS: FUNCTION TABLE FORMAT##############
+
+/**
+@page functable The Object-MD Table Format
+
+One of important classes in Object-MD is the TableReader.
+Using this class one can input any function as a table to
+an MD simulation. The table reader is essential for splining
+potential classes (TForceEAM, TForcePair).
+
+TableReader takes values from a table file, and provides
+the values at arbitrary points in a specified range, using
+the cubic-spline algorithm. This allows, for instance, the 
+fast calculation of any complicated functions, like the 
+interaction force between atoms.
+
+An Object-MD table consists a set of information, written as
+pseudo-comments, and the stream of numeric data. The pseudo-comments
+are shown in the following table snapshot:
+
+@code
+#$ NumberOfData 1000
+#$ OutOfRangeLower 0.0
+#$ OutOfRangeUpper 0.0
+#$ Format PLAIN
+#$ Spacing 50
+#$ Offset 300
+#$ --
+0.23659
+0.27706
+0.31815
+0.36005
+...
+@endcode
+
+  - NumberOfData, (obligatory), defines the number of data points in the table.
+  - OutOfRangeLower, OutOfRangeUpper, (optional), defines the values at
+    points outside the range.
+  - Format (optional, default=PLAIN), the format of the table. Two types are
+    possible; PLAIN -- the data is plain values, and MULTR -- the values are
+    multiplied by r (the abcissa). The second type is similar to the SETFL
+    pair potential table.
+  - Spacing (obligatory), the spacing value (dr) of the abcissa.
+  - Offset (optional, default=0), the starting value of the abcissa.
+
+The stream of data starts after the "#$ --" comment.
+Only the ordinate values are given in file, while the abcissa is defined
+by "Spacing" and "Offset". Before this pseudo-comment, any character will be ignored.
+This makes it posible to put alot of text information together with the table.
+There must be one space between "$" and "--". 
+Double-dash is the end mark of a set of pseudo-comment (see ParamHandler).
+
+We may combine many of tables in one file. In this case the pseudo-comments of
+the corresponding table must start with "#$NAME", where "NAME" states the name of
+the table. The following is an example of eam potential table, combined with
+several additional information:
+
+@code
+##################################
+# Tight-binding eam potential
+# Thomas J. Colla style
+#
+# (c)Rosandi, 2007
+#
+element Platinum
+mass 195.078
+number 78
+structure fcc
+lattice_constant 3.924
+debye_temperature 240
+--
+#$PAIR NumberOfData 5000
+#$PAIR Spacing 1.020240000000000e-03
+#$PAIR Offset 1.020240000000000e-03
+#$PAIR Format RMULT
+#$PAIR --
+8.640222045459150e+04
+8.521789849805910e+04
+...
+
+#$EDENS NumberOfData 5000
+#$EDENS eldens Spacing 1.020240000000000e-03
+#$EDENS Offset 1.020240000000000e-03
+#$EDENS Format RMULT
+#$EDENS --
+1.870527591527857e+01
+3.730237702917162e+01
+...
+
+#$EMBED NumberOfData 5000
+#$EMBED Spacing 3.666838374358694e+00
+#$EMBED Offset 3.666838374358694e+00
+#$EMBED Format RMULT
+#$EMBED --
+-7.021625322117282e+00
+-1.986015552088123e+01
+...
+@endcode
+
+The first table is the pair-wise contribution "#$PAIR", the electron density
+"#$EDENS", and the last is the embedding energy table "#$EMBED". The position
+of a table in a file doesn't matter. TableReader will scan the data
+according to the defined table name in the second parameter passed to
+TableReader::open() function. This type of potential can be used in the simulation
+using TForceEAM class,
+
+@code
+...
+void CreateGadget() {
+...
+	AddForce(new TForceEAM("platinum"));
+...
+}
+...
+@endcode
+
+The table file must reside in the current directory or under the directory
+$OMD_TABLE. The file name must be "eam.platinum". For pair potential only one
+table is in the file (see the table snapshot above). The table data is the
+spline points as a function of distance r.
+
+In this example we put other information on the top of the file.
+Lines starting with hash "#" is normal comments. The text outside comments
+can be read by ParamHandler as values. The following code segment is a way
+to take these values:
+
+@code
+...
+ParamHandler p("eam.platinum");
+double lc=p.double_value("lattice_constant");
+...
+@endcode
+
+This code will take the parameter "lattice_constant" (3.924), from the file.
+Assume the file name is "eam.platinum", and it resides in the current
+directory.
+
+\section setfl Converting a SETFL potential table
+
+Converting SETFL eam table to OMD table is straight forward. We only need
+to read parameters from SETFL data stream, and write them in
+the proper way in OMD format. The following awk script does this job.
+Note that the script takes potential file from lammps format. To convert
+the original DYNAMO table, you need to substitute all fortran's floating
+point exponent "D" to C style "e".
+
+@code
+#!/usr/bin/awk -f
+# converts single typed setfl file to omd table
+BEGIN{n=0}
+NR<5{print "#",$0;next}
+NR==5{nrho=$1;drho=$2;nr=$3;dr=$4;rcut=$5;print "#",$0;next}
+NR==6{nelem=$1;melem=$2;lc=$3;$stru=$4;print "#",$0;next}
+NR==7{
+	print "#$EMBED NumberOfData",nrho
+	print "#$EMBED Spacing", drho
+	print "#$EMBED Offset 0.0"
+	print "#$EMBED Format PLAIN"
+	print "#$EMBED --"
+}
+n==nrho{
+	print "#$EDENS NumberOfData",nr
+	print "#$EDENS Spacing", dr
+	print "#$EDENS Offset 0.0"
+	print "#$EDENS Format PLAIN"
+	print "#$EDENS --"
+}
+n==(2*nrho){
+	print "#$PAIR NumberOfData",nr
+	print "#$PAIR Spacing", dr
+	print "#$PAIR Offset 0.0"
+	print "#$PAIR Format RMULT"
+	print "#$PAIR --"
+}
+{for(i=1;i<=NF;i++){print $i;n++}}
+@endcode
+
+The other DYNAMO format (FUNCL) can be treated in the same manner. After convertion
+the table can be used as a normal 
+
+@section tablenaming Table naming convention
+
+The OMD tables are store below the $OMD_TABLE directory ($OMD_HOME/tables).
+All types of table are stored in the same directory. The type is defined
+by the filename prefix, as follow:
+
+  - "def.", the material properties definition table
+  - "eam.", the eam potential table
+  - "pair.", the pair potential table
+
+A table name takes the name of the material. Example; def.argon -- the material
+properties or Argon, etc. Names are in lower case. An atom container (AtomContainer)
+will read the material properties by adding "def." prefix the the given name.
+The user application must not pass the complete filename as the constructor
+parameter.
+
+This works the same for table splining potential classes (TForceEAM, TForcePair).
+Only the filename without prefix is required. There are addition conventions for
+potential table naming. The name format is:
+
+@code
+pottype.element[-element][.potname]
+@endcode
+
+The text in square brackets is means optional.
+
+  - element, element name, periodic table, may be a full name or the abreviation.
+  - pottype, the potential type. Currently: eam -- embedded atom method,
+    pair -- pair potential.
+  - potname, name of the potential (optional, only for identification), i.e. lj, zbl, etc
+
+Example: 
+
+  - eam.platinum, pair.argon.lj
+  - interaction between two atom type: pair.ar-pt.zbl
+
+The full name is needed when the table is directly read by TableReader or ParamHandler.
+
+@section createpot Creating potential table
+
+By understanding the table format, a potential table can be easily generated.
+Any calculating tools can be used for this purpose, as log as we know the
+for of function to create. For example, we will create a Lennard-Jones
+pair potential table using gnuplot and a small conversion script. Consider the
+naming convention above.
+
+The following is the gnuplot script to plot Lennard-Jones (LJ) potential. Using
+TForcePair, we must work in atomic MKS unit. Using splining table the reduced unit,
+that usually used traditional MD simulation of LJ system, is not needed.
+
+@code
+#!/usr/bin/gnuplot
+print "# Argon Lennard-Jones potential"
+print "#$ Format SETFL"
+pi=3.141592653589793
+eps=0.010322
+sig=3.404
+rcut=2.5*sig
+td=1.0
+trad=rcut-2.*td
+tf=pi/(2.*td)
+tp=pi*(td-rcut)/(2.*td)
+lj(x)=x*4.0*eps*((sig/x)**12.-(sig/x)**6.)
+tr(x)=(0.5-0.5*sin(tf*x+tp))
+set xrange [0:rcut]
+set table
+set format y "%.15e"
+set format x "%.15e"
+set sample 1000
+p (x<trad)?lj(x):lj(x)*tr(x)
+@endcode
+
+The script will print the 1000 data to stdout, in x y format. The potential is smoothed to zero
+at cut-off using Tersoff function, and the data is in RMULT format.
+We can feed the output of this gnuplot script to the following conversion script:
+
+@code
+#!/bin/bash
+NDATA=1000
+awk '/^$/{next}/#/{next}{print}' $1 > tab-$$
+OD=($(awk 'NR==1{ofs=x=$1;next}{dx+=$1-x;x=$1;n++}END{print ofs,dx/n}' tab-$$))
+awk 'BEGIN{
+print "#$ NumberOfData '$NDATA'\n#$ Spacing '${OD[1]}'"   
+print "#$ Offset '${OD[0]}'\n#$ Format RMULT\n#$ --"}
+{print $2}' tab-$$
+rm tab-$$
+@endcode
+
+These scripts dump the data to stdout. We have to redirect the output to a final
+table file.
+
+**/

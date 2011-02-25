@@ -1,0 +1,27 @@
+#!/bin/bash
+################################################
+#
+#  ObjectMD tool
+#  (c) Rosandi
+#
+# converts gnuplot generated table to omd-table
+# use setfl format!!! v(x)-> v(x)*x
+#
+
+
+echo "warning! check that the input table is SETFL!" >&2
+
+NDATA=1000
+awk '/^$/{next}/#/{next}{print}' $1 > tab-$$
+
+#(offset dr)
+OD=($(awk 'NR==1{ofs=x=$1;next}{dx+=$1-x;x=$1;n++}END{print ofs,dx/n}' tab-$$))
+
+awk 'BEGIN{
+	print "#$ NumberOfData '$NDATA'"
+	print "#$ Spacing '${OD[1]}'"
+	print "#$ Offset '${OD[0]}'"
+	print "#$ Format RMULT\n#$ --"
+}{print $2}' tab-$$
+
+rm tab-$$

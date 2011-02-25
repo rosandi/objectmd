@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo crystal @0K
+./lop -rcut 5.8 -lc 4.04527 -i 0K.cry -o 0K.lop
+awk '/#/{next}{s+=$4;n++}END{print "average local-order",s/n}' 0K.lop
+
+echo crystal @300K
+./lop -rcut 5.8 -lc 4.04527 -i 300K.cry -o 300K.lop
+awk '/#/{next}{s+=$4;n++}END{print "average local-order",s/n}' 300K.lop

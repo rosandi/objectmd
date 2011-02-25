@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cat << endt > machine
+$(hostname)
+$(hostname)
+$(hostname)
+$(hostname)
+endt
+
+mpirun -machinefile machine -np 4 sigact $@

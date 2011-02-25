@@ -1,0 +1,79 @@
+
+###################EXPLAINS: CREATING GADGETS####################
+
+  - The iterator, implements the iteration algorithm through all atoms.
+
+/**
+
+@page gadget Creating Simulation Gadgets
+
+In Object-MD, the function of a simulation is built by arranging gadgets. A gadget
+is a class having specific functions. There are four types of gadget:
+
+  - The integrator (MDIntegrator), implements the integration of equation of motion.
+  - The force kernel (ForceKernel), does the force calculation between two interacting
+    atoms.
+  - The conditioner (Conditioner), manipulates atom data in some check points in the
+    integration loop.
+  - The detector (Detector), does detection algorithm.
+
+MDIntegrator is a ready to use class, implements the Verlet integrator algorithm.
+The ForceKernel class is an abstract class, which needs to be reimplemented. The 
+usable implementations are TForceEAM and TForcePair, the eam and pair potential.
+Both are table splining potentials.
+
+Gadgets are created inside the function MDSystem::CreateGadget(). Four special commands 
+are provided regarding the types of the gadget:
+
+  - SetIntegrator()
+  - AddForce()
+  - AddConditioner()
+  - AddDetector()
+
+All functions return the reference to the added entity. A sort of conditioners and
+detectors are put inside the "include/class" directory ($OMD_CLASS). An application
+must include the corresponding header file in order to add it to the system.
+Example:
+
+@code
+#include <omd/team.hpp>
+#include <class/NeighborCell.hpp>
+#include <class/SysMonitor.hpp>
+#include <class/TempPressDetector.hpp>
+
+...
+void CreateGadget() {
+    SetIntegrator(new MDIntegrator(1e-3));
+    AddForce(new TForceEAM("platinum"));
+    AddConditioner(new NeighborCell);		
+    AddDetector(new SysMonitor("md.out"));
+    AddDetector(new TempPressDetector(0.1,"Data"));
+}
+@endcode
+
+In this example we use the Verlet integrator (MDIntegrator), the eam table splining force (TForceEAM), 
+the neighbor cell iterator (NeighborCell), and two detectors, a system monitor (SysMonitor) and
+a temperature/pressure detector (TempPressDetector).
+
+There is one special conditioner class, the iterator (MDIterator).
+This class performs iteration of pair interaction through all atoms
+in the system, described by the following equation:
+
+\f[
+U = \sum_i^{N-1}\sum_{i<j}^{N} V_{i,j}
+\f]
+
+where @f$V@f$ is an arbitrary interaction function between atom pair @f$(i, j)@f$.
+Although each pair interaction is visited only once inside the algorithm, 
+double counting is not always taken care. For example, in potential calculation, 
+both of the interacting particles store the same information in every visit.
+This means the value after the iteration is twice of the actual one. The caller
+must halve the value (see MDSystem::MeasurePotential()). The default iterator
+will be created by MDSystem if none is inserted in an application program.
+
+MDSystem also adds a default integrator if none is specified using SetIntegrator()
+function. In NORMAL_MODE and RESTART_MODE the default is the Verlet integrator. 
+In STATIC_MODE, the dummy integrator will be assign as default. In this mode no
+force is required when no real integrator is given to the system.
+
+**/ 

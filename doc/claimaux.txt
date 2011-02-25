@@ -1,0 +1,57 @@
+#######################EXPLAINS: CLAIMING AUX VARIABLE AND FLAG BIT################
+
+/**
+
+@page claimaux Claiming Aux Variable and Flag Bit in Gadgets
+
+@section auxvar  Aux Variable
+
+A gadget can claim an aux variable from the atom structure. The number of aux variables is
+defined in hard wired way on the compilation time, by MAXAUXVAR in file base.hpp. 
+When claiming a variable, the gadget is given an index to one element of aux array of type double. 
+In the parallel OMD, all the auxes are transferred along with the atom information between
+processors.
+
+MDGadget own a method called: ClaimAuxVariable(), that returns the index of a variable in the
+aux array. Later on, a claiming gadget may use the variable by this index, like the
+following segment of code:
+
+@code
+	void Init() {
+		...
+		myaux=ClaimAuxVariable();
+		...
+	}
+@endcode
+
+Claiming aux variables should be performed in the initialization stage (in Init() function).
+The aux index may be transferred between gadgets to share the values. Nevertheless, one
+aux can only be claimed by one gadget.
+
+An aux variable has two types:
+  - printable, this aux is included in data file created by DumpData() as a field.
+  - non printable.
+
+When an aux is printable, it must be claimed using the following declaration of the claiming
+function:
+
+@code
+	int ClaimAuxVariable(bool printable, const char* tag, const char* sformat)
+@endcode
+
+The first parameter is the type (true=printable, false=non prontable), the second is the
+tag for field information in data file, and the last is the format used to print the value.
+The sformat parameter is optional. By default the value is printed using "%0.5e" format.
+
+See, for example, TempPressDetector.hpp for the usage.
+
+@section bitflag Bit Flag
+
+The atom structure has a bit flag to stor the status of an atom. It is of the unsigned integer 
+type. The first three bits are claimed by the MDSystem, and the rest are reserved of the 
+gadgets. To claim a bit a gadget must invoke ClaimFlagBit() function. This function return the
+bit mask of the claimed flag, so it can be used using CheckFlag() function, or simply
+using the bit-wise "and" (&) and "or" (|) operator. See, for example, ForceStopper.hpp for the
+usage.
+
+**/

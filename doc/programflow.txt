@@ -1,0 +1,102 @@
+################## EXPLAINS: THE OBJECT-MD PROGRAM FLOW ######################
+
+/**
+@page programflow The Object-MD Program Flow
+
+The flow of program is controlled by the simulation manager MDSystem.
+The main program loop is implemented in the MDSystem::Run() function. The
+function returns the status of execution process.
+The application main function must call Run(), as in the code segment below:
+
+@code
+// the main class
+class MyMDClass: public MDSystem {
+...
+};
+
+int main() {
+    MyMDClass TheSim; //<--- the main class instance
+    return TheSim.Run(); //<-- running the simulation
+}
+@endcode
+
+The following function is the kernel executed in the program loop
+until the simulation finish condition reached. The condition is checked 
+in MDSystem::CheckRun(). 
+
+@code
+void MDSystem::RunKernel() {
+	while(CheckRun()) {
+		Scheduller();
+		ExecuteConditioners(COND_PRE_INTEGRATION);
+		Integrator->Integrate();
+		InlineFunction();
+		MeasurePotential();
+		MeasureKinetic();
+		Energy=Kinetic+Potential-BasePotential;
+		ExecuteConditioners(COND_POST_INTEGRATION);
+		ExecuteDetectors();
+		CheckBoundary();
+		PrintMessages(std::cout);
+		ElapsedTime+=Integrator->TimeStep;
+		Step++;
+		CheckInterruption();
+	}
+}
+@endcode
+
+The function above is clear, shows the processes carried out in the program loop.
+One must notice the "check points" where the conditioners and detectors are executed.
+Conditioners have many check points correspond to their type.
+Here there are two, the pre-integration and the post-integration. The other two types
+are executed by the integrator (pre-calculation and force-modifier), in
+MDIntegrator::Iterate() function, via the function call Iterator->Integrate().
+
+By default, the loop will terminate in two conditions; the maximum simulation reached,
+or the interrupt signal accepted. The condition may be altered by reimplementing the
+CheckRun() function in the main class.
+
+@section printmsg The Message Slots
+
+To print information to the screen MDSystem uses the the data slots (DataSlot). Every
+gadgets may register a data to be printed. The type of data can be
+integer, double, or string. The function PrintMessages() will print all the registered
+slots every step. To register a variable a gadget must call RegisterMessageSlot(),
+function on the initialization stage, in Init() function. 
+The function takes a pointer to data slot as its parameter and returns the reference to
+the slot.
+
+Usage in Init():
+
+@code
+RegisterMessageSlot(new DataSlot("temp"))
+	->SetFormat("%0.3E")->SetData(system_temperature);
+@endcode
+
+See for example TempPressDetector.hpp.
+
+@section interrupt Checking Interruption Signal
+
+Object-MD is able to catch system interruption while the simulation loop is running.
+Four interrupt signals are handled, and have default action as followings:
+  - TERM, INT, USR1, save the simulation to omd binary and terminate.
+  - USR2, save simulation and continue.
+
+The saved simulation file can be used later using RESTART_MODE.
+The handler actions can be altered by reimplementing OnInterruptXXX, where XXX is replaced
+by the name of signal.
+
+To activate signal handling, an application program must enable it by calling AcceptSignal()
+function. This should be done in the SystemSetting(), in user implementation. 
+The only parameter is the signal number, or the name as defined in
+"signal.h".
+
+Note on parallel version of Object-MD (MDSystemGrid), the usage of TERM and INT signal is not
+applicable since the signal may be blocked by the message passing library (MPI). USR signal
+should be used instead, and send the signal via "kill" command.
+
+Object-MD saves the accepted signal in a variable, and handles it on the tail of the loop
+(CheckInterruption). If the program must continue after handling, the interrupt flag 
+(InterruptFlag) must be reset to zero. For USR2, the flag is always reset, so the program continues.
+
+**/

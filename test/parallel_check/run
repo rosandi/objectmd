@@ -1,0 +1,9 @@
+
+NP=4
+#[[ -z $NP ]] && NP=1
+#shift
+
+make clean all
+hostname > mach
+for ((i=1;i<NP;i++)); do hostname >> mach; done
+$OMD_MPI/bin/mpiexec -machinefile mach -np $NP small $@

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+awk '/#/{print;next}{print $1,$2,$3,$6}' $1
+

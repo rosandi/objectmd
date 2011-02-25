@@ -1,0 +1,21 @@
+POTENTIAL:
+
+table naming convension:
+
+pottype.element[-element][.potname]
+
+square bracket: optional
+
+'element' = element name, periodic table, etc.
+'pottype' = currently, 
+   eam: embedded atom method class
+   pair: pair interaction
+'potname' = name of the potential (optional, only for identification), i.e. lj, zbl, etc
+
+element can be full name, i.e. eam.platinum or eam.pt
+example for two elements: pair.ar-pt.zbl, pair.argon.lj
+
+
+ELEMENT DEFINITION:
+
+def.element

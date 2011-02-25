@@ -1,0 +1,60 @@
+
+################EXPLAINS: HOW TO CREATE CONDITIONER###############
+
+/**
+
+@page conditioner Creating Conditioner
+
+To create a conditioner we must inherit from one of conditioner
+class. See the check points of conditioner calls in @link programflow@endlink.
+The base class of a conditioner can be:
+
+  - Conditioner, the root of all conditioners
+  - PreIntegration(), called before system integration. 
+  - PreCalculation(), called by the integrator class before the force 
+    calculation loop.
+  - ForceModifier(), called by the integrator after the force 
+    calculation loop.
+  - PostIntegration(), called after the integration, before 
+    executing Detectors.
+  - Other descendant of any conditioners.
+
+The following is the example, the Quencher that reduces the velocity
+of atoms to quence the system on some period of time:
+
+@code
+class Quencher:public Post_Conditioner {
+protected:
+	int Period, Step;
+	double Factor;
+	
+public:
+	Quencher(double QFactor, int per, string target) {
+		TargetName=target;
+		Factor=QFactor;
+		Period=per; 
+		Step=0;
+		set_name("Quencher");
+	}
+	
+	void PostIntegration() {
+		if (Step>=Period) {
+			Step=0;
+			int na=GetNAtom();
+			for (int i=0; i<na; i++) {
+				Atoms(i).vx*=Factor;
+				Atoms(i).vy*=Factor;
+				Atoms(i).vz*=Factor;
+		 	}
+	 	} 
+	 	Step++;
+	}
+};
+@endcode
+
+In this example, the conditioner will be executed every step after integration.
+All MDGadget childs refer to the atoms of the target container. If nothing is
+specified on the TargetName variable before initialization, then the target
+is set to the system (all atoms). This happens when TargetName is set empty ("").
+
+**/

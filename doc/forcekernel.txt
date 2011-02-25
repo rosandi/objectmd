@@ -1,0 +1,85 @@
+#################### EXPLAINS: HOW TO IMPLEMENT A FORCE KERNEL ##############
+
+/**
+@page forcekernel The Force Kernel: How To Implement
+
+Force kernel plays a central function of a molecular dynamics simulation.
+Object-MD uses a so called force kernel to model the interaction between
+particles. The class ForceKernel implements the pair style function 
+declaration between two refered atoms. This class takes care only the
+calculation of force of two atoms.
+
+The function that is abligatory to be implemented is the Compute() function.
+It is reserved for the potential and force computation function.
+
+@code
+void ForceKernel::Compute(Atom &at, Atom &to);
+@endcode
+
+The function takes two parameters, the reference to the interaction
+particles. At the end of a calculation, the function must call the
+ForceKernel::ReturnForce() function.
+
+@code
+void ForceKernel::ReturnForce(Atom &at, Atom &to,
+                              double dx, double dy, double dz,
+                              double fr, double pot)
+@endcode
+
+There are seven variables to return: the reference to atoms (at, to),
+the distance elements, (dx, dy, dz), the force (fr, in force/distance),
+and the potential (pot). The potential is returned twice the value due
+to the iterator's double counting. This actually depends on the
+implementation, but MDSystem assumes the double counting effect on
+potential is not taken care by the iterator or integrator. 
+One may implement the interaction potential by inheriting ForceKernel, 
+which is straight forward. Nevertheless, the usage of
+@link functable table potential@endlink is recomended for pair and eam class
+of potentials.
+
+Example: Lennard-Jones
+
+@code
+class LJKernel: public ForceKernel {
+public:
+
+	LJKernel(double r_cut) {
+		set_name("Lennard-Jones");
+		CutRadius=r_cut;
+	}
+
+	void Compute(Atom &at, Atom &to) {
+		double dx, dy, dz;
+		double r = sqrt(CalcSqrDistance(at, to, dx, dy, dz));
+		if (r<CutRadius) {
+			double rp2 = 1.0/(r*r);
+			double rp6 = rp2*rp2*rp2;
+			double rp12= rp6*rp6;
+			double pot = rp12-rp6;
+			double ff  = rp2*(rp12+rp12-rp6);
+			ReturnForce(at,to,dx,dy,dz,ff,pot);
+		}
+	}
+
+	void Correction() {
+		MDSystem->Potential*=(4.0);
+		MDSystem->Kinetic*=(24.0);
+	}
+
+};
+@endcode
+
+This example calculates force in a reduced unit. The Correction() function is reserved 
+for correcting the calculation after the force loop, if needed. By default this function 
+does nothing.
+
+The loop of force calculation is done using an iterator (MDIterator). An iterator is
+a conditioner class which provides the iteration algorithm. The very basic algorithm is
+the nested for loop, which is implemented by default in MDIterator. For a large system
+a special algorithm is needed, for example the neighbor list implemented in
+NeighborCell class. The iteration of force loop is invoked by MDIntegrator::Iterate().
+Other gadget can use the iterator in the same way. A gadget can act as the so called
+iterated class by implementing MDGadget::IterationNode() and/or MDGadget::PreIterationNode()
+function.
+
+**/

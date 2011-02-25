@@ -1,0 +1,7 @@
+element Argon
+mass 39.948
+number 18
+structure fcc
+lattice_constant 5.31
+debye_temperature 92
+potential.pair argon.lj

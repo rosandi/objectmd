@@ -1,0 +1,106 @@
+#######################EXPLAINS: PARALLEL OMD################
+
+/**
+
+@page parallel On Parallel Object-MD
+
+Parallel version of Object-MD is implemented by MDSystemGrid class.
+To an application program this class has an identical function to its serial 
+counterpart MDSystem. The class works both using single processor and
+multi processor, but in contrast to MDSystem it utilizes a communication
+handler, CommunicationHandler. The system creation is handled differently.
+Only the root process creates the complete simulation atoms by calling the
+CreateSystem() function. The root distributes the atoms to all processors
+by generating a binary file in BinDirectory (pomd). Later on, every processor
+reads the atoms assigned for it from this directory, including the root it self.
+This also means all assignment takes place in CreateSystem() function will
+apply only to the root processor.
+
+The root is also responsible to arrange the processors to the processor neighbor
+list, named the rubik (NeigRubix). To every processor is given a matrix of its neighbor, consisting 26 elements,
+arranged by geometrical coordinates of the neighbors. The rubik matrix is
+arranged in three slabs; top, middle, and bottom slabs.
+
+Grid rubik arrangement, inside the rectangular bracket is the index:
+@code
+top:
+        n
+   [24][25][26]
+ w [21][22][23] e
+   [18][19][20]
+        s
+ 
+middle:
+        n
+   [15][16][17]
+ w [12][13][14] e
+   [09][10][11]
+        s
+ 
+bottom:
+        n
+   [06][07][08]
+ w [03][04][05] e
+   [00][01][02]
+        s
+@endcode
+
+n, s, e, w stands for north, south, east, and west, respectively.
+The element number 13 is the "SELF" processor. If there is no neighboring processor,
+i.e. in non periodic case, a negative value is set to the element.
+
+MDSystemGrid requires the main program arguments (argc, argv). These arguments
+can be passed to the constructor or explicitly calling SetArgument() function in the
+application program.
+
+@section communicator The communicator
+
+A communicator plays a central role in the parallel version. The communicator is
+a special conditioner (CommunicationHandler), which has type pre-integration and
+force-modifier in the same time. Both conditioner functions are used to synchronize 
+the particle data between processors.
+
+A parallel compliant gadget can be created by using double inheritance of
+the gadget class and a special ParallelGadget class. The new gadget class
+inherites the properties and methods to perform communication between
+processor. Before this capabilities is available, the ParallelGadget::Init()
+must be called in its Init() function. Fail to do so will cause strange run
+time behaviour. The following is an example:
+
+@code
+class NewParallelDetector:: public Detector, public ParallelGadget {
+  ...
+
+  void Init(MDSystem *WorkSys) {
+    Detector::Init(WorkSys);
+    ParallelGadget::Init(WorkSys);
+    ...
+
+  }
+
+...
+};
+@endcode
+
+See the methods of ParallelGadget for the list of available functions. For
+further example see ThermoDetector, SysMonitor and RestartSaver.
+
+@section restartvar The restart variable
+
+When the SaveSimulation() function is invoked, all the important variables are
+stored to the omd binary file. The file is used to continue the simulation
+from the point it was saved. This functionality is enabled by the LoadSimulation()
+function.
+
+In the parallel version, only the root process loads the variables. Then, they
+are synchronized in the MDSystemGrid::CreationFunction(). When a gadget needs
+to save a variable, it must register it as a restart variable, using RestartVariable()
+function. The function accepts the name and variable to be saved. 
+The data may be of type integer of double which is fed to a DataSlot. MDGadget will
+scan the variable by its name on program initialization. So, it is necessary to
+give a unique name. The variable is not only registered for saving, but it is also
+loaded by the saved value on RESTART_MODE. A restart variable is saved in string form, 
+so it may lose its precission. For example, see the initialization function of 
+DataDumper class.
+
+**/

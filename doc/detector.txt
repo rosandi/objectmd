@@ -1,0 +1,44 @@
+#####################EXPLAINS: HOW TO CREATE DETECTOR###############
+
+/**
+
+@page detector Creating Detector
+
+The same with a conditioner, a detector can also be created as a descendant
+of another detectors. The function that need to be inherited is the Measure()
+function, where the measurement takes place. The period a detector do the
+measurement is defined by the sampling time (TSample). If the variable
+is not set, the default sampling time is every step of simulation loop.
+See the Detector class for clarity. The following is on example of
+detector:
+
+@code
+class TrajectoryWatcher: public Detector {
+	ofstream fl;
+	int idx;
+public:
+
+	TrajectoryWatcher(int index, string fname) {
+		idx=index;
+		fl.open(fname.c_str(), ios::trunc);
+		assert(fl.good(), "can not open file for reading "+fname);
+	}
+
+	~TrajectoryWatcher() {fl.close();}
+
+	void Measure() {
+		fl	<< Atoms(idx).x << " " << Atoms(idx).y << " "Atoms(idx).z << " "
+			<< Atoms(idx).vx << " " << Atoms(idx).vy << " "Atoms(idx).vz << "\n";
+	}
+
+};
+@endcode
+
+This example is the detector that writes out the position and velocity of an atom
+in the system to a file to watch the trajectory. The true implementation of 
+trajectory watcher can be read in the TrajectoryWatcher class implementation.
+
+Note that detectors are called at the tail of the simulation loop, where all the 
+conditioners and the system energies have been calculated.
+
+**/

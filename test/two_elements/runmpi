@@ -1,0 +1,15 @@
+#!/bin/bash
+
+make clean
+cat << endt > machine
+$(hostname)
+$(hostname)
+$(hostname)
+$(hostname)
+endt
+
+EXE=two
+
+make &&
+#nohup mpirun -machinefile machine -np 2 $EXE $@ 2>err &
+mpirun -machinefile machine -np 4 $EXE

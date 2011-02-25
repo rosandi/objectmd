@@ -1,0 +1,8 @@
+element Aluminum
+mass 26.98154
+number 13
+structure fcc
+lattice_constant 4.04527
+debye_temperature 428
+potential eam.aluminum
+volume 16.387

@@ -1,0 +1,33 @@
+#!/usr/bin/awk -f
+# converts single type setfl file to omd table
+BEGIN{n=0}
+NR<5{print "#",$0;next}
+NR==5{nrho=$1;drho=$2;nr=$3;dr=$4;rcut=$5;print "#",$0;next}
+NR==6{nelem=$1;melem=$2;lc=$3;$stru=$4;print "#",$0;next}
+# FIXME! substitute D+ /d+ to e+ here
+NR==7{
+	print "#$EMBED NumberOfData",nrho
+	print "#$EMBED Spacing", drho
+	print "#$EMBED Offset 0.0"
+	print "#$EMBED Format PLAIN"
+	print "#$EMBED --"
+}
+n==nrho{
+	print "#$EDENS NumberOfData",nr
+	print "#$EDENS Spacing", dr
+	print "#$EDENS Offset 0.0"
+	print "#$EDENS Format PLAIN"
+	print "#$EDENS --"
+}
+
+n==(2*nrho){
+	print "#$PAIR NumberOfData",nr
+	print "#$PAIR Spacing", dr
+	print "#$PAIR Offset 0.0"
+	print "#$PAIR Format RMULT"
+	print "#$PAIR --"
+}
+
+{
+	for(i=1;i<=NF;i++){print $i;n++}
+}

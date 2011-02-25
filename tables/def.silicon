@@ -1,0 +1,8 @@
+element Silicon
+mass 28.0855
+number 14
+structure diamon
+lattice_constant 5.43095
+debye_temperature 645
+melting_point 1680
+potential tersoff.silicon

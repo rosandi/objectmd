@@ -1,0 +1,7 @@
+load_crystal 10x10x10
+monitor.filename si.out
+#temperature 0
+maxtime 5
+tersoff.material silicon
+tersoff.zbl no
+thermo.sample 0.1

@@ -1,0 +1,81 @@
+#ifndef _TRAJECTORY_WATCHER_HPP_
+#define _TRAJECTORY_WATCHER_HPP_
+
+#include <cstring>
+#include <omd/detector.hpp>
+#include <omd/paragadget.hpp>
+
+/**
+ * @ingroup detector
+ * @brief Watches one atom trajectory
+ */
+
+class TrajectoryWatcher: public Detector, public ParallelGadget {
+
+	ofstream fl;
+	string filename;
+	OMD_INT xid;
+	OMD_INT watchflag;
+	OMD_CHAR st[256];
+	
+	public:
+		
+		TrajectoryWatcher(string TargetAtom, string fname) {
+			TargetName=TargetAtom; xid=-1; filename=fname;
+		}
+
+		TrajectoryWatcher(OMD_INT x_id, string fname) {
+			xid=x_id; filename=fname;
+		}
+		
+		~TrajectoryWatcher() {fl.close();}
+
+		void Init(MDSystem* WorkSys) {
+			Detector::Init(WorkSys);
+			ParallelGadget::Init(WorkSys);
+			
+			if(GetRank()==0)
+				fl.open(filename.c_str(), ios::trunc);
+			else
+				fl.open(filename.c_str(), ios::app);
+			
+			assert(fl.good(), "can not open file for reading "+filename);
+	
+			// only one atom!
+			watchflag=ClaimFlagBit();
+			
+			if(GetNAtom()) {
+				if(xid>=0) {
+					for(OMD_INT i=0; i<GetNAtom(); i++)
+						if(Atoms(i).xid==xid){SetFlag(i, watchflag);break;}
+				} else {SetFlag(0, watchflag);}
+			}
+
+		}
+
+		void Measure() {
+			// may be the container is empty.....
+			OMD_INT na=GetNAtom();
+			OMD_INT idx=0;
+
+			if(na>1) {
+				for(OMD_INT i=0;i<na;i++) if(CheckFlag(i, watchflag)){idx=i;break;}
+			}
+
+			if(na){
+				Atom* a=AtomPtr(idx);
+				if((a->flag&watchflag)&&(a->flag&FLAG_ACTIVE)){					
+					sprintf(st, "%0.8f %0.8f %0.8f %0.8f %0.8f %0.8f %0.8f\n",
+							System->ElapsedTime, a->x, a->y, a->z, a->vx, a->vy, a->vz);
+					fl << st; fl.flush();
+				}
+			}
+		}
+		
+		virtual void Detect() {
+			Measure();
+		}
+
+};
+
+#endif

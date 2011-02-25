@@ -1,0 +1,56 @@
+###############EXPLAINS: SIMULATION SETTINGS###################
+
+/**
+
+@page simsetting The Simulation Settings
+
+The settings of an MD simulation take place inside MDSystem::SystemSetting()
+function. This is an abstract function, that must be implemented
+in the user application. The application can set some variables,
+such as the maximum simulation time, MaxTime (obligatory), the boundary setting
+(periodic, non-periodic), the border offset in periodic boundary condition, etc. 
+Some system variables may also be changed before the simulation is executed 
+(simulation box, name, output directory, writting mode, etc).
+
+Example:
+
+@code
+void SystemSetting() {
+  SetBoundaryCondition(PERIODIC_X|PERIODIC_Y|PERIODIC_Z);
+  SetMaxTime(1.0);
+  BorderOffset(offset);
+  SetWriteMode(WM_FORCE|WM_ID);
+}
+@endcode
+
+In this example we apply full periodic boundary condition, the maximum
+simulation time is 1.0 (normally pico-second), setting the border offset
+with variable offset (some fractions of lattice constant), and the last
+setting the write mode (by DumpAtoms() function) which tells the system
+to write also the forces and atom ids as data fields. Note that the boundary
+and maximum simulation time settings defined in the parameter file has higher
+priority. The setting in this function is ignored if the corresponding
+parameter exist. See the discussion about @link parameter parameters@endlink
+for details.
+
+\section wtd What to do before and after simulation loop?
+
+To perform some processes before and after the simulation loop, an application
+must reimplement the BeforeRun() and AfterRun() function. For example,
+one may dump the system atoms to file, printing system information, simulation
+time, etc. The following is an example,
+
+@code
+void BeforeRun() {
+	PrintInfo(std::cerr); 
+	DumpAtoms("init.data");
+}
+
+void AfterRun() {
+	PrintTime(std::cerr);
+	SaveSimulation();
+}
+@endcode
+
+
+**/

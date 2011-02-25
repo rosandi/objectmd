@@ -1,0 +1,6 @@
+#!/bin/bash
+
+while true; do
+	echo "p 'md.out' u 2:4, 'md.out' u 2:5"
+	sleep 2
+done |gnuplot

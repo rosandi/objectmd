@@ -1,0 +1,154 @@
+#######################EXPLAINS: HOW TO BUILD PROGRAM################
+
+/**
+
+@page build On Building and Executing Object-MD Programs
+
+@section omdreq Library requirements
+
+Object-MD needs only a minimal dependency to external libraries.
+It is designed to be compact. The MPI library is needed only by
+CommunicationHandler when parallel version is used, 
+but by default it is assumed to exist. The basic library should
+compile successfully without it.
+
+The author uses gnu c++ compiler. All posix c++ compilers should work
+fine. Object-MD was designed and developed in Linux environment
+(Debian lenny/etch). Compatibility to other operating system is 
+not considerred. Automake must also be installed in the system.
+To compile the Object-MD library, simply call:
+@code
+make
+@endcode
+or
+@code
+make install
+@endcode
+under
+the source directory, and "make doc" to create documentation. Edit the
+@e config.make file to adjust the compiler settings.
+
+Note: since version 3.0 using MDSystemGrid in every application is
+recomended, also for a serial program.
+
+@section envir Environment variables
+
+For sake of programming and compiling simplicity, some environment
+variables are needed to be defined in the shell. There are many
+ways to set these variables, the author recommends using a special
+omd configuration file, called .omdconf, stored in the home
+directory. The following is the example of the file, containing 
+the needed variables:
+
+$HOME/.omdconf
+@code
+export OMD_HOME=$HOME/omd-x86_64
+export OMD_TABLE=$OMD_HOME/tables
+export OMD_CLASS=$OMD_HOME/include/class
+export OMD_LIBS="-I$HOME/omd-x86_64/include -L$HOME/omd-x86_64/lib -lm -lomd_object-x86_64 -lomd-x86_64"
+export OMD_MPI=$HOME/mpi-x86_64
+export OMD_CXX=$OMD_MPI/bin/mpic++
+@endcode
+
+The file is loaded in login time, by sourcing it in .bashrc or
+.profile file. The following script segment will source the omd
+configuration files. 
+
+@code
+[[ -f ~/.omdconf ]] && . ~/.omdconf
+[[ -f ~/.omdconf-$(uname -m) ]] && . ~/.omdconf-$(uname -m)
+@endcode
+
+The machine specific file (e.g. .omdconf-i386, etc) may be used. 
+The install script (called using @e make @e install) will automatically
+create a machine specifik configuration in the home directory, if it does not
+already exist, otherwise the configuration file will not be touched.
+
+The variable OMD_TABLE is always needed on runtime. So make sure that
+it is defined before the program is executed.
+
+@section simplemake A common Makefile
+
+Using the environment variables explained above we can make a simple 
+common Makefile for an omd application as follow:
+
+@code
+CXX=$(OMD_MPI)/bin/mpic++
+
+EXE=example
+
+all:
+    $(CXX) -g -o $(EXE) $(EXE).cpp $(OMD_LIBS)
+
+clean:
+	rm -rf $(EXE) pomd
+@endcode
+
+One needs only to change the EXE variable on different application. If the
+OMD_CXX is defined in the configuration file, the make file can be simpler
+by using this as the compiler.
+
+@section mpiver The MPI library
+
+The author uses Open MPI library for message passing. It is working with
+version 1.4 or the older version 1.3. Theoretically, it should be working
+with other version of MPI, since only the C implementation is used.
+When building the parallel version some communication problems was occuring
+with mpich, but then it was not checked again. The author decided to stick
+only to the running MPI implementation, which is Open MPI. The compatibility
+issues are simply ignored.
+
+@section Running Object-MD in cluster environment
+
+If the cluster does not use the queuing system, to execute a parallel OMD application
+is done using mpirun. The number of processor must be the consistent with the
+MDSystemGrid setting, set by SetClusterArch() function. The following is the
+example script to run in a multi-processor computer (4 processors),
+
+@code
+#!/bin/bash
+
+. $HOME/.omdconf
+EXE=example
+make clean
+echo -e "$(hostname)\n$(hostname)\n$(hostname)\n$(hostname)" > machine
+make && $OMD_MPI/bin/mpirun -machinefile machine -np 4 $EXE
+@endcode
+
+When a queuing system is employed in the cluster, then the application must be
+submitted via the submission program. For example, using torque or PBS queue manager,
+one must write a job script, and submit it using qsub command. The following
+is the example of job script:
+
+sendjob
+@code
+#!/bin/bash
+#PBS -l nodes=8:ppn=4
+#PBS -l walltime=1024:00:00
+#PBS -j oe
+#PBS -o TTM.OUT
+#PBS -m e
+#PBS -M myemail@somewhere.com
+#PBS -N EXAMPLEOMD
+
+. $HOME/.omdconf
+EXE=example
+cd $PBS_O_WORKDIR
+make clean
+cat $PBS_NODEFILE > mach
+make > MAKE.OUT 2>&1
+$OMD_MPI/bin/mpirun -machinefile mach -np 32 ./$EXE
+@endcode
+
+The aplication is submitted by,
+@code
+qsub sendjob
+@endcode
+
+The number of processor must be consistent with the grid architecture of the
+application program. Setting the grid architecture can be done by explicitly
+calling the SetClusterArch() function or by feeding the parameter
+"comm.arch" to the program. See also the discussion about
+@link parameter parameters@endlink and the local reference of qsub for a detail explanation.
+
+**/

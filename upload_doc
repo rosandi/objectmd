@@ -1,0 +1,5 @@
+WEBSRV=merapi
+USER=rosandi
+WEBPATH=public_html/objectmd
+
+rsync -avP doc/html/ $USER@$WEBSRV:$WEBPATH --delete

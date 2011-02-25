@@ -1,0 +1,13 @@
+#!/bin/bash
+
+make clean
+cat << endt > machine
+$(hostname)
+$(hostname)
+$(hostname)
+$(hostname)
+endt
+
+make &&
+#nohup mpirun -machinefile machine -np 4 periodic $@ 2>err &
+$OMD_MPI/bin/mpirun -machinefile machine -np 4 periodic $@

@@ -1,0 +1,173 @@
+    ##############EXPLAINS: ATOM CREATION################
+
+/**
+@page create_atom Creating Simulation Atoms
+
+The simulation atoms (SystemAtoms) are created in the MDSystem::CreateSystem() function.
+An atom class is inserted into the simulation using AddAtom() command, which
+take a reference of type AtomContainer. To the added atom class is given a unique id,
+in the order of the calling sequence of AddAtom(). The function returns the reference
+to the added container.
+
+In this stage the added container may be modified/edited. Some manipulation functions are
+available, which normally used in the creation stage:
+
+  - Create()
+  - Import()
+  - Shift()
+  - SetKineticEnergy()
+  - SetTemperature()
+  - SetName()
+  - DumpAtoms()
+  - Combine()
+
+See the implementation of AtomContainer for a complete reference. Beside the default
+constructor, AtomContainer accept a material file name as the constructor parameter.
+The material file is stored below $OMD_TABLE (tables) directory, using the prefix "def"
+as file name. The class search for the file name automatically, so the user must
+supply only the material name as parameter. For example, if "platinum" is given to
+the constructor, than the class will search for the file "def.platinum" in the current
+directory and then in $OMD_TABLE. A file stored in the current directory has the
+highest priority.
+
+The class AtomContainer is inherited by concrete classes to generate
+crystal; such as CrystalFCC111, CrystalFCC100, CrystalBCC100, etc, which are
+implemented as omd classes below the $OMD_CLASS (include/class) directory. The header file of
+the class must be included in the application program. The following are some
+examples:
+
+@subsection  single Creating an FCC(100) crystal
+
+The parameters are the number of monolayers (x, y, z)
+and the material file.
+
+@code
+#include <class/FCC100.hpp>
+
+...
+void CreateSystem() {
+  AddAtom(new CrystalFCC100(16, 16, 8, "aluminum"))
+     ->Create()
+     ->SetKineticEnergy(0.8);
+}
+...
+@endcode
+
+@subsection combine Combining two structures
+
+In the following example two containers are combined into one larger container.
+The first is shifted and added a velocity @f$10.0~{\sf\AA/ps}@f$ downward. The
+constructor of the AtomContainer copies the data from the containers.
+In such a way that the perviously created containers can be removed savely.
+
+@code
+#include <class/FCC100.hpp>
+#include <class/FCC111.hpp>
+
+...
+void CreateSystem() {
+  CrystalFCC100 a(10,10,10, "platinum");
+  a.Create()->Shift(-5.,-5.,50.0)->AddVelocity(0.0, 0.0, -10.0);
+
+  CrystalFCC111 b(10,10,10, "platinum");
+  b.Create();
+     
+  AddAtom(new AtomContainer(a,b))->SetName("system");
+}
+...
+@endcode
+
+Otherwise AddAtom may take the following form, with which
+one may add as many containers as he needs:
+
+@code
+...
+  AddAtom(new AtomContainer)
+     ->Combine(a)
+     ->Combine(b)
+     ->SetName("system");
+...
+@endcode
+
+If the material file name is not given to the constructor, AtomContainer will take
+it from the first combined container.
+
+An atom container must be created first in the function. There are two ways
+to create:
+  - invoking reimplemented AtomContainer::Create() function. The function must be reimplemented
+    by the descendant class. Examples: CrystalFCC111, CrystalFCC100, etc.
+  - importing data from the previously created structure using AtomContainer::Import()
+    function.
+  - Or create directly. To do this, the application must ensure to set AtomContainer::created
+    variable to true.
+
+@section import How to import atom data
+
+An atom container takes a plain text file as an import file. The file must contain fields separated
+by spaces. By default the first three fields will be read as x, y, and z coordinates of atoms. In
+this case all atoms will have zero velocity.
+
+To import another fields, AtomContainer needs a field definition line. The line is put as a
+pseudo comment, as follow:
+
+@code
+#$ Fields x y z vx vy vz id idx --
+@endcode
+
+the fields "x y z" are mandatory, while "vx vy vz" (velocity components) and "id idx" (atom ids)
+are optional. The order is arbitrary but must be consistent with the data fields. Import() will 
+search the right fields accordingly. The field definition line must be terminated by double dash
+"--".
+
+If the "Material" pseudo comment exists, Import() will read the material properties from the
+corresponding material file, if they are not assigned previously. Example:
+
+@code
+#$ Material platinum
+@endcode
+
+in this case the properties will be read from file "def.platinum" in the current directory, or,
+if it is not found, under the $OMD_TABLE. The values those are assigned, are the atomic number (Z)
+and the mass (M). The name of the class is also set to the defined element name in the "def" file.
+An example to import a crystal data file in CreateSystem():
+
+@code
+AddAtom(new AtomContainer("platinum"))->Import("platinum.cry");
+@endcode
+
+the file "platinum.cry" must exist in the current directory.
+
+MDSystem reimplements Import() methods, so it is able to import directly a multi-element file.
+The individual element is defined by the "id" field. To enable this, the data file must have
+the id definitions, in the pseudo comment "IDn", where "n" is replaced by the type id number of
+the elements, starting with 0. The format of this pseudo comment is:
+
+@code
+#$ IDn <name> <material>
+@endcode
+
+The data file will look like:
+
+@code
+#$ ID0 hot argon
+#$ ID1 cool platinum
+#$ Fields x y z vx vy vz id xid --
+0.00000 0.00000 -82.30500 7.93743e-01 -8.57157e+00 5.12989e+00 0 1
+2.65500 2.65500 -82.30500 8.04331e+00 -4.94380e+00 -3.21549e+00 0 1
+...
+58.86000 58.86000 -86.92200 0.00000e+00 0.00000e+00 0.00000e+00 1 2 
+60.82200 60.82200 -86.92200 0.00000e+00 0.00000e+00 0.00000e+00 1 2 
+@endcode
+
+in this example, atoms with id=0 will take properties from "def.argon", and
+id=1 from "def.platinum" file. The creation function will simply be:
+
+@code
+void CreateSystem() {
+  Import("system.cry");
+}
+@endcode
+
+"system.cry" is the exemplary file name of the crystal data.
+
+*/

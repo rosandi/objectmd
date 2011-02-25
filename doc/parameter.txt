@@ -1,0 +1,78 @@
+###############EXPLAINS: SIMULATION SETTINGS###################
+
+/**
+
+@page parameter On Parameters and Default Parameter File
+
+When an Object-MD compiled application is executed, the program will load
+a default parameter file named "omd-parameter" in the current directory.
+The content of this file will be read into the parameter handler of
+MDSystem, param. All the parameters are already available on the creation 
+stage. A parameter list may also given in the command line. This will have
+highest priority if the same names of parameters are also listed in the
+parameter file.
+
+Parameter is written in the free-form way. Usually a parameter consists of 
+a tag and a value, but in some cases it may also consist of only tag or 
+many values (array). Example of omd-parameter file:
+
+@code
+dir.output output
+dir.binary pomd
+comm.arch  2 2 1
+comm.refresh 5
+monitor.filename par.md
+@endcode
+
+A parameter file may contain single line comments begins with hash character
+(#). Following is an example to give a list of parameters in the command
+line:
+
+@code
+./example silent maxtime 10.0
+@endcode
+
+To let the example program read command line parameters, the application
+program must feed the C's main function arguments (argc, argv) to the
+constructor of MDSystem, or call explicitly the MDSystem::SetArgument()
+function.
+ 
+\section parlist The list of (currently) recognized parameters
+
+Followings are parameter that will be read by MDSystem (and MDSystemGrid)
+upon execution. Here brackets is used only to state the values.
+
+- @b paramfile (file name) : this is relevant only when used as command line
+  parameter, to load a non-default named parameter file.
+- @b silent : suppress the print out of simulation data on the screen every
+  step.
+- @b dir.output (directory name) : specify the name of output directory.
+- @b dir.binary (directory name) : specify the directory name to stor binary and
+  log files in parallel OMD application.
+- @b maxtime (time unit) : specify the maximum simulation time 
+  (usually pico seconds).
+- @b restart (file name) : sets the restart file name. If the file exists in the
+  current directory, the simulation will run in RESTART_MODE and load the
+  corresponding file.
+- @b boundary.periodic (no or xyz) : specify the boundary condition. If the
+  value is "no", the simulation has non-periodic boundary. Otherwise the
+  combination of x,y, and z states the periodic boundary is applied on the
+  corresponding axis.
+- @b comm.refresh (refresh period in step) : specify the refresh period of the
+  communication handler in the parallel OMD program. This refresh period
+  effects also the update period of the NeighborCell iterator if used.
+- @b comm.arch (nx) (ny) (nz) : define the architecture/configuration of the
+  processor grid in parallel OMD application.
+- @b dump.field (id+nid+xid+velocity+force+potential+virial) : additional fields 
+  to dump in the dump file. The field names are separated by "+", without space.
+
+Beside these parameters there are two other types of parameter, the gadget
+parameters which are read by the gadgets and the user parameters. As the
+convention, a gadget parameter has a prefix that is unique to the owner
+gadget. For example $e monitor.filename$e belongs to the SysMonitor
+detector, and read upon initialization of the class. A user parameter is a
+free-formed parameter (tag-value pair) that can be read by the application 
+program. To access the parameter, the application must use functions of
+param variable (see ParamHandler class).
+
+**/

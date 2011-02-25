@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo detecting local temperature silicon @450K
+./thermo -rcut 5.8 -lc 4.04527 -i silicon450K -o out -mat silicon

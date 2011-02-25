@@ -1,0 +1,11 @@
+#!/bin/bash
+
+make clean
+cat << endt > machine
+$(hostname)
+$(hostname)
+$(hostname)
+$(hostname)
+endt
+make &&
+mpirun -machinefile machine -np 4 memlogtest

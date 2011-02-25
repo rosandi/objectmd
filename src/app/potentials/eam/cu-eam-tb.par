@@ -1,0 +1,38 @@
+##################
+# parameter for eam potential
+# AG. Urbassek style
+#
+# (c) Rosandi
+
+ELEMENT Copper
+
+R_CUT   6.2
+
+# tight binding parameter
+PHI0    61368.69997943735500
+ALPHA   5.18601305724453
+G0      26.49875512904454
+BETA    1.26044412051693
+
+# zbl coefficients
+ZBL_C0     0.1818
+ZBL_C1     0.5099
+ZBL_C2     0.2802
+ZBL_C3     0.02817
+ZBL_EXP0   3.2
+ZBL_EXP1   0.9423
+ZBL_EXP2   0.4029
+ZBL_EXP3   0.2016
+
+# polynomial spline ZBL to TB
+SPLINE0 1.3500
+SPLINE1 1.6500
+P0     41.0741612267475920
+P1     -129.0775511274431200
+P2     244.7812889877756100
+P3    -1439.0063321101350000
+P4     4749.1157819474374000
+P5     -5020.6564488961230000
+
+# Tersoff radius at R_cut
+TERSOFF_DELTA  0.45

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+make clean
+
+cat << endt > machine
+$(hostname)
+$(hostname)
+$(hostname)
+$(hostname)
+endt
+
+
+EXE=hot
+
+make &&
+mpirun -machinefile machine -np 2 $EXE

@@ -1,0 +1,9 @@
+hostname > mach
+hostname >> mach
+hostname >> mach
+hostname >> mach
+
+export OMD_TABLE=$HOME/omd-tables
+make -j 4 && 
+nohup $HOME/mpi/bin/mpirun -machinefile mach -np 4 ./nonref 2>err &
+#$HOME/mpi/bin/mpirun -machinefile mach -np 4 ./nonref 2>err 

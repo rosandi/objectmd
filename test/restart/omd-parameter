@@ -1,0 +1,17 @@
+material platinum
+maxtime 5.0
+restart restart.bin
+
+save.filename save.bin
+save.overwrite no
+save.every 10 second
+
+dump.sample 1.0
+dump.filename data
+dump.xlength 4
+
+timestep.maxpath 0.1
+
+boundary.periodic no
+comm.refresh 5
+comm.arch 2 2 1

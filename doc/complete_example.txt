@@ -1,0 +1,196 @@
+################## EXPLAINS: OMD APPLICATION PROGRAM STRUCTURE ############
+
+/**
+
+@page fullexample Putting All Together: first Object-MD program
+
+In the following we go step by step through a complete small simulation program.
+
+The header files:
+
+@code
+#include <omd/system.hpp>
+#include <omd/team.hpp>
+#include <conditioner/NeighborCell.hpp>
+#include <crystal/FCC111.hpp>
+#include <detector/ThermoDetector.hpp>
+#include <detector/SysMonitor.hpp>
+@endcode
+
+In Object-MD we must include all the required header file explicitly. Here we will
+use table splining eam potential as the interaction between atoms (team.hpp).
+The iteration will be performed by the neighbor cell algorithm (NeighborCell.hpp).
+As the simulation crystall we choose FCC(111), where the (111) surface normal
+directed in +z axis. Two detectors will be used; the temperature/pressure
+detector (TempPressDetector.hpp), and the system monitor (SysMonitor.hpp). Note
+that the header file of the simulation manager, system.hpp, must take place before
+other Object-MD header files.
+
+The first thing to do is to inherit the simulation manager class, MDSystem, which
+is followed by the CreateSystem() function:
+
+@code
+class MyMDClass:public MDSystem {
+
+    void CreateSystem() {
+        AddAtom(new CrystalFCC111(30,20,10, "platinum"))
+           ->Create()
+           ->SetTemperature(100.0)
+           ->SetName("Crystal");
+    }
+@endcode
+
+In this small project, we take an FCC(111) platinum crystall, which sides
+30 x-, 20 y-, and 10 z-monolayers. The temperature of the crystall is set to 100.0 Kelvin.
+
+The gadgets creation follows after the system creation. Here we create all the needed gadgets.
+
+@code
+    void CreateGadget() {
+        SetIntegrator(new MDIntegrator);
+        AddForce(new TForceEAM("platinum"));
+        AddConditioner(new NeighborCell);
+        AddDetector(new SysMonitor("md.out"));  
+        AddDetector(new TempPressDetector(0.02));
+    }
+@endcode
+
+The last part in the main class implementation is the settings and things to do
+before the simulation loop.
+
+@code
+    void SystemSetting() {
+        SetBoundaryCondition(NONPERIODIC);
+        SetMaxTime(0.2);
+        SetOutputDirectory("output");
+    }
+
+    void BeforeRun() {
+        DumpAtoms("init.dat");
+        PrintInfo("info.out");
+    }
+
+};
+@endcode
+
+The main function is straight forward:
+
+@code
+int main() {
+    MyMDClass TheSim;
+    return TheSim.Run();
+}
+@endcode
+
+\section exmake The make file
+
+To automate compiling it is recommended to use make file. The following is the
+Makefile for our small example. Assume the program file name is "example.cpp".
+
+@code
+EXE=example
+
+all:
+    $(OMD_CXX) -g -o $(EXE) $(EXE).cpp $(OMD_LIBS)
+    
+@endcode
+
+For a serial application we only need a standard c++ compiler. For parallel
+version mpic++ is applicable. The library and include settings must also
+be addapted.
+
+Note that Object-MD requires some environment variables to be defined in
+the operating system:
+
+  - OMD_HOME : the home directory of Object-MD
+  - OMD_TABLE : the path to Object-MD tables (normally $OMD_HOME/tables)
+  - OMD_CLASS : the path to omd class declarations
+  - OMD_LIBS : the full command line omd library settings
+
+A script to set these environment variables will be created when invoking @e make
+@e install. As addition, the following may be added by editing the
+configuration file (~/.omdconf-*) :
+
+  - OMD_MPI : the path to mpi library
+  - OMD_CXX : the compiler to use
+
+Setting @e OMD_CXX is preferable. When mpic++ is used, @e OMD_MPI
+is not anymore needed.
+
+To compile and run the program, use these commands:
+
+@code
+make
+./example
+@endcode
+
+After running the compiled program, some files will be created:
+
+  - info.out, the simulation information created in BeforeRun() function.
+  - init.dat, the atom data written before simulation also in BeforeRun() function.
+  - md.out, the simulation output created by SysMonitor.
+  - mem.log and run.log, memory and run-time log files.
+  - output, the output directory containing the Data.* files, created by
+    ThermoDetector.
+
+We can plot the kinetic and potential energy from our simulation using gnuplot:
+
+@code
+gnuplot
+gnuplot> set xlabel 'time (ps)'
+gnuplot> set ylabel 'eV'
+gnuplot> p 'md.out' u 2:4 w l t 'kinetic', 'md.out' u 2:5 w l t 'potential'
+@endcode
+
+@image html example.jpg "The kinetic and potential energy plot of the system"
+
+The complete code:
+
+@code
+#include <omd/system.hpp>
+#include <omd/team.hpp>
+#include <conditioner/NeighborCell.hpp>
+#include <crystal/FCC111.hpp>
+#include <detector/ThermoDetector.hpp>
+#include <detector/SysMonitor.hpp>
+
+class MyMDClass:public MDSystem {
+
+    void CreateSystem() {
+        AddAtom(new CrystalFCC111(30,20,10, "platinum"))
+           ->Create()
+           ->SetTemperature(100.0)
+           ->SetName("Crystal");
+    }
+
+    void CreateGadget() {
+        SetIntegrator(new MDIntegrator);
+        AddForce(new TForceEAM("platinum"));
+        AddConditioner(new NeighborCell);
+        AddDetector(new SysMonitor("md.out"));  
+        AddDetector(new ThermoDetector(0.02));
+    }
+
+    void SystemSetting() {
+        SetBoundaryCondition(NONPERIODIC);
+        SetMaxTime(0.2);
+        SetOutputDirectory("output");
+    }
+
+    void BeforeRun() {
+        DumpAtoms("init.dat");
+        PrintInfo("info.out");
+    }
+
+};
+
+int main() {
+    MyMDClass TheSim;
+    return TheSim.Run();
+}
+@endcode
+
+Note: MDSystem can handle only NONPERIODIC boundary condition. To simulate a
+periodic boundary system use MDSystemGrid instead!
+
+**/

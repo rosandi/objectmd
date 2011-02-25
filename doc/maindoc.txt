@@ -1,0 +1,87 @@
+/**
+@defgroup basestruct Primitive Structures
+@defgroup baseclass Object-MD Base classes
+@defgroup essential Essential classes
+@defgroup atom Atom and Crystals
+@defgroup conditioner Conditioners
+@defgroup detector Detectors
+@defgroup iterator Iterators
+@defgroup tool Tools
+**/
+
+###################THE MAIN PAGE####################
+
+/**
+@mainpage The Object Oriented Molecular Dynamics Library
+@author Y. Rosandi, AG-Urbassek, FB-Physik, TU-Kaiserslautern
+
+@section Introduction
+
+Object-MD is a molecular dynamic (MD) class library, written in C++, a collection of classes
+which encapsulate MD simulation functions in object form. The OOP allows a flexible
+program design based on 'plugable' objects, the so called gadgets. The application can choose only
+the needed gadgets to be embedded in a program, making it compact and adjustable.
+
+The class library provides a simple programming interface to create an MD simulation, both in serial or 
+parallel computing environment.
+
+Base objects
+
+ - Atom keeper: keeps the atom data structure: allocation, expansion, deletion.... 
+ - Atom container: manages atom data: import, save, create crystallite structures.... 
+ - Unit converter: handles unit conversion in simulation 
+ - Gadgets: Integrator, iterator, forces, conditioner, detector 
+
+Main class (the simulation manager)
+
+  - Simulation system class (MDSystem): MD main loop
+  - Parallel version (MDSystemGrid)
+
+<hr>
+
+@ref manual "Click here to read the manual"
+
+Browse/checkout the source code: http://code.google.com/p/object-md/
+
+<hr>
+
+@section snap Snapshot
+
+@image html omd-abl.jpg "Snapshot of a simulation of the ablation of 1 Million Aluminum atoms"
+
+
+**/
+
+/**
+@page manual User Manual
+
+For the impatience, see @link build how to build@endlink the library and go
+to @e test/example directory and try to edit and run the program.
+
+@ref create_atom "Creating Simulation Atoms"
+
+@ref gadget "Creating Simulation Gadgets"
+
+@ref simsetting "The Simulation Settings"
+
+@ref fullexample "Putting All Together"
+
+@ref functable "The Object-MD Table Format"
+
+@ref programflow "Program Flow"
+
+@ref forcekernel "Force Kernel"
+
+@ref conditioner "Creating Conditioner"
+
+@ref detector "Creating Detector"
+
+@ref claimaux "Claiming Aux Variable and Flag Bit in Gadgets"
+
+@ref parameter "On Parameters and Default Parameter File"
+
+@ref parallel "On Parallel Object-MD"
+
+@ref build "On Building and Executing Object-MD Programs"
+
+**/

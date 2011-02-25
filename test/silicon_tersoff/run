@@ -1,0 +1,6 @@
+#!/bin/bash
+
+OMD_TABLE=../../tables
+
+make clean all
+./freerun

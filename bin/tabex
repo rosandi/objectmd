@@ -1,0 +1,30 @@
+#!/usr/bin/awk -f
+
+####################################################
+# table extractor
+# 
+# This program extract a table from omd table file
+# in x,y format.
+# (c) rosandi
+#
+
+BEGIN{
+	T=""
+	start=0
+	search=0
+	c=0
+}
+NR==1{TMARK="#$"T}
+T==""{search=1}
+$1==TMARK&&$2=="--"&&search{sub(/#\$/,""); print "found:",$1;next}
+$1==TMARK&&$2=="--"{start=1;next}
+/^#\$/&&$2=="Spacing"{dr=$3}
+/^#\$/&&$2=="Offset"{ofs=$3}
+/^#\$/&&$1!=TMARK&&start{exit}
+/^#/{next}
+start{print ofs+dr*c++,$1}
+END{
+	if(search) print "please give table name: TABLE=<table-name>" > "/dev/stderr"
+	else if(start==0)print "table",T,"not found" > "/dev/stderr"
+}
+

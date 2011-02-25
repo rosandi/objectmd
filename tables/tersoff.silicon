@@ -1,0 +1,21 @@
+# Tersoff potential parameter for Silicon
+# splined to zbl at high energy (enabled by tersoff.zbl)
+# cite: Tersoff, PRB, 37:6991, 1988
+
+tersoff.A 3264.7
+tersoff.lambda_1 3.2394
+tersoff.alpha 0.0
+tersoff.c 4.8381
+tersoff.lambda_3 1.3258
+tersoff.B 95.373
+tersoff.lambda_2 1.3258
+tersoff.beta 0.33675
+tersoff.d 2.0417
+tersoff.R 3.0
+tersoff.n 22.956
+tersoff.h 0.0
+tersoff.D 0.2
+tersoff.zbl true
+tersoff.zbl_cut 1.0
+tersoff.zbl_sharpness 30.0
+tersoff.spline_range 0.8 1.3
