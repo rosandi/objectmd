@@ -94,10 +94,10 @@ class CommunicationHandler:public MDClass {
 
 	PackageSpace* SpaceSendBuffer[27];
 	PackageSpace* SpaceRecvBuffer[27];
-	PackageVector* ForceSendBuffer[27];
-	PackageVector* ForceRecvBuffer[27];
-	PackageScalar* AuxSendBuffer[27];
-	PackageScalar* AuxRecvBuffer[27];
+	PackageVector* VectorSendBuffer[27];
+	PackageVector* VectorRecvBuffer[27];
+	PackageScalar* ScalarSendBuffer[27];
+	PackageScalar* ScalarRecvBuffer[27];
 
 	OMD_INT      SendNumber[27];
 	OMD_INT      RecvNumber[27];
@@ -135,14 +135,19 @@ public:
 
 	virtual void   CollectSendRecvNumber();
 	virtual void   DistributeAtomIndex();
-	virtual void   PrepareSendBuffers(OMD_INT mode);
 	virtual void   SendReceiveData(void** sendpack, void** recvpack, OMD_SIZET unitlength);
 	virtual void   SendReceive(OMD_INT mode);
-	virtual bool   CheckCellShift(OMD_INT b, OMD_FLOAT& xshift,OMD_FLOAT& yshift, OMD_FLOAT& zshift);
+	virtual void   PrepareSpaceBuffers();
+	virtual void   PreparePositionBuffers();
+	virtual void   PrepareVelocityBuffers();
+	virtual void   PrepareForceBuffers();
+	virtual void   PrepareAuxBuffers(OMD_INT aidx);
 	virtual void   UnpackSpace();
+	virtual void   UnpackPosition();
+	virtual void   UnpackVelocity();	
 	virtual void   UnpackForce();
 	virtual void   UnpackAux(OMD_INT aidx);
-	virtual void   Unpack(OMD_INT mode);
+	virtual bool   CheckCellShift(OMD_INT b, OMD_FLOAT& xshift, OMD_FLOAT& yshift, OMD_FLOAT& zshift);
 	virtual void   SyncProcesses();
 	virtual void   Abort();
 

@@ -56,10 +56,11 @@ using std::string;
 #define STATIC_MODE  2
 
 #define SYNC_ALL       0x0F00
-#define SYNC_SPACE     0x0100
-#define SYNC_FORCE     0x0200
-#define SYNC_VELOCITY  0x0400
+#define SYNC_POSITION  0x0100
+#define SYNC_VELOCITY  0x0200
+#define SYNC_FORCE     0x0400
 #define SYNC_AUX       0x0800
+#define SYNC_SPACE     0x1000
 
 class MDGadget;
 class DataSlot;

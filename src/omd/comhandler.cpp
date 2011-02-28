@@ -41,10 +41,10 @@ CommunicationHandler::CommunicationHandler(){
 	for(OMD_INT i=0;i<27;i++) {
 		SpaceSendBuffer[i]=NULL;
 		SpaceRecvBuffer[i]=NULL;
-		ForceSendBuffer[i]=NULL;
-		ForceRecvBuffer[i]=NULL;
-		AuxSendBuffer[i]=NULL;
-		AuxRecvBuffer[i]=NULL;
+		VectorSendBuffer[i]=NULL;
+		VectorRecvBuffer[i]=NULL;
+		ScalarSendBuffer[i]=NULL;
+		ScalarRecvBuffer[i]=NULL;
 		SendNumber[i]=0;
 		RecvNumber[i]=0;
 		NeigRubix[i]=new IndexList;
@@ -143,66 +143,110 @@ void CommunicationHandler::RootReduceSUM(OMD_FLOAT*source, OMD_FLOAT*dest, OMD_I
 	MPI_Reduce(source,dest,length,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
 }
 
-void CommunicationHandler::PrepareSendBuffers(OMD_INT mode){
-
+void CommunicationHandler::PrepareSpaceBuffers(){
 	for(int i=0;i<27;i++){
 		int na=NeigRubix[i]->length;
+		int a;
 		if(i==MYSELF||na<=0) continue;
 		if(System->GetNeighborRank(i)<0)continue;
-		int a;
-
-		if(mode&SYNC_SPACE) {
-			MemRealloc(SpaceSendBuffer[i], na*sizeof(PackageSpace));
-			PackageSpace* X=SpaceSendBuffer[i];
-			NeigRubix[i]->reset();
-			while((a=NeigRubix[i]->fetch())>=0) {
-				Atom* A=System->AtomPtr(a);
-				X->id=A->id;
-				X->xid=A->xid;
-				X->nid=A->nid;
-				X->flag=A->flag;
-				X->x=A->x;
-				X->y=A->y;
-				X->z=A->z;
-				X->vx=A->vx;
-				X->vy=A->vy;
-				X->vz=A->vz;
-				X++;
-			}
+		MemRealloc(SpaceSendBuffer[i], na*sizeof(PackageSpace));
+		PackageSpace* X=SpaceSendBuffer[i];
+		NeigRubix[i]->reset();
+		while((a=NeigRubix[i]->fetch())>=0) {
+			Atom* A=System->AtomPtr(a);
+			X->id=A->id;
+			X->xid=A->xid;
+			X->nid=A->nid;
+			X->flag=A->flag;
+			X->x=A->x;
+			X->y=A->y;
+			X->z=A->z;
+			X->vx=A->vx;
+			X->vy=A->vy;
+			X->vz=A->vz;
+			X++;
 		}
-
-		if(mode&SYNC_FORCE) {
-			MemRealloc(ForceSendBuffer[i], na*sizeof(PackageVector));
-			PackageVector* X=ForceSendBuffer[i];
-			NeigRubix[i]->reset();
-			while((a=NeigRubix[i]->fetch())>=0) {
-				Atom* A=System->AtomPtr(a);
-				X->nid=A->nid;
-				X->x=A->fx;
-				X->y=A->fy;
-				X->z=A->fz;
-				X++;
-			}
-		}
-
-		// aux index in LSB
-		if (mode&SYNC_AUX) {
-			int naux=(mode&0x00FF);
-			if(naux>MAXAUXVAR) die("attempt to send/receive invalid auxvar index="+as_string(naux));
-			MemRealloc(AuxSendBuffer[i], na*sizeof(PackageScalar));
-			PackageScalar* X=AuxSendBuffer[i];
-			NeigRubix[i]->reset();
-			while((a=NeigRubix[i]->fetch())>=0) {
-				Atom* A=System->AtomPtr(a);
-				X->nid=A->nid;
-				X->value=A->aux[naux];
-				X++;
-			}
-		}
-
 	}
-
 }
+
+void CommunicationHandler::PreparePositionBuffers(){
+	for(int i=0;i<27;i++){
+		int na=NeigRubix[i]->length;
+		int a;
+		if(i==MYSELF||na<=0) continue;
+		if(System->GetNeighborRank(i)<0)continue;
+		MemRealloc(VectorSendBuffer[i], na*sizeof(PackageVector));
+		PackageVector* X=VectorSendBuffer[i];
+		NeigRubix[i]->reset();
+		while((a=NeigRubix[i]->fetch())>=0) {
+			Atom* A=System->AtomPtr(a);
+			X->nid=A->nid;
+			X->x=A->x;
+			X->y=A->y;
+			X->z=A->z;
+			X++;
+		}			
+	}
+}
+		
+void CommunicationHandler::PrepareVelocityBuffers(){
+	for(int i=0;i<27;i++){
+		int na=NeigRubix[i]->length;
+		int a;
+		if(i==MYSELF||na<=0) continue;
+		if(System->GetNeighborRank(i)<0)continue;
+		MemRealloc(VectorSendBuffer[i], na*sizeof(PackageVector));
+		PackageVector* X=VectorSendBuffer[i];
+		NeigRubix[i]->reset();
+		while((a=NeigRubix[i]->fetch())>=0) {
+			Atom* A=System->AtomPtr(a);
+			X->nid=A->nid;
+			X->x=A->vx;
+			X->y=A->vy;
+			X->z=A->vz;
+			X++;
+		}			
+	}		
+}
+void CommunicationHandler::PrepareForceBuffers(){
+	for(int i=0;i<27;i++){
+		int na=NeigRubix[i]->length;
+		int a;
+		if(i==MYSELF||na<=0) continue;
+		if(System->GetNeighborRank(i)<0)continue;		
+		MemRealloc(VectorSendBuffer[i], na*sizeof(PackageVector));
+		PackageVector* X=VectorSendBuffer[i];
+		NeigRubix[i]->reset();
+		while((a=NeigRubix[i]->fetch())>=0) {
+			Atom* A=System->AtomPtr(a);
+			X->nid=A->nid;
+			X->x=A->fx;
+			X->y=A->fy;
+			X->z=A->fz;
+			X++;
+		}
+	}
+}
+
+void CommunicationHandler::PrepareAuxBuffers(OMD_INT aidx){
+	for(int i=0;i<27;i++){
+		int na=NeigRubix[i]->length;
+		int a;
+		if(i==MYSELF||na<=0) continue;
+		if(System->GetNeighborRank(i)<0)continue;
+		if(aidx>MAXAUXVAR) die("attempt to send/receive invalid auxvar index="+as_string(aidx));
+		MemRealloc(ScalarSendBuffer[i], na*sizeof(PackageScalar));
+		PackageScalar* X=ScalarSendBuffer[i];
+		NeigRubix[i]->reset();
+		while((a=NeigRubix[i]->fetch())>=0) {
+			Atom* A=System->AtomPtr(a);
+			X->nid=A->nid;
+			X->value=A->aux[aidx];
+			X++;
+		}
+	}
+}
+
 
 void CommunicationHandler::CollectSendRecvNumber() {
 	MPI_Status  stat[54];
@@ -232,61 +276,60 @@ bool CommunicationHandler::CheckCellShift(OMD_INT b, OMD_FLOAT& xshift,OMD_FLOAT
 	OMD_INT mx=System->ProcInfo.CellX[rank];
 	OMD_INT my=System->ProcInfo.CellY[rank];
 	OMD_INT mz=System->ProcInfo.CellZ[rank];
-	
+
 	// neigboring cell coordinate relative to the current cell
 	OMD_INT nx=b%3;
 	OMD_INT ny=(b/3)%3;
 	OMD_INT nz=(b/9)%3;
-	
+
 	bool do_shift=false;
-	
+
 	// this occurs only in periodic boundary condition,
 	// wraps on a single processor
 	if(System->GetNeighborRank(b)==rank) {
-		
+
 		xshift=(nx==0)?(-System->ProcInfo.Box.lx):((nx==2)?System->ProcInfo.Box.lx:0.0);
 		yshift=(ny==0)?(-System->ProcInfo.Box.ly):((ny==2)?System->ProcInfo.Box.ly:0.0);
 		zshift=(nz==0)?(-System->ProcInfo.Box.lz):((nz==2)?System->ProcInfo.Box.lz:0.0);
 		do_shift=true;
-		
+
 	} else {
-		
+
 		// this happens only if PERIODIC_X|Y|Z
 		// otherwise neighbor rank b < 0...
-		
+
 		if(mx==0&&nx==0)
 		{xshift=-System->ProcInfo.Box.lx; do_shift=true;}
 		else if((mx==(OMD_INT)System->ClusterNX-1)&&(nx==2))
 		{xshift=System->ProcInfo.Box.lx; do_shift=true;}
 		else xshift=0.0;
-		
+
 		if(my==0&&ny==0)
 		{yshift=-System->ProcInfo.Box.ly;do_shift=true;}
 		else if((my==(OMD_INT)System->ClusterNY-1)&&(ny==2))
 		{yshift=System->ProcInfo.Box.ly;do_shift=true;}
 		else yshift=0.0;
-		
+
 		if(mz==0&&nz==0)
 		{zshift=-System->ProcInfo.Box.lz;do_shift=true;}
 		else if((mz==(OMD_INT)System->ClusterNZ-1)&&(nz==2))
 		{zshift=System->ProcInfo.Box.lz;do_shift=true;}
 		else zshift=0.0;
-		
+
 	}
-	
+
 	return do_shift;
 }
-
 
 void CommunicationHandler::UnpackSpace() {
 	OMD_INT rank=GetRank();
 	OMD_SIZET newna=System->LocalAtomNumber;
 	OMD_FLOAT xshift, yshift, zshift;
 	System->AtomStorage.Cut(System->LocalAtomNumber);
-	
+
 	// appending all received atoms from other procs...
 	for(OMD_INT b=0;b<27;b++) {
-		
+
 		if(System->GetNeighborRank(b)<0||b==MYSELF||RecvNumber[b]==0) continue;
 		
 		if(CheckCellShift(b,xshift,yshift,zshift)) {
@@ -296,10 +339,10 @@ void CommunicationHandler::UnpackSpace() {
 				SpaceRecvBuffer[b][c].z+=zshift;
 			}
 		}
-		
+
 		PackageSpace* X=SpaceRecvBuffer[b];
 		System->AtomStorage.Expand(newna+RecvNumber[b]);
-		
+
 		for(OMD_INT c=0;c<RecvNumber[b];c++) {
 			Atom* A=System->AtomPtr(c+newna);
 			A->id=X->id;
@@ -316,29 +359,100 @@ void CommunicationHandler::UnpackSpace() {
 		}
 		
 		newna+=RecvNumber[b];
-	}
+	} // for all rubix
 }
 
-void CommunicationHandler::UnpackForce() {
+void CommunicationHandler::UnpackPosition() {
+	OMD_INT rank=GetRank();
+	OMD_SIZET newna=System->LocalAtomNumber;
+	OMD_FLOAT xshift, yshift, zshift;
+	System->AtomStorage.Cut(System->LocalAtomNumber);
+	
+	// appending all received atoms from other procs...
+	for(OMD_INT b=0;b<27;b++) {
+		if(System->GetNeighborRank(b)<0||b==MYSELF||RecvNumber[b]==0) continue;
 
+		if(CheckCellShift(b,xshift,yshift,zshift)){
+			for(OMD_INT c=0;c<RecvNumber[b];c++){
+				VectorRecvBuffer[b][c].x+=xshift;
+				VectorRecvBuffer[b][c].y+=yshift;
+				VectorRecvBuffer[b][c].z+=zshift;
+			}
+		}
+		
+		PackageSpace* X=SpaceRecvBuffer[b];
+		System->AtomStorage.Expand(newna+RecvNumber[b]);
+		
+		for(OMD_INT c=0;c<RecvNumber[b];c++) {
+			Atom* A=System->AtomPtr(c+newna);
+			
+			if(A->nid!=X->nid)
+				die("unpacking position: atoms structure is non-contiguous! attempt to assign nid="+
+					as_string(A->nid)+" with nid="+as_string(X->nid));
+
+			A->x=X->x;
+			A->y=X->y;
+			A->z=X->z;
+			X++;
+		}
+		
+		newna+=RecvNumber[b];
+	} // for all rubix
+}
+
+void CommunicationHandler::UnpackVelocity() {
+	
 	OMD_INT rank=GetRank();
 	OMD_SIZET oldna=System->LocalAtomNumber;
 	OMD_SIZET newna=System->LocalAtomNumber;
-
+	
 	// appending all received atoms from other procs...
 	for(OMD_INT b=0;b<27;b++) {
-
+		
 		if(System->GetNeighborRank(b)<0||b==MYSELF||RecvNumber[b]==0) continue;
-
+		
 		newna+=RecvNumber[b];
-		PackageVector* X=ForceRecvBuffer[b];
+		PackageVector* X=VectorRecvBuffer[b];
 		for(OMD_INT c=0;c<RecvNumber[b];c++) {
 			Atom* A=System->AtomPtr(c+oldna);
+			
+			if(A->nid!=X->nid)
+				die("unpacking velocity: atoms structure is non-contiguous! attempt to assign nid="+
+					as_string(A->nid)+" with nid="+as_string(X->nid));
+			
+			A->vx=X->x;
+			A->vy=X->y;
+			A->vz=X->z;
+			X++;
+		}
+		oldna=newna;
+	}
+	
+	if(newna!=GetNAtom()) die("unpacking force: missing/additional atoms total after received="+
+							  as_string(newna)+" number of atoms="+as_string(GetNAtom()));
+	
+}
 
+void CommunicationHandler::UnpackForce() {
+	
+	OMD_INT rank=GetRank();
+	OMD_SIZET oldna=System->LocalAtomNumber;
+	OMD_SIZET newna=System->LocalAtomNumber;
+	
+	// appending all received atoms from other procs...
+	for(OMD_INT b=0;b<27;b++) {
+		
+		if(System->GetNeighborRank(b)<0||b==MYSELF||RecvNumber[b]==0) continue;
+		
+		newna+=RecvNumber[b];
+		PackageVector* X=VectorRecvBuffer[b];
+		for(OMD_INT c=0;c<RecvNumber[b];c++) {
+			Atom* A=System->AtomPtr(c+oldna);
+			
 			if(A->nid!=X->nid)
 				die("unpacking force: atoms structure is non-contiguous! attempt to assign nid="+
-						as_string(A->nid)+" with nid="+as_string(X->nid));
-
+					as_string(A->nid)+" with nid="+as_string(X->nid));
+			
 			A->fx=X->x;
 			A->fy=X->y;
 			A->fz=X->z;
@@ -346,10 +460,10 @@ void CommunicationHandler::UnpackForce() {
 		}
 		oldna=newna;
 	}
-
+	
 	if(newna!=GetNAtom()) die("unpacking force: missing/additional atoms total after received="+
-			as_string(newna)+" number of atoms="+as_string(GetNAtom()));
-
+							  as_string(newna)+" number of atoms="+as_string(GetNAtom()));
+	
 }
 
 void CommunicationHandler::UnpackAux(OMD_INT aidx) {
@@ -364,7 +478,7 @@ void CommunicationHandler::UnpackAux(OMD_INT aidx) {
 		if(System->GetNeighborRank(b)<0||b==MYSELF||RecvNumber[b]==0) continue;
 
 		newna+=RecvNumber[b];
-		PackageScalar* X=AuxRecvBuffer[b];
+		PackageScalar* X=ScalarRecvBuffer[b];
 		for(OMD_INT c=0;c<RecvNumber[b];c++) {
 			Atom* A=System->AtomPtr(c+oldna);
 
@@ -383,12 +497,6 @@ void CommunicationHandler::UnpackAux(OMD_INT aidx) {
 	if(newna!=GetNAtom()) die("unpacking aux["+as_string(aidx)+"] missing/additional atoms total after received="+
 			as_string(newna)+" number of atoms="+as_string(GetNAtom()));
 
-}
-
-void CommunicationHandler::Unpack(OMD_INT mode) {
-	if(mode&SYNC_SPACE) UnpackSpace();
-	if(mode&SYNC_FORCE) UnpackForce();
-	if(mode&SYNC_AUX)   UnpackAux(mode&0x00FF);
 }
 
 void CommunicationHandler::SendReceiveData(void* sendpack[], void* recvpack[], OMD_SIZET unitlength){
@@ -425,15 +533,45 @@ void CommunicationHandler::SendReceive(OMD_INT mode){
 	timeval tstart, tend;
 	gettimeofday(&tstart,NULL);
 
-	PrepareSendBuffers(mode);
 	SyncProcesses();
 	CollectSendRecvNumber();
 
-	if(mode&SYNC_SPACE) SendReceiveData((void**) SpaceSendBuffer, (void**) SpaceRecvBuffer, sizeof(PackageSpace));
-	if(mode&SYNC_FORCE) SendReceiveData((void**) ForceSendBuffer, (void**) ForceRecvBuffer, sizeof(PackageVector));
-	if(mode&SYNC_AUX)   SendReceiveData((void**)   AuxSendBuffer, (void**)   AuxRecvBuffer, sizeof(PackageScalar));
+	if(mode&SYNC_SPACE) {
+		PrepareSpaceBuffers();
+		SendReceiveData((void**) SpaceSendBuffer, 
+						(void**) SpaceRecvBuffer, sizeof(PackageSpace));
+		UnpackSpace();
+	}
+	
+	if(mode&SYNC_POSITION) { 
+		PreparePositionBuffers();
+		SendReceiveData((void**) VectorSendBuffer, 
+						(void**) VectorRecvBuffer, sizeof(PackageVector));
+		UnpackPosition();
+	}
+	
+	if(mode&SYNC_VELOCITY) {
+		PrepareVelocityBuffers();
+		SendReceiveData((void**) VectorSendBuffer, 
+						(void**) VectorRecvBuffer, sizeof(PackageVector));
+		UnpackVelocity();
+	}
+		
+	if(mode&SYNC_FORCE) {
+		PrepareForceBuffers();
+		SendReceiveData((void**) VectorSendBuffer, 
+						(void**) VectorRecvBuffer, sizeof(PackageVector));
+		UnpackForce();
+	}
+	
+	if(mode&SYNC_AUX) {
+		OMD_INT aidx=mode&0x00FF;
+		PrepareAuxBuffers(aidx);
+		SendReceiveData((void**)   ScalarSendBuffer, 
+						(void**)   ScalarRecvBuffer, sizeof(PackageScalar));
+		UnpackAux(aidx);
+	}
 
-	Unpack(mode);
 	gettimeofday(&tend,NULL);
 	TotalComtime+=(OMD_FLOAT)((tend.tv_sec-tstart.tv_sec)+1e-6*(tend.tv_usec-tstart.tv_usec));
 }
