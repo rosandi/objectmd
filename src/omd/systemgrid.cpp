@@ -537,7 +537,7 @@ void MDSystemGrid::SyncData(OMD_INT syncmode) {
         if(Step%CommRefreshPeriod) {
             Communicator->SendReceive(syncmode);
         } else {
-            Communicator->SendReceive(syncmode);
+            Communicator->SendReceive(SYNC_POSITION);
             FlattenAtomBox();
             DistributeContainers();
             UpdateRadiusTolerance();
@@ -809,7 +809,8 @@ AtomContainer* MDSystemGrid::Save(string binname, string mode) {
 }
 
 void MDSystemGrid::SaveSimulation(string binfile) {
-	if(binfile=="")binfile.assign(GetRestartFilename());
+	if(binfile=="")
+		binfile.assign(replace_char(lower_case(get_name()), ' ', '_'));
 	if(GetRank()==ROOT) SaveSimulationConfig(binfile);
 	Save(binfile);
 }

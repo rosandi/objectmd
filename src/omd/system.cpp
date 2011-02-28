@@ -662,7 +662,8 @@ void MDSystem::SaveSimulationConfig(string binfile) {
 }
 
 void MDSystem::SaveSimulation(string binfile) {
-	if(binfile=="") binfile.assign(GetRestartFilename());
+	if(binfile=="") 
+		binfile.assign(replace_char(lower_case(get_name()), ' ', '_'));
 	SaveSimulationConfig(binfile);
 	Save(binfile);
 }
