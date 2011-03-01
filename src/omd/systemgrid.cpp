@@ -517,9 +517,9 @@ void MDSystemGrid::DistributeContainers() {
 	cntatom=Communicator->TakeSUM(cntatom);
 
 	if(cntatom!=(OMD_INT)ProcInfo.TotalAtom) {
-		Communicator->SyncProcesses();
 		DumpAtoms(LocalBuffer, "dump-err-local-"+as_string(GetRank()),WM_GHOST|WM_ID|WM_XID|WM_NID);
 		DumpAtoms(GhostBuffer, "dump-err-ghost-"+as_string(GetRank()),WM_GHOST|WM_ID|WM_XID|WM_NID);
+		Communicator->SyncProcesses();
 		die( "missing atoms "+as_string(cntatom)+" total="+as_string(ProcInfo.TotalAtom)+
 	       ". to check: boundary conditions, box size, box offset");
 	}
@@ -537,7 +537,7 @@ void MDSystemGrid::SyncData(OMD_INT syncmode) {
         if(Step%CommRefreshPeriod) {
             Communicator->SendReceive(syncmode);
         } else {
-            Communicator->SendReceive(SYNC_POSITION);
+            Communicator->SendReceive(syncmode);
             FlattenAtomBox();
             DistributeContainers();
             UpdateRadiusTolerance();
