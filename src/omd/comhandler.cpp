@@ -364,11 +364,10 @@ void CommunicationHandler::UnpackSpace() {
 
 void CommunicationHandler::UnpackPosition() {
 	OMD_INT rank=GetRank();
+	OMD_SIZET oldna=System->LocalAtomNumber;
 	OMD_SIZET newna=System->LocalAtomNumber;
 	OMD_FLOAT xshift, yshift, zshift;
-	System->AtomStorage.Cut(System->LocalAtomNumber);
 	
-	// appending all received atoms from other procs...
 	for(OMD_INT b=0;b<27;b++) {
 		if(System->GetNeighborRank(b)<0||b==MYSELF||RecvNumber[b]==0) continue;
 
@@ -380,11 +379,10 @@ void CommunicationHandler::UnpackPosition() {
 			}
 		}
 		
-		PackageSpace* X=SpaceRecvBuffer[b];
-		System->AtomStorage.Expand(newna+RecvNumber[b]);
-		
+		newna+=RecvNumber[b];
+		PackageVector* X=VectorRecvBuffer[b];
 		for(OMD_INT c=0;c<RecvNumber[b];c++) {
-			Atom* A=System->AtomPtr(c+newna);
+			Atom* A=System->AtomPtr(c+oldna);
 			
 			if(A->nid!=X->nid)
 				die("unpacking position: atoms structure is non-contiguous! attempt to assign nid="+
@@ -395,9 +393,11 @@ void CommunicationHandler::UnpackPosition() {
 			A->z=X->z;
 			X++;
 		}
-		
-		newna+=RecvNumber[b];
-	} // for all rubix
+		oldna=newna;
+	}
+
+	if(newna!=GetNAtom()) die("unpacking force: missing/additional atoms total after received="+
+							  as_string(newna)+" number of atoms="+as_string(GetNAtom()));
 }
 
 void CommunicationHandler::UnpackVelocity() {
