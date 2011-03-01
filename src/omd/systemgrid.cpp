@@ -537,7 +537,7 @@ void MDSystemGrid::SyncData(OMD_INT syncmode) {
         if(Step%CommRefreshPeriod) {
             Communicator->SendReceive(syncmode);
         } else {
-            Communicator->SendReceive(syncmode);
+            Communicator->SendReceive(SYNC_POSITION);
             FlattenAtomBox();
             DistributeContainers();
             UpdateRadiusTolerance();
