@@ -27,7 +27,6 @@ AtomGroup::AtomGroup(string group_name, AtomContainer* ac, MDSystem* WorkSys) {
 	source=ac;
 	scratch_ak.set_name("ATOM GROUP SCRATCH");
 	scratch_ak.ReferArray(ac->GetAtomStorage()); // this is the scratch...
-	register_class("atom group");
 	group_flagmask=0;
 }
 
