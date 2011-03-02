@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cat << endt > machine
+$(hostname)
+$(hostname)
+$(hostname)
+$(hostname)
+endt
+
+$OMD_MPI/bin/mpirun -machinefile machine -np 4 periodic $@
