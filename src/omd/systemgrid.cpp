@@ -512,8 +512,8 @@ void MDSystemGrid::DistributeContainers() {
 
 		SystemAtoms[(OMD_INT)(a->id)]->GetAtomStorage().IndexBook.push(i);
 
-		for(OMD_INT i=0;i<ng;i++) {
-			if(a->flag&ing[i]) SystemAtomGroups[i]->GetAtomStorage().IndexBook.push(i);
+		for(OMD_INT k=0;k<ng;k++) {
+			if(a->flag&ing[k]) SystemAtomGroups[k]->GetAtomStorage().IndexBook.push(i);
 		}
 
 	}
