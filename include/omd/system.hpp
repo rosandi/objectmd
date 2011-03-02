@@ -32,6 +32,7 @@
 #include <signal.h>
 #include <omd/config.hpp>
 #include <omd/container.hpp>
+#include <omd/atomgroup.hpp>
 #include <omd/unit.hpp>
 
 using std::vector;
@@ -61,6 +62,13 @@ using std::string;
 #define SYNC_FORCE     0x0400
 #define SYNC_AUX       0x0800
 #define SYNC_SPACE     0x1000
+
+#define WEST_EDGE   (Box.x0-EDGE_TOLE)
+#define EAST_EDGE   (Box.x1+EDGE_TOLE)
+#define SOUTH_EDGE  (Box.y0-EDGE_TOLE)
+#define NORTH_EDGE  (Box.y1+EDGE_TOLE)
+#define BOTTOM_EDGE (Box.z0-EDGE_TOLE)
+#define TOP_EDGE    (Box.z1+EDGE_TOLE)
 
 class MDGadget;
 class DataSlot;
@@ -138,6 +146,7 @@ protected:
 	OMD_SIZET Mode; /**<the running mode: NORMAL_MODE|RESTART_MODE|TEST_MODE**/
 
 	OMD_INT AtomID;
+	OMD_INT GroupID;
 	OMD_INT ConditionerID;
 	OMD_INT DetectorID;
 	bool BoxImport;
@@ -172,6 +181,7 @@ public:
     vector<Conditioner*>   Conditioners;
     vector<Detector*>      Detectors;
     vector<AtomContainer*> SystemAtoms;
+    vector<AtomGroup*>     SystemAtomGroups;
 	vector<DataSlot*>      MessageSlots;
 	vector<DataSlot*>      RestartVars;
 
@@ -250,6 +260,7 @@ public:
 	Detector* AddDetector(Detector* Detc);
 	Conditioner* AddConditioner(Conditioner* Cond);
 	AtomContainer* AddAtom(AtomContainer* Atm);
+	AtomGroup* AddAtomGroup(string group_name);
 	
 	class ForceKernel* AddForce(class ForceKernel* Force);
 	class ForceKernel* AddForce(class ForceKernel* Force, const OMD_CHAR* from, const OMD_CHAR* to);
@@ -306,7 +317,7 @@ public:
 	virtual void BoundaryCorrectDistances(OMD_FLOAT& dx, OMD_FLOAT& dy, OMD_FLOAT& dz);
 	
 	virtual void ErrorHandler(const OMD_CHAR* errst);
-	virtual OMD_SIZET  ClaimFlagBit(MDClass* user, const OMD_CHAR* sinfo=NULL);
+	virtual OMD_SIZET  ClaimFlagBit(MDClass* user, string sinfo="");
 	virtual OMD_SIZET  ClaimAuxVariable(MDClass* user, bool printable=false, const OMD_CHAR* tag=NULL, const OMD_CHAR* sformat=NULL);
 	                             
 	virtual OMD_SIZET GetFlagBitMask(const OMD_CHAR* usagecode);
@@ -364,8 +375,5 @@ public:
 	virtual OMD_SIZET GetLocalAtomNumber(){return GetNAtom();}
 
 };
-
-#define OMD_BEGIN try {
-#define OMD_END }catch(const OMD_CHAR* st){std::cerr<<st<<std::endl;}
 
 #endif

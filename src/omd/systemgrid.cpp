@@ -3,7 +3,7 @@
  *
  * ObjectMD
  * Molecular Dynamics Class Library
- * Version 2.0 (2009)
+ * Version 3.0 (2009, 2011)
  *
  * Released under:
  *       GNU GENERAL PUBLIC LICENSE Version 3
@@ -493,8 +493,14 @@ void MDSystemGrid::FlattenAtomBox() {
 
 void MDSystemGrid::DistributeContainers() {
 	OMD_INT nc=SystemAtoms.size();
+	OMD_INT ng=SystemAtomGroups.size();
+	OMD_INT *ing=new int[ng];
 
 	for (OMD_INT i=0;i<nc;i++) SystemAtoms[i]->GetAtomStorage().IndexBook.clear();
+	for (OMD_INT i=0;i<ng;i++) {
+		SystemAtomGroups[i]->GetAtomStorage().IndexBook.clear();
+		ing[i]=SystemAtomGroups[i]->GetGroupFlagMask();
+	}
 
 	for(OMD_INT i=0;i<LocalAtomNumber;i++) {
 		Atom* a=AtomPtr(i);
@@ -505,12 +511,21 @@ void MDSystemGrid::DistributeContainers() {
 				" xid="+as_string((OMD_INT)a->xid));
 
 		SystemAtoms[(OMD_INT)(a->id)]->GetAtomStorage().IndexBook.push(i);
+
+		for(OMD_INT i=0;i<ng;i++) {
+			if(a->flag&ing[i]) SystemAtomGroups[i]->GetAtomStorage().IndexBook.push(i);
+		}
+
 	}
 
 	OMD_INT cntatom=0;
 	for(OMD_INT i=0;i<nc;i++){
 		SystemAtoms[i]->GetAtomStorage().AssignByIndex(AtomStorage);
 		cntatom+=SystemAtoms[i]->GetNAtom();
+	}
+
+	for(OMD_INT i=0;i<ng;i++) {
+		SystemAtomGroups[i]->GetAtomStorage().AssignByIndex(AtomStorage);
 	}
 
 	// checking

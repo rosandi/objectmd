@@ -16,6 +16,7 @@ LIBOBJ = toolkit.o \
 	tablereader.o \
 	base.o \
 	container.o \
+	atomgroup.o \
 	gadget.o \
 	integrator.o \
 	comhandler.o \

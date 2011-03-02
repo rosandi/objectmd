@@ -4,8 +4,7 @@
 #include <omd/conditioner.hpp>
 #include <omd/comhandler.hpp>
 
-class NonReflecting: public Conditioner {
-	CommunicationHandler* Communicator;
+class NonReflecting: public Conditioner, private ParallelGadget {
 	
 	OMD_FLOAT fconst;
 	OMD_FLOAT imp;
@@ -56,22 +55,29 @@ public:
 			"this class requires SIMULATION_SYSTEM_GRID");
 			
 		Conditioner::Init(WorkSys);
-		Communicator=dynamic_cast<MDSystemGrid*>(WorkSys)->GetCommunicator();
-		
+		ParallelGadget::Init(WorkSys);
+
+		imp=SysParam->double_value("boundary.nonref.impedance");
+		fconst=SysParam->double_value("boundary.nonref.forceconstant");
+		gridthick=SysParam->double_value("boundary.nonref.layerthick");
+
+		// find the id of terminating-zone, put in tzid
+
+
 		tzflag=ClaimFlagBit();
 		top_force=ClaimAuxVariable(printforce, "ftop");
 		bot_force=ClaimAuxVariable(printforce, "fbot");
 		
 		OMD_FLOAT zmax=-DBL_MAX, zmin=DBL_MAX;
 		for(OMD_INT i=0;i<GetNAtom(); i++) {   
-			if(Atoms(i).xid==tzid) {
+			if(Atoms(i).group_of(tzid)) {
 				if(zmax<Atoms(i).z)zmax=Atoms(i).z;
 				if(zmin>Atoms(i).z)zmin=Atoms(i).z;
 			}
 		}
 		
-		zmax=Communicator->TakeMAX(zmax);
-		zmin=Communicator->TakeMIN(zmin);
+		zmax=TakeMAX(zmax);
+		zmin=TakeMIN(zmin);
 		
 		termzone=zmax+0.5*gridthick;
 		n_layer=(OMD_INT)((termzone-zmin)/gridthick);

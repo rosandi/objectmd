@@ -18,8 +18,8 @@
  *
 */
 
-#ifndef _CRYSTAL_H_
-#define _CRYSTAL_H_
+#ifndef _CONTAINER_H_
+#define _CONTAINER_H_
 
 #include <fstream>
 #include <omd/base.hpp>

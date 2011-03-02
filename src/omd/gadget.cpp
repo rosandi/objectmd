@@ -47,9 +47,16 @@ OMD_INT MDGadget::GetContainerID(string name){
 
 AtomContainer* MDGadget::SearchTarget(string name, bool strict){
 	if(name==System->get_name()) return System;
+
+	// Atom group has priority...
+	for(OMD_SIZET i=0;i<System->SystemAtomGroups.size();i++)
+		if(name==System->SystemAtomGroups[i]->get_name())
+			return System->SystemAtomGroups[i];
+
 	for(OMD_SIZET i=0;i<System->SystemAtoms.size();i++)
 		if(name==System->SystemAtoms[i]->get_name())
 			return System->SystemAtoms[i];
+
 	if(strict) die("can not find target atom '"+name+"'");
 	return NULL; // avoids warning..
 }

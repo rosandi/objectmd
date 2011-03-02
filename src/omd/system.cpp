@@ -77,7 +77,7 @@ void MDSystem::SystemInit(){
 	Step   = 0;
     MaxTime    = -1.0;
 	SimWallTime = 0.0;
-	AtomID=ConditionerID=DetectorID=0; // Creation counter
+	AtomID=GroupID=ConditionerID=DetectorID=0; // Creation counter
 	PBoundary= -1;
     Integrator  = NULL;
     Iterator    = NULL;
@@ -1129,6 +1129,14 @@ AtomContainer* MDSystem::AddAtom(AtomContainer* Atm)
 	return Atm;
 }
 
+AtomGroup* MDSystem::AddAtomGroup(string group_name) {
+	AtomGroup *ag=new AtomGroup(group_name, this, this);
+	ag->set_id(GroupID++);
+	SystemAtomGroups.push_back(ag);
+	blog("added atom group: "+group_name, LOGCREATE);
+	return ag;
+}
+
 void MDSystem::ChangeAtomID(OMD_SIZET idx, OMD_INT NewID) 
 {
 	assert(idx<GetNAtom(), 
@@ -1162,12 +1170,12 @@ OMD_FLOAT MDSystem::GetNumber(OMD_INT atomid){
 	return z;
 }
 
-OMD_SIZET MDSystem::ClaimFlagBit(MDClass* user,const OMD_CHAR* sinfo) {
+OMD_SIZET MDSystem::ClaimFlagBit(MDClass* user,string sinfo) {
 	OMD_SIZET a=1<<FlagBitUsed;
 	FlagBitUsed++;
 	
 	string scode(user->get_name());
-	if(sinfo){
+	if(sinfo!=""){
 		scode.append("<");
 		scode.append(sinfo);
 		scode.append(">");

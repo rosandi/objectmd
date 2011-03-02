@@ -3,7 +3,7 @@
  *
  * ObjectMD
  * Molecular Dynamics Class Library
- * Version 2.0 (2009)
+ * Version 3.0 (2009, 2011)
  *
  * Released under:
  *       GNU GENERAL PUBLIC LICENSE Version 3
@@ -14,7 +14,7 @@
  ********************************************************
  * ObjectMD header file
  *
- * AtomContainer: AtomKeeper implementation
+ * MDClass & AtomKeeper implementation
  *
 */
 
@@ -112,10 +112,10 @@ void MDClass::SetGhost(OMD_INT idx, bool a){
 
 //------------------ATOM-KEEPER----------------------//
 
-AtomKeeper::AtomKeeper(){
+AtomKeeper::AtomKeeper(KeeperType kty){
 	NAtom=0;
 	NAlloc=0;
-	Type=Storage;
+	Type=kty;
 	AtomArray=NULL;
 	AtomIndex=NULL;
 	MyClone=NULL;
@@ -393,4 +393,12 @@ void AtomKeeper::CloneArray(AtomKeeper& ak) {
 	AtomIndex=ak.GetIndexPtr();
 	NAtom=ak.GetNAtom();
 	NAlloc=ak.GetAllocSize();
+}
+
+void AtomKeeper::ReferArray(AtomKeeper& ak) {
+	Release();
+	Type=Referral;
+	OMD_SIZET sz=ak.GetNAtom();
+	Expand(sz);Clear();
+	for(int i=0;i<sz;i++) Attach(ak[i]);
 }

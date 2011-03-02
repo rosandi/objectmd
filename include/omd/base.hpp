@@ -50,12 +50,12 @@ using std::ostream;
 */
 
 class SysBox {
-    public:
-        OMD_FLOAT x0, x1; ///< west--east
-        OMD_FLOAT y0, y1; ///< south--north
-        OMD_FLOAT z0, z1; ///< bottom--top
-        OMD_FLOAT lx, ly, lz; ///< length
-        OMD_FLOAT hlx, hly, hlz; ///< half length
+public:
+	OMD_FLOAT x0, x1; ///< west--east
+	OMD_FLOAT y0, y1; ///< south--north
+	OMD_FLOAT z0, z1; ///< bottom--top
+	OMD_FLOAT lx, ly, lz; ///< length
+	OMD_FLOAT hlx, hly, hlz; ///< half length
 };
 
 enum stage_type {
@@ -102,7 +102,7 @@ enum stage_type {
 class Atom {
 public:
     OMD_CHAR  id;              ///< atom's type id: interaction and container membership
-    OMD_CHAR  xid;             ///< extended id, tagging, etc
+    OMD_CHAR  xid;             ///< extended id, tagging, grouping, etc
     OMD_INT   nid;			   ///< enumerated id
     OMD_INT   flag;            ///< the status and multi-purpose flag
     OMD_FLOAT x,   y,  z;
@@ -354,7 +354,7 @@ public:
 
 	//----Constructors/Destructor----//
 	
-	AtomKeeper();	
+	AtomKeeper(KeeperType kty=Storage);
 	AtomKeeper(AtomKeeper& ak);	
 	void Release();
 	virtual ~AtomKeeper(){Release();}
@@ -382,6 +382,7 @@ public:
 	void  Dispose(OMD_INT idx);
 	void  Copy(AtomKeeper& ak);
 	void  CloneArray(AtomKeeper& ak);
+	void  ReferArray(AtomKeeper& ak);
 	Atom* GetArrayPtr(){return AtomArray;}
 	Ptr*  GetIndexPtr(OMD_INT offset=0){return(AtomIndex+offset);}
 	OMD_SIZET GetNAtom(){return NAtom;}

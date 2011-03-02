@@ -61,8 +61,14 @@ CommunicationHandler::~CommunicationHandler() {
 	if(!opened) return;
 
 	for(OMD_INT i=0;i<27;i++) {
+		disable_log(LOGMEMORY);
 		MemFree(SpaceSendBuffer[i]);
 		MemFree(SpaceRecvBuffer[i]);
+		MemFree(VectorSendBuffer[i]);
+		MemFree(VectorRecvBuffer[i]);
+		MemFree(ScalarSendBuffer[i]);
+		MemFree(ScalarRecvBuffer[i]);
+		enable_log(LOGMEMORY);
 	}
 
 	OMD_CHAR st[DEFAULT_TRANSFER_LENGTH];
@@ -79,6 +85,8 @@ CommunicationHandler::~CommunicationHandler() {
 	SyncProcesses();
 	OMD_FLOAT walltime=TakeMAX(System->SimWallTime);
 	OMD_FLOAT comtime=TakeMAX(TotalComtime);
+	string tmsg("walltime: ");
+	tmsg.append(as_string(walltime)+"commtime: "+as_string(comtime)+" seconds");
 
 	if(GetRank()==ROOT) {
 		for(OMD_INT r=1;r<NProc;r++) {
@@ -94,8 +102,9 @@ CommunicationHandler::~CommunicationHandler() {
 		RawSend(ROOT,st,DEFAULT_TRANSFER_LENGTH);
 	}
 	
+	blog(tmsg);
+	blog("SIMULATION ENDS");
 	SyncProcesses();
-	blog("SIMULATION ENDS");	
 	Close();
 }
 
