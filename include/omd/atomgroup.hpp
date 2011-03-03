@@ -43,6 +43,7 @@ public:
 	AtomGroup* Commit(){return dynamic_cast<AtomGroup*>(Create());}
 
 	OMD_SIZET GetGroupFlagMask() {return group_flagmask;}
+	OMD_FLOAT GetMass(OMD_SIZET idx);
 };
 
 #endif

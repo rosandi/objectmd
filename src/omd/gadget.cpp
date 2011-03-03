@@ -111,11 +111,13 @@ Atom*  MDGadget::AtomPtr(OMD_INT idx) {return Target->AtomPtr(idx);}
 OMD_SIZET   MDGadget::GetNAtom() {return Target->GetNAtom();}
 OMD_FLOAT MDGadget::GetTimeStep() {return System->Integrator->TimeStep;}
 OMD_FLOAT MDGadget::GetElapsedTime() {return System->ElapsedTime;}
-OMD_FLOAT MDGadget::GetMass(Atom &a) {return System->GetMass(a.id);}
-OMD_FLOAT MDGadget::GetMass(Atom *a) {return System->GetMass(a->id);}
-OMD_FLOAT MDGadget::GetMass(OMD_INT atomid) {return System->GetMass(atomid);}
-OMD_FLOAT MDGadget::GetNumber(Atom &a) {return System->GetNumber(a.id);}
-OMD_FLOAT MDGadget::GetNumber(OMD_INT atomid) {return System->GetNumber(atomid);}
+OMD_FLOAT MDGadget::GetMass(Atom &a) {return System->SystemAtoms[a.id]->M;}
+OMD_FLOAT MDGadget::GetMass(Atom *a) {return System->SystemAtoms[a->id]->M;}
+OMD_FLOAT MDGadget::GetMass(OMD_SIZET idx) {return System->GetMass(idx);}
+
+OMD_FLOAT MDGadget::GetZ(Atom &a) {return System->SystemAtoms[a.id]->Z;}
+OMD_FLOAT MDGadget::GetZ(OMD_SIZET idx) {return System->GetZ(idx);}
+
 OMD_SIZET   MDGadget::ClaimFlagBit() {return System->ClaimFlagBit(this);}
 bool   MDGadget::OnTime(OMD_FLOAT tm){return System->OnTime(tm);}
 OMD_FLOAT&MDGadget::AuxVariable(OMD_SIZET i){return Atoms(i).aux[AuxIdx];}

@@ -989,7 +989,7 @@ void MDSystem::MeasureKinetic() {
 		if(a->flag&FLAG_GHOST) continue;
 		if(a->flag&FLAG_ACTIVE) {
    			sqrv=a->vx*a->vx+a->vy*a->vy+a->vz*a->vz;   			
-       		ValTmp += GetMass(a->id)*sqrv;
+       		ValTmp += GetMass(a)*sqrv;
        		if(sqrv>SqrMaxVelocity)SqrMaxVelocity=sqrv;
 
        	}
@@ -1156,19 +1156,11 @@ void MDSystem::ChangeAtomID(OMD_SIZET start, OMD_SIZET end, OMD_INT NewID)
 OMD_FLOAT MDSystem::GetMaxCutRadius(){return Integrator->MaxCutRadius;}
 OMD_FLOAT MDSystem::GetMaxVelocity(){return sqrt(SqrMaxVelocity);}
 
-OMD_FLOAT MDSystem::GetMass(OMD_INT atomid){
-	OMD_FLOAT m;
-	try {m=SystemAtoms.at(atomid)->M;}
-	catch(...){throw "reading atom mass out of bound";}
-	return m;
-}
+OMD_FLOAT MDSystem::GetMass(OMD_SIZET idx){return SystemAtoms[Atoms(idx).id]->M;}
+OMD_FLOAT MDSystem::GetMass(Atom* a){return SystemAtoms[a->id]->M;}
+OMD_FLOAT MDSystem::GetMass(Atom& a){return SystemAtoms[a.id]->M;}
 
-OMD_FLOAT MDSystem::GetNumber(OMD_INT atomid){
-	OMD_FLOAT z;
-	try {z=SystemAtoms.at(atomid)->Z;}
-	catch(...){throw "reading atom number out of bound";}
-	return z;
-}
+OMD_FLOAT MDSystem::GetZ(OMD_SIZET idx){return SystemAtoms[Atoms(idx).id]->Z;}
 
 OMD_SIZET MDSystem::ClaimFlagBit(MDClass* user,string sinfo) {
 	OMD_SIZET a=1<<FlagBitUsed;

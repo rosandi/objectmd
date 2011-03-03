@@ -35,10 +35,10 @@ class MySim:public MDSystemGrid {
 	}
 	
 	void PostCreation() {
-/*		AddAtomGroup("hot slab")
+		AddAtomGroup("hot slab")
 			->SelectGT(WEST_EDGE, SOUTH_EDGE, -16*LC)
-			->SetTemperature(600);
-*/
+			->SetTemperature(600)
+			->DumpAtoms("hot", WM_VELOCITY|WM_ID);
 	}
 	
 	void CreateGadget() {

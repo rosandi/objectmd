@@ -7,4 +7,4 @@ $(hostname)
 $(hostname)
 endt
 
-$OMD_MPI/bin/mpirun -machinefile machine -np 4 periodic $@
+$OMD_MPI/bin/mpirun -machinefile machine -np 4 group $@

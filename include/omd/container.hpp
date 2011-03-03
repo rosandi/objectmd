@@ -162,7 +162,11 @@ public:
 
 	/** Get the number of atoms stored in or referred by the container **/
 	virtual OMD_SIZET GetNAtom(){return AtomStorage.GetNAtom();}
-	
+
+	// calling compatibility...
+	virtual OMD_FLOAT GetMass(OMD_SIZET idx){return M;}
+	virtual OMD_FLOAT GetZ(OMD_SIZET idx){return Z;}
+
 	/** Take the reference to the primitive atom keeper, AtomKeeper **/
 	virtual AtomKeeper& GetAtomStorage(){return AtomStorage;}
 	

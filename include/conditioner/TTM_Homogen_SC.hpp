@@ -201,7 +201,7 @@ private:
 			if (!(a->flag&FLAG_ACTIVE)) continue;
 			if (a->aux[adens]*volcut<=3.0) continue;
 
-			OMD_FLOAT m=GetMass(a->id);
+			OMD_FLOAT m=GetMass(a);
 			OMD_FLOAT de=coup*(electron_temperature - a->aux[atemp])*atom_volume*fd_time_step;
 
 			OMD_FLOAT cx=(a->vx-cmx[i]);

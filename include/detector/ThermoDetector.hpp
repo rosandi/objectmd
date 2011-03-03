@@ -140,7 +140,7 @@ public:
 	virtual bool CheckLoopTemp(OMD_SIZET idx) {
 		Atom* a=AtomPtr(idx);
 		nneig[idx]++;
-		masat=GetMass(a->id);
+		masat=GetMass(a);
 		sumas[idx]+=masat;
 		sumvx[idx]+= masat*a->vx;
 		sumvy[idx]+= masat*a->vy;
@@ -155,7 +155,7 @@ public:
 		Atom* a=AtomPtr(at);
 		Atom* b=AtomPtr(to);
 		if (d<=ercut) {
-			masto=GetMass(b->id);	
+			masto=GetMass(b);	
 			nneig[to]++;
 			nneig[at]++;
 			sumas[to]+=masat;
@@ -296,7 +296,7 @@ public:
 			Atom *a=AtomPtr(i);
 			if(a->flag&FLAG_GHOST) continue;
 			if(a->flag&FLAG_ACTIVE) {
-				OMD_FLOAT ma=GetMass(a->id);
+				OMD_FLOAT ma=GetMass(a);
 				cmvx+=ma*a->vx;
 				cmvy+=ma*a->vy;
 				cmvz+=ma*a->vz;
@@ -335,7 +335,7 @@ public:
 				OMD_FLOAT ax=a->vx-cmvx;
 				OMD_FLOAT ay=a->vy-cmvy;
 				OMD_FLOAT az=a->vz-cmvz;
-				temp+=GetMass(a->id)*(ax*ax+ay*ay+az*az);
+				temp+=GetMass(a)*(ax*ax+ay*ay+az*az);
 				totatom++;
 			}
 		}

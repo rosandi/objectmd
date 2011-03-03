@@ -119,11 +119,11 @@ public:
     Atom&  Atoms(OMD_INT idx);
     Atom*  AtomPtr(OMD_INT idx);
     OMD_SIZET   GetNAtom();
-    OMD_FLOAT GetMass(OMD_INT atomid);
+    OMD_FLOAT GetMass(OMD_SIZET idx);
     OMD_FLOAT GetMass(Atom &a);
 	OMD_FLOAT GetMass(Atom *a);
-    OMD_FLOAT GetNumber(OMD_INT atomid);
-    OMD_FLOAT GetNumber(Atom &a);    
+    OMD_FLOAT GetZ(OMD_SIZET idx);
+    OMD_FLOAT GetZ(Atom &a);
     OMD_FLOAT GetTimeStep();
     OMD_FLOAT GetElapsedTime();
     AtomContainer* GetTarget(){return Target;}

@@ -145,11 +145,9 @@ AtomGroup* AtomGroup::SelectGT(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z)  {
 	AtomKeeper tmpa(AtomKeeper::Referral);
 	tmpa.disable_log(LOGMEMORY);
 	OMD_SIZET na=scratch_ak.GetNAtom();
-
 	for(OMD_SIZET i=0;i<na;i++) {
 		if((scratch_ak[i].x>x)&&(scratch_ak[i].y>y)&&(scratch_ak[i].z>z)) tmpa.IndexBook.push(i);
 	}
-
 	tmpa.AssignByIndex(scratch_ak);
 	scratch_ak.ReferArray(tmpa);
 	return this;
@@ -181,4 +179,8 @@ AtomGroup* AtomGroup::SelectLE(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z) {
 	tmpa.AssignByIndex(scratch_ak);
 	scratch_ak.ReferArray(tmpa);
 	return this;
+}
+
+OMD_FLOAT AtomGroup::GetMass(OMD_SIZET idx) {
+	return System->GetMass(idx);
 }

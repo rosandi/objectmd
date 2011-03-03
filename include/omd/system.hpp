@@ -305,8 +305,10 @@ public:
 		
 	virtual OMD_FLOAT GetMaxCutRadius();
 	virtual OMD_FLOAT GetMaxVelocity();
-	virtual OMD_FLOAT GetMass(OMD_INT atomid);
-	virtual OMD_FLOAT GetNumber(OMD_INT atomid);
+	virtual OMD_FLOAT GetMass(OMD_SIZET idx);
+	virtual OMD_FLOAT GetMass(Atom& a);
+	virtual OMD_FLOAT GetMass(Atom* a);
+	virtual OMD_FLOAT GetZ(OMD_SIZET idx);
 	
 	virtual void MeasurePotential();
 	virtual void MeasureKinetic();

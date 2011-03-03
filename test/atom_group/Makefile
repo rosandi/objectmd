@@ -3,7 +3,7 @@ LIB_PATH=-L ../../lib
 INCLUDE_PATH=-I ../../include
 LIBS=-lm -lomd_object-$(shell uname -m) -lomd-$(shell uname -m)
 
-EXE=periodic
+EXE=group
 
 all:
 	$(CXX) -g -o $(EXE) $(EXE).cpp $(LIB_PATH) $(INCLUDE_PATH) $(LIBS)

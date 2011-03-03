@@ -224,7 +224,7 @@ void MDIntegrator::Integrate() {
     for (OMD_INT i=0;i<natom;i++) {
     	if(CheckActive(i)) {
 			Atom* a=AtomPtr(i);
-			OMD_FLOAT Mass = GetMass(a->id);
+			OMD_FLOAT Mass = GetMass(a);
 			a->vx+=half_dt*a->fx/Mass;
         	a->vy+=half_dt*a->fy/Mass;
         	a->vz+=half_dt*a->fz/Mass;
@@ -241,7 +241,7 @@ void MDIntegrator::Integrate() {
     for(OMD_INT i=0;i<natom;i++) {
     	if(CheckActive(i)){
 			Atom* a=AtomPtr(i);
-			OMD_FLOAT Mass = GetMass(a->id);
+			OMD_FLOAT Mass = GetMass(a);
 			a->vx+=half_dt*a->fx/Mass;
         	a->vy+=half_dt*a->fy/Mass;
         	a->vz+=half_dt*a->fz/Mass;

@@ -679,9 +679,9 @@ AtomContainer* AtomContainer::SetKineticEnergy(OMD_FLOAT ek_per_atom) {
 
 	// Give same energy, random direction
 	OMD_FLOAT svx=0.0,svy=0.0,svz=0.0;
-	OMD_FLOAT v=sqrt(2.0*ek_per_atom/M);
 	OMD_INT natom=GetNAtom();
 	for(OMD_INT i=0;i<natom;i++) {
+		OMD_FLOAT v=sqrt(2.0*ek_per_atom/GetMass(i));
 		OMD_FLOAT sx=mdrand()*v;
 		OMD_FLOAT sy=mdrand()*(v-sx);
 		OMD_FLOAT sz=v-(sx+sy);
@@ -704,13 +704,13 @@ AtomContainer* AtomContainer::SetKineticEnergy(OMD_FLOAT ek_per_atom) {
 
 	OMD_FLOAT checkek=0.0;
 	for(OMD_INT i=0;i<natom;i++) {
-		checkek+=0.5*M*(
+		checkek+=0.5*GetMass(i)*(
 			Atoms(i).vx*Atoms(i).vx+
 			Atoms(i).vy*Atoms(i).vy+
 			Atoms(i).vz*Atoms(i).vz);
 	}
 	
-	OMD_FLOAT fact=sqrt((ek_per_atom*natom)/checkek);
+	OMD_FLOAT fact=sqrt((ek_per_atom*(OMD_FLOAT)natom)/checkek);
 	
 	for(OMD_INT i=0;i<natom;i++) {
 		Atoms(i).vx*=fact;
