@@ -103,7 +103,7 @@ class Atom {
 public:
     OMD_CHAR  id;              ///< atom's type id: interaction and container membership
     OMD_CHAR  xid;             ///< extended id, tagging, grouping, etc
-    OMD_INT   nid;			   ///< enumerated id
+    OMD_SIZET nid;			   ///< enumerated id
     OMD_SIZET flag;            ///< the status and multi-purpose flag
     OMD_FLOAT x,   y,  z;
     OMD_FLOAT vx, vy, vz;
