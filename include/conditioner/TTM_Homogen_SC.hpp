@@ -170,26 +170,25 @@ private:
 
 		if(GetRank()==ROOT) {
 			blog("finding temperature...");
-			double tn=300.0;
-			double tm=eng/3.0/MD_BOLTZMANN;
-			double d,en,em;
-			int n;
-
-			// secant method...
-		    for(n=0;n<1000;n++){
-				en=(C0*Ce.read(tn)*tn-eng);
-				em=(C0*Ce.read(tm)*tm-eng);
-		        d = en*(tn-tm)/(en-em);
-		        if(fabs(d)<OMD_EPSILON) break;
-		        tm=tn;
-		        tn-=d;
-		    }
-
-		    if(n==1000) warn("find_temperature: iteration was not convergen");
-		    electron_temperature=tn;
-
-		    std::cerr << "electron temperature = " << electron_temperature << "\n";
-
+			double tn=eng/3.0/MD_BOLTZMANN;
+			double en=0.5*C0*Ce.read(tn)*tn*atom_volume;
+			double tm=tn;
+			double em;
+			double d0=eng-en;
+			double d1=d0;
+			double tstep=d0/fabs(d0)*5.0;
+			double tt,et;
+			
+			// FIXME! do better algorithm!
+			while(d1*d0>0) {
+				tn=tm;
+				d1=d0;
+				tm+=tstep;
+				en=0.5*C0*Ce.read(tm)*tm*atom_volume;
+				d0=eng-en;
+			}
+		    electron_temperature=tm;
+		    blog("electron temperature = "+as_string(electron_temperature));
 		}
 		SyncProcesses();
 		Broadcast(electron_temperature);
@@ -204,7 +203,7 @@ private:
 		if(firstfd){
 			if(electron_temperature<=0.0) {
 				if(electron_energy<=0.0) electron_temperature=atomtemp;
-				else find_temperature(electron_energy):
+				else find_temperature(electron_energy);
 			}
 
 			int_Een=0.5*electron_temperature*

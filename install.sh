@@ -20,11 +20,14 @@ for x in $@; do
 		--conf=*)
 			CONF_FILE=${x#--conf=}
 			;;
+		--noconf)
+			NOCONF=yes
+			;;
 	esac
 done
 
 [[ -z $OMD_HOME ]] || INSTALL_DIR=$OMD_HOME
-[[ -z $INSTALL_DIR ]] && die 'install target directory needed as $1'
+[[ -z $INSTALL_DIR ]] && die 'use --prefix=dir for installation target'
 [[ -z $CONF_FILE ]] && CONF_FILE=$HOME/.omdconf-$(uname -m)
 
 echo using target directory: $INSTALL_DIR
@@ -43,6 +46,8 @@ mkdir -p \
 cp -r include/* $INSTALL_DIR/include
 cp -r lib/* $INSTALL_DIR/lib
 cp -r tables/* $INSTALL_DIR/tables
+
+[[ $NOCONF == yes ]] && exit
 
 if [[ -f $CONF_FILE ]]; then
 	echo the configuration file exist. keeping the file...
