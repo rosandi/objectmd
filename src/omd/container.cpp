@@ -671,15 +671,23 @@ AtomContainer* AtomContainer::Load(string binname, string blockname) {
  */
 
 AtomContainer* AtomContainer::SetKineticEnergy(OMD_FLOAT ek_per_atom) {
+	OMD_SIZET natom=GetNAtom();
 
 	if(!created) Create();
-	if(ek_per_atom<=0) return this;
+
+	if(ek_per_atom<=0.0) {
+		for(OMD_INT i=0;i<natom;i++) {
+			Atoms(i).vx=0.0;
+			Atoms(i).vy=0.0;
+			Atoms(i).vz=0.0;
+		}
+		return this;
+	}
 
 	mdrseed();
 
 	// Give same energy, random direction
 	OMD_FLOAT svx=0.0,svy=0.0,svz=0.0;
-	OMD_INT natom=GetNAtom();
 	for(OMD_INT i=0;i<natom;i++) {
 		OMD_FLOAT v=sqrt(2.0*ek_per_atom/GetMass(i));
 		OMD_FLOAT sx=mdrand()*v;

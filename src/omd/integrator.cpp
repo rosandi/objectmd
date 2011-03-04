@@ -108,6 +108,10 @@ void MDIntegrator::Init(MDSystem* WorkSys) {
 
 	assert(MaxCutRadius>0.0, "bad cut radius: "+as_string(MaxCutRadius));
 
+	// fetch parameters...
+	SysParam->peek("time.step", TimeStep);
+	// ------------------
+
 	if(TimeStep<=0.0) {
 		warn("using default initial time step (dt=unit_time/1000)");
 		TimeStep=0.001;

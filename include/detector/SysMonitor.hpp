@@ -22,6 +22,11 @@ using std::string;
     - the time step
     - the kinetic, potential, and total energy 
 
+ Parameters:
+    - @e monitor.filename (file name)
+    - @e monitor.nofile : suppress creating output file
+    - @e monitor.noscreen : dont print data to screen, FIXME! conflict with @e silent parameter (MDSystem)
+
 **/
 
 class SysMonitor:public Detector, public ParallelGadget {
@@ -58,7 +63,7 @@ public:
 	    // read settings from parameter file
 	    SysParam->peek("monitor.filename", Filename);
 	    if(SysParam->exist("monitor.nofile")) usefile=false;
-	    if(SysParam->exist("monitor.silent")) usescreen=false;
+	    if(SysParam->exist("monitor.noscreen")) usescreen=false;
 
 	    if(GetRank()==ROOT) {
 	    	if(usefile)fout.open(GetFilename().c_str(), ios::trunc);

@@ -193,7 +193,10 @@ void MDSystem::ReadParameters() {
 	if(param.exist("silent")) silent_mode=true;
 	// TODO: other system settings??
 	param.peek("dir.output", OutputDirectory);
-	param.peek("maxtime", MaxTime);
+
+	param.peek("maxtime",MaxTime); // FIXME! obsolete.. to be removed...
+
+	param.peek("time.max", MaxTime);
 
 	if(param.exist("restart")) {
 		SetRestartFilename(param.string_value("restart"));
