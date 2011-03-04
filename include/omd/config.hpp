@@ -27,6 +27,7 @@
 #define MAXPROC         512
 #define DEFAULT_CONFIG_FILENAME "omd-parameter"
 #define EDGE_TOLE       0.1
+#define OMD_EPSILON     1e-20
 
 // types
 #define OMD_FLOAT double

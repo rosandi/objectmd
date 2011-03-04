@@ -41,6 +41,7 @@ class TTM_Homogen: public Pre_Conditioner, public ParallelGadget {
 	OMD_FLOAT pulse_width;
 	OMD_FLOAT pulse_offset;
 	OMD_FLOAT fd_time_step;
+	OMD_FLOAT electron_energy;
 	OMD_FLOAT electron_temperature;
 	OMD_FLOAT atom_volume;
 	OMD_FLOAT e_source; // timestep source 
@@ -69,7 +70,8 @@ public:
 	TTM_Homogen():Pre_Conditioner(){
 		set_name("Homogen two temperature model");
 		register_class("TWO_TEMPERATURE_MODEL");
-		electron_temperature=0.0;
+		electron_temperature=-1.0; // undefined...
+		electron_energy=-1.0; // undefined...
 		e_source=0.0;
 		int_Een=0.0;
 		int_Aen=0.0;
@@ -90,7 +92,12 @@ public:
 		SysParam->peek("ttm.atom_volume", atom_volume, -1.0);
 		SysParam->peek("ttm.pulse_width", pulse_width, -1.0);
 		SysParam->peek("ttm.pulse_offset", pulse_offset, 0.0);
-		SysParam->peek("ttm.electron_init_temperature", electron_temperature, -1.0);
+
+		if(SysParam->exist("ttm.electron_init_energy"))
+			electron_energy=SysParam->double_value("ttm.electron_init_energy");
+		else
+			SysParam->peek("ttm.electron_init_temperature", electron_temperature, -1.0);
+
 		SysParam->peek("ttm.balance_electron_lattice", balance_el_lattice, false);
 		SysParam->peek("ttm.stop_at", stop_time, -1.0);
 		SysParam->peek("ttm.stop_equ", stop_equ, false);
@@ -151,11 +158,43 @@ public:
 
 		if(electron_temperature>0.0)
 			ost<< "electron initial temperature = " << electron_temperature << "K\n";
+		else if(electron_energy>0.0)
+			ost<< "electron initial energy = " << electron_energy << "eV\n";
+
 		ost << "pulse offset = " << pulse_offset << " ps\n";
 	}
 
 private:
-		
+
+	void find_temperature(OMD_FLOAT eng) {
+
+		if(GetRank()==ROOT) {
+			blog("finding temperature...");
+			double tn=300.0;
+			double tm=eng/3.0/MD_BOLTZMANN;
+			double d,en,em;
+			int n;
+
+			// secant method...
+		    for(n=0;n<1000;n++){
+				en=(C0*Ce.read(tn)*tn-eng);
+				em=(C0*Ce.read(tm)*tm-eng);
+		        d = en*(tn-tm)/(en-em);
+		        if(fabs(d)<OMD_EPSILON) break;
+		        tm=tn;
+		        tn-=d;
+		    }
+
+		    if(n==1000) warn("find_temperature: iteration was not convergen");
+		    electron_temperature=tn;
+
+		    std::cerr << "electron temperature = " << electron_temperature << "\n";
+
+		}
+		SyncProcesses();
+		Broadcast(electron_temperature);
+	}
+
 	void fd_main_loop(){
 		OMD_INT na=GetNAtom();
 		OMD_FLOAT atomtemp=temp_detector->GetTemperatureAvg();
@@ -163,9 +202,14 @@ private:
 		// use constant volume!
 		
 		if(firstfd){
-			if(electron_temperature<=0.0) electron_temperature=atomtemp;
+			if(electron_temperature<=0.0) {
+				if(electron_energy<=0.0) electron_temperature=atomtemp;
+				else find_temperature(electron_energy):
+			}
+
 			int_Een=0.5*electron_temperature*
 			                        C0*Ce.read(electron_temperature)*atom_volume;
+
 			int_Aen=(2.0*System->Kinetic)/System->GetTotalAtom();
 			firstfd=false;
 		}
