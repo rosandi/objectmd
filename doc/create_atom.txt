@@ -170,4 +170,11 @@ void CreateSystem() {
 
 "system.cry" is the exemplary file name of the crystal data.
 
+@section coord IMPORTANT! Coordinate system
+
+ObjectMD uses left handed coordinate system:
+- @e x-axis directed from west to east
+- @e y-axis directed from south to north
+- @e z-axis directed from bottom to top
+
 */
