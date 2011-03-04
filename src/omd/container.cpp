@@ -671,9 +671,8 @@ AtomContainer* AtomContainer::Load(string binname, string blockname) {
  */
 
 AtomContainer* AtomContainer::SetKineticEnergy(OMD_FLOAT ek_per_atom) {
-	OMD_SIZET natom=GetNAtom();
-
 	if(!created) Create();
+	OMD_SIZET natom=GetNAtom();
 
 	if(ek_per_atom<=0.0) {
 		for(OMD_INT i=0;i<natom;i++) {
