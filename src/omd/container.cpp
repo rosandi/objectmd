@@ -126,6 +126,7 @@ void AtomContainer::Release() {
 
 AtomContainer* AtomContainer::Shift(OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz)
 {
+	if(!created) Create();
     for(OMD_SIZET i=0;i<GetNAtom();i++) {
         Atoms(i).x+=dx;
         Atoms(i).y+=dy;
