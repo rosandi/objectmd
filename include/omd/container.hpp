@@ -72,6 +72,7 @@ using std::ofstream;
 */
 
 class AtomContainer: public MDClass {
+
 protected:
 	AtomKeeper AtomStorage;
 	AtomContainer* MasterContainer;
@@ -80,21 +81,16 @@ protected:
 	string mat_file;
 	OMD_INT posprec,valprec;
 	OMD_INT write_mode;
+	bool created;
 
 public:	
     OMD_FLOAT   M;
     OMD_FLOAT   Z;
     OMD_FLOAT   Value;
+	
 	SysBox   Box;
 	vector<string> StringInfo;
 	string    filename;
-//-----------------------------------------
-
-public:
-
-	bool created;
-
-    //-------Methods---------//
     
 	AtomContainer() { // empty container
 		Value=0.0; 

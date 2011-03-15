@@ -159,7 +159,9 @@ void AtomContainer::Allocate(OMD_INT na, bool clear, AtomKeeper::KeeperType type
  * Calculates the box dimension surrounding the AtomContainer, and returns the
  * SysBox object. The results is saved in variable Box.
  * The dimension is calculated by taking the maximum and the minimum values 
- * of atom coordinates.
+ * of atom coordinates. In the crystal descendant structures, this function
+ * must be called in the overriding function and add offset for 
+ * periodic boundary condition.
 */
 
 SysBox& AtomContainer::CalcBox(){

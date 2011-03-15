@@ -394,12 +394,39 @@ void MDSystem::CreationFunction() {
     CreateGadget();
 }
 
+// FIXME! working on this
+SysBox& MDSystem::CalcBox() {
+	SysBox ba,bb;
+	
+	bb.x0=bb.y0=bbz0=DBL_MAX;
+	bb.x1=bb.y1=bb.z1=-DBL_MAX;
+
+	// find bounding box...
+	for (OMD_INT i=0; i<SystemAtoms.size(); i++) {
+		ba=SystemAtoms[i]->CalcBox();
+		if(bb.x0>ba.x0)bb.x0=ba.x0;
+		if(bb.y0>ba.y0)bb.y0=ba.y0;
+		if(bb.z0>ba.z0)bb.z0=ba.z0;
+		if(bb.x1<ba.x0)bb.x1=ba.x1;
+		if(bb.y1<ba.y0)bb.y1=ba.y1;
+		if(bb.z1<ba.z0)bb.z1=ba.z1;
+	}
+	
+	Box=bb;
+	Box.lx=fabs(Box.x1-Box.x0);
+	Box.ly=fabs(Box.y1-Box.y0);
+	Box.lz=fabs(Box.z1-Box.z0);	
+	Box.hlx=Box.lx/2.0;
+	Box.hly=Box.ly/2.0;
+	Box.hlz=Box.lz/2.0;
+	return Box;
+}
+
 /** 
  * Adjust the system and give the right geometrical information to
  * user's SystemSetting() function. The box dimension is recalculated
- * regarding the possibly changed box information. Ehen the simulation
- * is reloaded (RESTART_MODE) the system box can not be changed in 
- * SystemSetting().
+ * regarding the possibly changed box information. In RESTART_MODE
+ * this function is not called.
  * 
  * In static mode, the integrator and force is set to dummy variables
  * if none is specified in the application program.
@@ -407,21 +434,11 @@ void MDSystem::CreationFunction() {
  */
 
 void MDSystem::AdjustSystem() {
-	
-		if((Mode!=RESTART_MODE)&&(!BoxImport))CalcBox();
-		SysBox SaveBox=Box;
+	if(Mode!=RESTART_MODE) {
+		if(!BoxImport) CalcBox();
 		SystemSetting();
 		if(PBoundary<0) PBoundary=0;
-		if(Mode==RESTART_MODE) Box=SaveBox;
-
-		// System's boundary box maybe adjusted in InitSystem!!
-		Box.lx=fabs(Box.x1-Box.x0);
-		Box.ly=fabs(Box.y1-Box.y0);
-		Box.lz=fabs(Box.z1-Box.z0);
-		
-		Box.hlx=Box.lx/2.0;
-		Box.hly=Box.ly/2.0;
-		Box.hlz=Box.lz/2.0;
+	}
 }
 
 /**
@@ -429,6 +446,8 @@ void MDSystem::AdjustSystem() {
  * way the gadgets take care of their own slots.
  * 
  */
+
+// FIXME! adjust border for periodic boundary here...
 
 void MDSystem::InitGadgets() {
 
@@ -1100,8 +1119,7 @@ Detector* MDSystem::AddDetector(Detector* Detc)
 	return Detc;
 }
 
-Conditioner* MDSystem::AddConditioner(Conditioner* Cond)
-{
+Conditioner* MDSystem::AddConditioner(Conditioner* Cond) {
 	Cond->SetSystem(this);
 	Cond->set_logger(this);
 	Cond->set_id(ConditionerID++); 
@@ -1110,8 +1128,7 @@ Conditioner* MDSystem::AddConditioner(Conditioner* Cond)
 	return Cond;
 }
 
-AtomContainer* MDSystem::AddAtom(AtomContainer* Atm)
-{	
+AtomContainer* MDSystem::AddAtom(AtomContainer* Atm) {	
 	Atm->set_logger(this);
 	if(!Atm->created)Atm->Create();
 	if(Atm->get_name()=="ATOM_CONTAINER"){
@@ -1119,10 +1136,8 @@ AtomContainer* MDSystem::AddAtom(AtomContainer* Atm)
 		sprintf(nst,"ATOM_%d",AtomID);
 		Atm->set_name(nst);
 	}
-	
 	Atm->set_id(AtomID++);
 	SystemAtoms.push_back(Atm); 
-	
 	blog("added atoms:",
 	    "name="+Atm->get_name()+
 	    " id="+as_string(Atm->get_id())+

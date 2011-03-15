@@ -56,6 +56,7 @@ public:
 	OMD_FLOAT z0, z1; ///< bottom--top
 	OMD_FLOAT lx, ly, lz; ///< length
 	OMD_FLOAT hlx, hly, hlz; ///< half length
+	OMD_FLOAT unx, uny, unz; ///< unit cell in xyz direction
 };
 
 enum stage_type {

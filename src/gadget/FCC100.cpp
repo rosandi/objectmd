@@ -8,8 +8,7 @@ AtomContainer* CrystalFCC100::Create() {
 		  XRelPos[ATOMS_PER_UC], YRelPos[ATOMS_PER_UC], ZRelPos[ATOMS_PER_UC],
 		  XOrg, YOrg, ZOrg,
 		  XPos, YPos, ZPos,
-		  Deviation, 
-		  XMLayerDist, YMLayerDist, ZMLayerDist, hlc;
+		  Deviation, hlc;
 
   OMD_INT     XMLayerPerUC, YMLayerPerUC, ZMLayerPerUC,
 		  XUCs, YUCs, ZUCs,
@@ -40,13 +39,13 @@ AtomContainer* CrystalFCC100::Create() {
 	XUCOffset *= hlc;  YUCOffset *= hlc;  ZUCOffset *= hlc;
 
   /* Abstand der Monolagen                      */
-	XMLayerDist = hlc; //XUCOffset / (double) XMLayerPerUC;
-	YMLayerDist = hlc; //YUCOffset / (double) YMLayerPerUC;
-	ZMLayerDist = hlc; //ZUCOffset / (double) ZMLayerPerUC;
+	XMLDist = hlc; //XUCOffset / (double) XMLayerPerUC;
+	YMLDist = hlc; //YUCOffset / (double) YMLayerPerUC;
+	ZMLDist = hlc; //ZUCOffset / (double) ZMLayerPerUC;
 
-	Box.x1=Box.x0+XMLayerDist*((OMD_FLOAT)xml-1.);
-	Box.y1=Box.y0+YMLayerDist*((OMD_FLOAT)yml-1.);
-	Box.z0=Box.z1-ZMLayerDist*((OMD_FLOAT)zml-1.);
+	Box.x1=Box.x0+XMLDist*((OMD_FLOAT)xml-1.);
+	Box.y1=Box.y0+YMLDist*((OMD_FLOAT)yml-1.);
+	Box.z0=Box.z1-ZMLDist*((OMD_FLOAT)zml-1.);
 
   /* Anzahl der Einheitszellen in X-, Y- und Z-Richtung    */
 	XUCs = (xml+XMLayerPerUC-1)/XMLayerPerUC;
@@ -104,4 +103,4 @@ AtomContainer* CrystalFCC100::Create() {
 	} 
 	created=true;
 	return this;
-}  // Create()
+}

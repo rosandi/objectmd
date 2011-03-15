@@ -231,6 +231,7 @@ protected:
 	virtual void Initiate();
 	virtual void InitGadgets();
 	virtual void PrintMessages(ostream& ost);
+	virtual SysBox& CalcBox();
 
 	virtual void CheckBeforeRun();
     virtual void BeforeFirstRun(){}

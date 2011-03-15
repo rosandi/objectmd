@@ -47,19 +47,18 @@ AtomContainer* CrystalFCC111::Create()
     OMD_INT     ATOMS_PER_UC=6;
      
     OMD_FLOAT  XUCOffset, YUCOffset, ZUCOffset,
-            XRelPos[ATOMS_PER_UC], YRelPos[ATOMS_PER_UC], ZRelPos[ATOMS_PER_UC],
-            XOrg, YOrg, ZOrg, XPos, YPos, ZPos, Deviation, hlc,
-            XMLDist, YMLDist, ZMLDist;
+		XRelPos[ATOMS_PER_UC], YRelPos[ATOMS_PER_UC], ZRelPos[ATOMS_PER_UC],
+		XOrg, YOrg, ZOrg, XPos, YPos, ZPos, Deviation, hlc;
 
     OMD_INT     XMLayerPerUC, YMLayerPerUC, ZMLayerPerUC,
             XUCs, YUCs, ZUCs, Count, i, j, k, l;
 	
 	assert(xml&&yml&&zml, "crystal monolayers are not defined");
         
-    XMLDist   = lattice_constant*sqrt(6.)/12.;
-    YMLDist   = lattice_constant*sqrt(2.)/4.;
-    ZMLDist   = lattice_constant/sqrt(3.);        
-    hlc       = lattice_constant/2.;
+    XMLDist= lattice_constant*sqrt(6.)/12.;
+    YMLDist= lattice_constant*sqrt(2.)/4.;
+    ZMLDist= lattice_constant/sqrt(3.);
+    hlc    = lattice_constant/2.;
         
     /* Offset in X-, Y-, Z-Richtung in Einheiten der halben Gitterkonstanten */
     XUCOffset = S6;    YUCOffset =S2;    ZUCOffset = V2S3;
@@ -150,3 +149,20 @@ AtomContainer* CrystalFCC111::Create()
     created=true;
     return this;
 }
+
+SysBox& CrystallFCC111::CalcBox() {
+	AtomContainer::CalcBox();
+	Box.x0-=0.5*XMLDist;
+	Box.y0-=0.5*YMLDist;
+	Box.z0-=0.5*ZMLDist;
+	Box.x1+=0.5*XMLDist;
+	Box.y1+=0.5*YMLDist;
+	Box.z1+=0.5*ZMLDist;
+	Box.lx=fabs(Box.x1-Box.x0);
+	Box.ly=fabs(Box.y1-Box.y0);
+	Box.lz=fabs(Box.z1-Box.z0);	
+	Box.hlx=Box.lx/2.0;
+	Box.hly=Box.ly/2.0;
+	Box.hlz=Box.lz/2.0;
+}
+

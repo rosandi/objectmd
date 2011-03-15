@@ -20,7 +20,8 @@ public:
 		OMD_INT eNy=(yml+1)/2;
 		OMD_INT oNx=xml/2;
 		OMD_INT oNy=yml/2;
-		
+		XMLDist=YMLDist=ZMLDist=lattice_constant/2.0;
+
 		OMD_INT na=zml*(eNx*eNy+oNx*oNy)/2 + (zml%2)*(eNx*eNy);
 		Allocate(na);
 
@@ -40,7 +41,6 @@ public:
 		created=true;
 		return this;
 	}
-
 };
 
 #endif
