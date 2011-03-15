@@ -27,7 +27,6 @@ public:
 	*/
 
 	AtomContainer* Create();
-	SysBox& CalcBox();
 };
 
 #endif
