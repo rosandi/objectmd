@@ -42,7 +42,6 @@ using std::istringstream;
 	while(f.peek()==' ' || f.peek()=='\t' || f.peek()=='\n')f.get();\
 }
 
-// FIXME! using elipsis to combine many number of containers...
 AtomContainer::AtomContainer(AtomContainer& a, AtomContainer& b) {
 	Value=0.0; 
 	filename="";
@@ -54,7 +53,6 @@ AtomContainer::AtomContainer(AtomContainer& a, AtomContainer& b) {
 	MasterContainer=NULL;
 	M=Z=-1.0;
 	write_mode=0;
-	// ...
 	Combine(a);
 	Combine(b);
 }

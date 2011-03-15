@@ -3,7 +3,7 @@
  *
  * ObjectMD
  * Molecular Dynamics Class Library
- * Version 2.0 (2009)
+ * Version 3.0 (2009,2011)
  *
  * Released under:
  *       GNU GENERAL PUBLIC LICENSE Version 3
@@ -12,7 +12,6 @@
  * Read license.txt file in the source's root directory.
  *
  ********************************************************
- *
  * Implementation of CommunicationHandler class
  *
 */
