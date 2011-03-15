@@ -394,7 +394,11 @@ void MDSystem::CreationFunction() {
     CreateGadget();
 }
 
-// FIXME! working on this
+/**
+ Calculate box dimension by taking maximum and minimum extents of the
+ SystemAtoms. The CalcBox() function of all containers is executed.
+ */
+
 SysBox& MDSystem::CalcBox() {
 	SysBox ba,bb;
 	

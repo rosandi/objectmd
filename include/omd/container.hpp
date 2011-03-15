@@ -215,7 +215,7 @@ public:
 	AtomContainer*         SetKineticEnergy(OMD_FLOAT ek_per_atom);
 	AtomContainer*         SetTemperature(OMD_FLOAT temperature);
 	bool                   CanImport() {return (filename!="" && filename!="-");}
-	SysBox& CalcBox();    
+	virtual SysBox& CalcBox();    
 	SysBox& GetBox(){return Box;}
 	AtomContainer* Deactivate() {for(OMD_SIZET i=0; i<GetNAtom(); i++)SetActive(i,false);return this;}
 	AtomContainer* Activate() {for (OMD_SIZET i=0;i<GetNAtom();i++)SetActive(i,true); return this;}
