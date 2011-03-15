@@ -38,4 +38,5 @@ public:
 	virtual SysBox& CalcBox();
 };
 
+
 #endif

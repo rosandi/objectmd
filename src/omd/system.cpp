@@ -193,9 +193,6 @@ void MDSystem::ReadParameters() {
 	if(param.exist("silent")) silent_mode=true;
 	// TODO: other system settings??
 	param.peek("dir.output", OutputDirectory);
-
-	param.peek("maxtime",MaxTime); // FIXME! obsolete.. to be removed...
-
 	param.peek("time.max", MaxTime);
 
 	if(param.exist("restart")) {
@@ -401,19 +398,19 @@ void MDSystem::CreationFunction() {
 
 SysBox& MDSystem::CalcBox() {
 	SysBox ba,bb;
-	
+	std::cerr << "calculating system box...\n";	
 	bb.x0=bb.y0=bb.z0=DBL_MAX;
 	bb.x1=bb.y1=bb.z1=-DBL_MAX;
 
 	// find bounding box...
 	for (OMD_INT i=0; i<SystemAtoms.size(); i++) {
-		ba=SystemAtoms[i]->CalcBox();
+		ba=SystemAtoms[i]->GetBox();
 		if(bb.x0>ba.x0)bb.x0=ba.x0;
 		if(bb.y0>ba.y0)bb.y0=ba.y0;
 		if(bb.z0>ba.z0)bb.z0=ba.z0;
-		if(bb.x1<ba.x0)bb.x1=ba.x1;
-		if(bb.y1<ba.y0)bb.y1=ba.y1;
-		if(bb.z1<ba.z0)bb.z1=ba.z1;
+		if(bb.x1<ba.x1)bb.x1=ba.x1;
+		if(bb.y1<ba.y1)bb.y1=ba.y1;
+		if(bb.z1<ba.z1)bb.z1=ba.z1;
 	}
 	
 	Box=bb;
@@ -423,6 +420,7 @@ SysBox& MDSystem::CalcBox() {
 	Box.hlx=Box.lx/2.0;
 	Box.hly=Box.ly/2.0;
 	Box.hlz=Box.lz/2.0;
+	
 	return Box;
 }
 
@@ -450,8 +448,6 @@ void MDSystem::AdjustSystem() {
  * way the gadgets take care of their own slots.
  * 
  */
-
-// FIXME! adjust border for periodic boundary here...
 
 void MDSystem::InitGadgets() {
 
@@ -1285,7 +1281,6 @@ void MDSystem::AcceptSignal(OMD_INT signo) {
 	sigaction(signo,&act,NULL);
 }
 
-// FIXME! case and space??
 MDGadget* MDSystem::SearchGadget(string name) {
 	for(OMD_SIZET i=0;i<Detectors.size();i++) {
 		if(Detectors[i]->get_name()==name) return Detectors[i];
@@ -1323,8 +1318,6 @@ bool MDSystem::GadgetExist(MDGadget* gad){
 	}
 	return false;
 }
-
-// FIXME! Box
 
 /**
  * @brief Importing simulation atoms from a saved text file.

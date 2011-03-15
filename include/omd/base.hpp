@@ -56,7 +56,17 @@ public:
 	OMD_FLOAT z0, z1; ///< bottom--top
 	OMD_FLOAT lx, ly, lz; ///< length
 	OMD_FLOAT hlx, hly, hlz; ///< half length
-	OMD_FLOAT unx, uny, unz; ///< unit cell in xyz direction
+
+	SysBox(){ // set box as undefined...
+		x0=y0=z0=DBL_MAX;
+		x1=y1=z1=-DBL_MAX;
+		lx=ly=lz=hlx=hly=hlz=0.0;
+	}
+
+	bool undefined() {
+		return x0==DBL_MAX&&y0==DBL_MAX&&z0==DBL_MAX&&x1==-DBL_MAX&&y1==-DBL_MAX&&z1==-DBL_MAX;
+	}
+
 };
 
 enum stage_type {

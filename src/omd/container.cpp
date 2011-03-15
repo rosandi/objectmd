@@ -42,6 +42,7 @@ using std::istringstream;
 	while(f.peek()==' ' || f.peek()=='\t' || f.peek()=='\n')f.get();\
 }
 
+// FIXME! using elipsis to combine many number of containers...
 AtomContainer::AtomContainer(AtomContainer& a, AtomContainer& b) {
 	Value=0.0; 
 	filename="";
@@ -53,8 +54,9 @@ AtomContainer::AtomContainer(AtomContainer& a, AtomContainer& b) {
 	MasterContainer=NULL;
 	M=Z=-1.0;
 	write_mode=0;
-	Combine(a,b);
-
+	// ...
+	Combine(a);
+	Combine(b);
 }
 
 AtomContainer::AtomContainer(string material_file) {
@@ -132,6 +134,7 @@ AtomContainer* AtomContainer::Shift(OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz)
         Atoms(i).y+=dy;
         Atoms(i).z+=dz;
     }
+    CalcBox();
     return this;
 }
 
@@ -201,13 +204,20 @@ SysBox& AtomContainer::CalcBox(){
 	return Box;
 }
 
+SysBox& AtomContainer::GetBox() {
+	if(Box.undefined())
+		return CalcBox();
+	else
+		return Box;
+}
+
 /**
  * Combining/appending a container. The container takes the parameters from
  * the material file of the first combined one.
  */
 
 AtomContainer* AtomContainer::Combine(AtomContainer& a) {
-	blog("Combining containers: "+a.get_name(), LOGCREATE);
+	blog("Combining container: "+a.get_name(), LOGCREATE);
 	if(!a.created)a.Create();
 	set_name(a.get_name());
 
@@ -219,55 +229,25 @@ AtomContainer* AtomContainer::Combine(AtomContainer& a) {
 
 	AtomStorage.Append(a.GetAtomStorage());
 	param.copy(a.param);
-	created=true;
-	return this;
-}
 
-/**
- * Initiates the container by combining atoms from two different containers.
- * The combined container must of the same type (equal mass and number). 
- * The function will take a copy of the atoms, and create a new structure.
- * After combining, the container has no relation to the two combined
- * containers. This function does not append the containers. The material
- * information is taken from the first atom container's material file, only if 
- * it is not configured previously.
- * 
-*/
-
-AtomContainer* AtomContainer::Combine(AtomContainer& a, AtomContainer& b) {
-	OMD_INT na=a.GetNAtom();
-	OMD_INT nb=b.GetNAtom();
-	OMD_INT nc=na+nb;
-	
-	if(!a.created){
-		warn("creating atom: "+a.get_name());
-		a.Create();
-	}
-	
-	if(!b.created){
-		warn("creating atom: "+b.get_name());
-		b.Create();
-	}
-
-	blog("Combining containers: "+a.get_name()+"+"+b.get_name(), LOGCREATE);
-	assert(a.Z==b.Z&&a.M==b.M, "combining diferent types: (Z,M)");
-	if(Z<0||M<0) ReadMaterial(a.GetMaterialFile());
-
-	set_name(a.get_name()+"+"+b.get_name());
-	Z=a.Z;
-	M=a.M;
-	
-	Allocate(nc);
-	
-	for(OMD_INT i=0;i<na;i++){
-		Atoms(i)=a.Atoms(i);
-	}
-	
-	for(OMD_INT i=na;i<nc;i++){
-		Atoms(i)=b.Atoms(i-na);
+	if(Box.undefined())
+		Box=a.Box;
+	else {
+		SysBox ab=a.GetBox();
+		if(Box.x0>ab.x0)Box.x0=ab.x0;
+		if(Box.y0>ab.y0)Box.y0=ab.y0;
+		if(Box.z0>ab.z0)Box.z0=ab.z0;
+		if(Box.x1<ab.x1)Box.x1=ab.x1;
+		if(Box.y1<ab.y1)Box.y1=ab.y1;
+		if(Box.z1<ab.z1)Box.z1=ab.z1;
+		Box.lx=fabs(Box.x1-Box.x0);
+		Box.ly=fabs(Box.y1-Box.y0);
+		Box.lz=fabs(Box.z1-Box.z0);
+		Box.hlx=Box.lx/2.0;
+		Box.hly=Box.ly/2.0;
+		Box.hlz=Box.lz/2.0;
 	}
 	created=true;
-	
 	return this;
 }
 

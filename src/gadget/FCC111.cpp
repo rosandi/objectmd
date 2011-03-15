@@ -23,14 +23,12 @@ CrystalFCC111::CrystalFCC111(OMD_INT XMLayer, OMD_INT YMLayer, OMD_INT ZMLayer, 
  The function takes monolayer numbers, x, y, z, respectivelly, and the
  lattice constant.
  
- The boundary box of the crystal is not defined here.
- The caller object must take responsible for it. 
+ The boundary box of the crystal is defined.
 */
 
 // FIXME! This function is ugly... must be replaced!
 
-AtomContainer* CrystalFCC111::Create()
-{
+AtomContainer* CrystalFCC111::Create() {
 
 #define S2                sqrt(2.)
 #define S6                sqrt(6.)
@@ -146,6 +144,7 @@ AtomContainer* CrystalFCC111::Create()
             }
         }
     }
+    CalcBox();
     created=true;
     return this;
 }
@@ -164,5 +163,6 @@ SysBox& CrystalFCC111::CalcBox() {
 	Box.hlx=Box.lx/2.0;
 	Box.hly=Box.ly/2.0;
 	Box.hlz=Box.lz/2.0;
+	return Box;
 }
 

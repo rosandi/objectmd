@@ -292,7 +292,7 @@ void MDSystemGrid::Root_Prepare() {
 	UnificateAtoms();
 	EnumerateAtoms();
 	MDSystem::AdjustSystem();	
-	ProcInfo.Box=Box; // This is the valid system box after adjusted by user!
+	ProcInfo.Box=Box; // This is the valid system box...
 	ProcInfo.TotalAtom=GetNAtom();
 	ProcInfo.NumberOfContainers=SystemAtoms.size();
 	Root_ArrangeNeighbor();

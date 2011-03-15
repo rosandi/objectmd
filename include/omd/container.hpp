@@ -195,7 +195,6 @@ public:
 	                                 string AuxNames="");
 	                                 
 	AtomContainer*         Combine(AtomContainer& a);
-	AtomContainer*         Combine(AtomContainer& a, AtomContainer& b);
 	
 	virtual AtomContainer* Save(string binname, string mode="w");
 	virtual AtomContainer* Load(string binname, string blockname="");
@@ -215,8 +214,10 @@ public:
 	AtomContainer*         SetKineticEnergy(OMD_FLOAT ek_per_atom);
 	AtomContainer*         SetTemperature(OMD_FLOAT temperature);
 	bool                   CanImport() {return (filename!="" && filename!="-");}
-	virtual SysBox& CalcBox();    
-	SysBox& GetBox(){return Box;}
+
+	virtual SysBox& CalcBox();
+	virtual SysBox& GetBox();
+
 	AtomContainer* Deactivate() {for(OMD_SIZET i=0; i<GetNAtom(); i++)SetActive(i,false);return this;}
 	AtomContainer* Activate() {for (OMD_SIZET i=0;i<GetNAtom();i++)SetActive(i,true); return this;}
 	AtomContainer* ActivateAtom(OMD_INT idx){SetActive(idx,true); return this;}

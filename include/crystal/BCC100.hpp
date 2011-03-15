@@ -38,6 +38,7 @@ public:
 					n++;
 				}
 		}
+		CalcBox();
 		created=true;
 		return this;
 	}

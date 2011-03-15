@@ -63,7 +63,7 @@ class MySim:public MDSystemGrid {
 	}
 
 	void SystemSetting() {
-		BorderOffset(0.25*LC);
+//		BorderOffset(0.25*LC);
 		AcceptSignal(SIGINT);
 		AcceptSignal(SIGUSR1);
 	}

@@ -100,7 +100,9 @@ AtomContainer* CrystalFCC100::Create() {
 				} 
 			}
 		}
-	} 
+	}
+
+	CalcBox();
 	created=true;
 	return this;
 }
