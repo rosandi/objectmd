@@ -150,7 +150,7 @@ AtomContainer* CrystalFCC111::Create()
     return this;
 }
 
-SysBox& CrystallFCC111::CalcBox() {
+SysBox& CrystalFCC111::CalcBox() {
 	AtomContainer::CalcBox();
 	Box.x0-=0.5*XMLDist;
 	Box.y0-=0.5*YMLDist;

@@ -81,9 +81,9 @@ protected:
 	string mat_file;
 	OMD_INT posprec,valprec;
 	OMD_INT write_mode;
-	bool created;
 
 public:	
+	bool created;
     OMD_FLOAT   M;
     OMD_FLOAT   Z;
     OMD_FLOAT   Value;

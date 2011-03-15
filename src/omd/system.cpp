@@ -398,7 +398,7 @@ void MDSystem::CreationFunction() {
 SysBox& MDSystem::CalcBox() {
 	SysBox ba,bb;
 	
-	bb.x0=bb.y0=bbz0=DBL_MAX;
+	bb.x0=bb.y0=bb.z0=DBL_MAX;
 	bb.x1=bb.y1=bb.z1=-DBL_MAX;
 
 	// find bounding box...
@@ -747,10 +747,14 @@ void MDSystem::LoadSimulation() {
 
 }
 
-//------------------------------------------------------------
+/**
+ This function recalculate the box boundary of the system and add offsets
+ to the sides of the box. The box is defined by the minimum and maximum values
+ of the atom coordinates.
+ */
 
 void MDSystem::BorderOffset(OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz) {
-
+	AtomContainer::CalcBox();
 	Box.x0-=dx;	Box.y0-=dy;	Box.z0-=dz;
 	Box.x1+=dx;	Box.y1+=dy;	Box.z1+=dz;
 
@@ -1130,7 +1134,7 @@ Conditioner* MDSystem::AddConditioner(Conditioner* Cond) {
 
 AtomContainer* MDSystem::AddAtom(AtomContainer* Atm) {	
 	Atm->set_logger(this);
-	if(!Atm->created)Atm->Create();
+	if(!Atm->created) Atm->Create();
 	if(Atm->get_name()=="ATOM_CONTAINER"){
 		OMD_CHAR nst[32];
 		sprintf(nst,"ATOM_%d",AtomID);
