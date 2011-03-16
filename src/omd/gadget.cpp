@@ -139,14 +139,13 @@ OMD_FLOAT MDGadget::CalcSqrDistance(Atom &at, Atom &to, OMD_FLOAT &dx, OMD_FLOAT
 	
 	if(!check) return r2;
 	
-	// FIXME! proximity limit....
-	
-	if(r2<1e-6){
-		die("overlapping atoms: r="+as_string(sqrt(r2),"%1.1E")+
-			" between atoms ("+
+	if(r2<OMD_PROXIMITY){
+		die("CalcSqrDistance: overlapping atoms: r="+as_string(sqrt(r2),"%1.1E")+
+			" between atom nid="+
+			as_string(at.nid)+" and nid="+as_string(to.nid)+" ("+
 			as_string(at.x)+","+
 			as_string(at.y)+","+
-			as_string(at.z)+") and ("+
+			as_string(at.z)+") -- ("+
 			as_string(to.x)+","+
 			as_string(to.y)+","+
 			as_string(to.z)+")");

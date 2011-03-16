@@ -28,9 +28,12 @@
 #define DEFAULT_CONFIG_FILENAME "omd-parameter"
 #define EDGE_TOLE       0.1
 #define OMD_EPSILON     1e-20
+#define OMD_PROXIMITY   1e-6
 
 // types
 #define OMD_FLOAT double
+
+// FIXME! delete this, and use only int!
 #define OMD_INT   int
 #define OMD_SIZET uint
 #define OMD_CHAR  char

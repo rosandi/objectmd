@@ -606,6 +606,7 @@ void MDSystemGrid::InitGadgets() {
 
 	UpdateRadiusTolerance();
 	Iterator->SetDirty();
+	Iterator->SetUpdatePeriod(0); // controlled update by MDSystemGrid...
 
 	// FirstSync... get ghosts from neighbors...
 	Communicator->DistributeAtomIndex();

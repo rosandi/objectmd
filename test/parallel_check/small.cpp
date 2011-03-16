@@ -15,7 +15,8 @@
 
 #include <omd/systemgrid.hpp>
 #include <potential/team.hpp>
-#include <conditioner/NeighborCell.hpp>
+//#include <conditioner/NeighborCell.hpp>
+#include <conditioner/VerletList.hpp>
 #include <crystal/FCC111.hpp>
 #include <detector/ThermoDetector.hpp>
 #include <detector/StructureDetector.hpp>
@@ -38,7 +39,8 @@ class MySim:public MDSystemGrid {
 	void CreateGadget() {
 		SetIntegrator(new MDIntegrator);
 		AddForce(new TForceEAM("platinum"));
-		AddConditioner(new NeighborCell);
+//		AddConditioner(new NeighborCell);
+		AddConditioner(new VerletList);
 		AddDetector(new SysMonitor("md.out"));
 		AddDetector(new ThermoDetector(0.1));
 	}

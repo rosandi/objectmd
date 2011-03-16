@@ -77,7 +77,9 @@ public:
 		blog("setting radius tolerance to "+as_string(RadiusTolerance));
 	}
 	
-	virtual void SetDirty(){dirty=true;}
+	void SetDirty(){dirty=true;}
+	void SetUpdatePeriod(int up){UpdatePeriod=up;}
+	void SetRebuildPeriod(int bp){RebuildPeriod=bp;}
 	
 	void PreCalculation() {
 		if(RebuildPeriod) {

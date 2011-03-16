@@ -398,7 +398,7 @@ void MDSystem::CreationFunction() {
 
 SysBox& MDSystem::CalcBox() {
 	SysBox ba,bb;
-	std::cerr << "calculating system box...\n";	
+
 	bb.x0=bb.y0=bb.z0=DBL_MAX;
 	bb.x1=bb.y1=bb.z1=-DBL_MAX;
 

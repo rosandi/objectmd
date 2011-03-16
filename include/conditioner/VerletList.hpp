@@ -21,14 +21,14 @@
 #include <omd/iterator.hpp>
 
 class VerletList: public MDIterator {
-	OMD_INT U, V, W;	
-	OMD_INT   nmean;
-	OMD_SIZET NeighSize;
-	OMD_SIZET AllocSize;
+	int U, V, W;
+	int nmean;
+	int NeighSize;
+	int AllocSize;
 	OMD_FLOAT VerletRadius;
-	OMD_INT   *Link;
-	OMD_SIZET *NeighborList;
-	OMD_SIZET *NeighborIndex;
+	int   *Link;
+	int *NeighborList;
+	int *NeighborIndex;
 	SysBox    Box;
 
 public:
@@ -39,15 +39,15 @@ public:
 	bool CheckParameter();
 	void Update();
 	void Refresh();
-	void CellNumber(OMD_SIZET, OMD_SIZET&, OMD_SIZET&, OMD_SIZET&);
+	void CellNumber(int, int&, int&, int&);
 	void Init(MDSystem* WorkSys);
 	void CalculateBox();
 	void PreIntegration();
 	void Iterate(MDGadget* IteratedClass, bool force_update=false);
-	void GetNeighborIndex(OMD_SIZET ni, OMD_SIZET& start, OMD_SIZET& end);
-	int  GetNeighbor(OMD_SIZET ni);
+	void GetNeighborIndex(int ni, int& start, int& end);
+	int  GetNeighbor(int ni);
 	void Dump(string fname);
-	void PrintInfo();	
+	void PrintInfo(ostream& ost);
 
 };
 

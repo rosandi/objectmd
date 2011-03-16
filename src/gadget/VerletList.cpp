@@ -30,7 +30,6 @@ VerletList::VerletList() {
 	SetConditionerType(COND_PRE_INTEGRATION|COND_PRE_CALCULATION);
 	NeighSize=0;
 	AllocSize=0;
-	nmean=120;
 	Link=NULL;
 	NeighborList=NULL;
 	NeighborIndex=NULL;
@@ -51,8 +50,9 @@ void VerletList::ReadParameter() {
 
 bool VerletList::CheckParameter() {
 	if(RadiusTolerance<=0.0) {
-		warn("no radius tolerance for verlet list. (verlet.radtole)");
+		warn("no radius tolerance for verlet list (verlet.radtole). Setting update period to 1");
 		RadiusTolerance=0.0;
+		UpdatePeriod=1.0;
 	}
 	return true;
 }
@@ -65,28 +65,29 @@ void VerletList::Init(MDSystem* WorkSys) {
 			   "MDSystemGrid is required for periodic boundary simulation");
 	}
 
-	CalculateBox();	
 }
 
-void VerletList::CellNumber(OMD_SIZET at, OMD_SIZET& xid, OMD_SIZET& yid, OMD_SIZET& zid) {
-	OMD_INT vxid=(OMD_INT)((Atoms(at).x-Box.x0)/VerletRadius);
-	OMD_INT vyid=(OMD_INT)((Atoms(at).y-Box.y0)/VerletRadius);
-	OMD_INT vzid=(OMD_INT)((Atoms(at).z-Box.z0)/VerletRadius);
-	if(vxid>(U-1))vxid=U-1;if(vxid<0)vxid=0;
-	if(vyid>(V-1))vyid=V-1;if(vyid<0)vyid=0;
-	if(vzid>(W-1))vzid=W-1;if(vzid<0)vzid=0;
-	xid=vxid;yid=vyid;zid=vzid;
+void VerletList::CellNumber(int at, int& xid, int& yid, int& zid) {
+	xid=(int)((Atoms(at).x-Box.x0)/VerletRadius);
+	yid=(int)((Atoms(at).y-Box.y0)/VerletRadius);
+	zid=(int)((Atoms(at).z-Box.z0)/VerletRadius);
+	if(xid>(U-1))xid=U-1;
+	if(xid<0)xid=0;
+	if(yid>(V-1))yid=V-1;
+	if(yid<0)yid=0;
+	if(zid>(W-1))zid=W-1;
+	if(zid<0)zid=0;
 }
 
 void VerletList::CalculateBox() {
 	OMD_FLOAT MinX, MaxX, MinY, MaxY, MinZ, MaxZ;        
-	OMD_INT na=GetNAtom();
+	int na=GetNAtom();
 	MinX=MinY=MinZ= DBL_MAX;
 	MaxX=MaxY=MaxZ=-DBL_MAX;
 	
 	VerletRadius=System->GetMaxCutRadius()+RadiusTolerance;
 
-	for(OMD_INT i=0; i<na; i++) {
+	for(int i=0; i<na; i++) {
 		if (MinX>Atoms(i).x)MinX=Atoms(i).x;
 		if (MinY>Atoms(i).y)MinY=Atoms(i).y;
 		if (MinZ>Atoms(i).z)MinZ=Atoms(i).z;
@@ -105,7 +106,8 @@ void VerletList::CalculateBox() {
 	Box.hlz=Box.lz/2.0;
 	U = (int)(Box.lx/VerletRadius); if(U==0) U=1;
 	V = (int)(Box.ly/VerletRadius); if(V==0) V=1;
-	W = (int)(Box.lz/VerletRadius); if(W==0) W=1;	
+	W = (int)(Box.lz/VerletRadius); if(W==0) W=1;
+	blog("linked cell dimension ("+as_string(U)+","+as_string(V)+","+as_string(W)+")");
 }
 
 void VerletList::Refresh(){
@@ -115,12 +117,7 @@ void VerletList::Refresh(){
 
 void VerletList::Update() {
 
-	OMD_SIZET i, j, k, ni, nj, nk;
-	OMD_SIZET at, to, NCounter;
-	double  rd, Rsq=VerletRadius*VerletRadius;
-	double  xto, yto, zto;
-	
-	OMD_SIZET na=GetNAtom();
+	int na=GetNAtom();
 	
 	if(AllocSize<na) {
 		MemRealloc(Link, na*sizeof(int));
@@ -128,20 +125,22 @@ void VerletList::Update() {
 		AllocSize=na;
 	}
 
-	OMD_INT CellHeaders[U][V][W];
+	int CellHeaders[U][V][W];
 
 	// Initiate the Link cells and header tabel	
-	for (at=0;at<na;at++) Link[at]=-1;
+	for (int at=0;at<na;at++) Link[at]=-1;
+
 	for (int i=0;i<U;i++)
 		for(int j=0;j<V;j++)
-			for(int k=0;k<W;k++) CellHeaders[i][j][k]=-1;
+			for(int k=0;k<W;k++)
+				CellHeaders[i][j][k]=-1;
 	
 	// Find membership of every atom in the system
 	// Remember! smallest number in cell must be the header
 	// This algorithm ensures that.
 	
-	for (at=na-1;at>=0;at--) {
-		OMD_SIZET u, v, w;
+	for (int at=na-1;at>=0;at--) {
+		int u, v, w;
 		CellNumber(at, u, v, w);
 		Link[at]=CellHeaders[u][v][w];
 		CellHeaders[u][v][w]=at;
@@ -150,22 +149,28 @@ void VerletList::Update() {
 	// Create Verlet neighbour list
 	// Every atom only search to atoms in it cell and 
 	// other 26 neighboring cells
-	NCounter=0;
-	for (OMD_SIZET me=0;me<na;me++) {
-		OMD_SIZET u, v, w;
+	OMD_FLOAT  xto, yto, zto;
+	OMD_FLOAT  rd, Rsq=VerletRadius*VerletRadius;
+	int NCounter=0;
+
+	for (int me=0;me<na;me++) {
+		int u, v, w;
 		CellNumber(me, u, v, w);
 		
-		if(me!=(OMD_SIZET)CellHeaders[u][v][w]) 
+		if(me!=CellHeaders[u][v][w])
 			die("wrong header at index "+as_string(me)+
 			    " cell index ("+as_string(u)+","+as_string(v)+","+as_string(w)+")");
 
 		//start=NeighborIndex[ni]; end=NeighborIndex[ni+1];
 		CellHeaders[u][v][w]=Link[me];
 		NeighborIndex[me]=NCounter;
-		for (k=w-1; k<=w+1; k++) {			
-			for (j=v-1; j<=v+1; j++) {
-				for (i=u-1; i<=u+1; i++) {
-					to=CellHeaders[ni][nj][nk];
+		for (int k=w-1; k<=w+1; k++) {
+			if(k==-1||k==W) continue;
+			for (int j=v-1; j<=v+1; j++) {
+				if(j==-1||j==V) continue;
+				for (int i=u-1; i<=u+1; i++) {
+					if(i==-1||i==U) continue;
+					int to=CellHeaders[i][j][k];
 					while (to>=0) {
 						rd=CalcSqrDistance(me, to, xto, yto, zto);
 						if(rd<=Rsq) {
@@ -182,49 +187,56 @@ void VerletList::Update() {
 		}
 	}
 	NeighborIndex[na]=0;
+	dirty=false;
 }
 
 void VerletList::Dump(string fname) {
 	ofstream fl(fname.c_str());
-	for (OMD_SIZET i = 0; i < GetNAtom(); i++) fl << NeighborIndex[i] << '\n';
+	for (int i = 0; i < GetNAtom(); i++) fl << NeighborIndex[i] << '\n';
 	fl.close();
 }
 
 // one-shot...
 void VerletList::PreIntegration() {
-	CalculateBox();
 	AllocSize=GetNAtom();
 	NeighSize=AllocSize*nmean;
 	MemRealloc(Link, AllocSize*sizeof(int));
 	MemRealloc(NeighborIndex, (AllocSize+1)*sizeof(int));
 	MemRealloc(NeighborList,NeighSize*sizeof(int));
-	SetConditionerType(COND_PRE_CALCULATION);
 	Refresh();
+	SetConditionerType(COND_PRE_CALCULATION);
 }
 
-void VerletList::GetNeighborIndex(OMD_SIZET ni, OMD_SIZET &start, OMD_SIZET &end) {
+void VerletList::GetNeighborIndex(int ni, int &start, int &end) {
 	start=NeighborIndex[ni];
 	end=NeighborIndex[ni+1];
 }
 
-int VerletList::GetNeighbor(OMD_SIZET ni) {
+int VerletList::GetNeighbor(int ni) {
 	return NeighborList[ni];
 }
 
 void VerletList::Iterate(MDGadget* IteratedClass, bool force_update) {
 	if(dirty||force_update) Update();
-	OMD_SIZET na=GetNAtom();
-	OMD_SIZET start, end;
+	int na=GetNAtom();
+	int start, end;
 	
-	for(OMD_SIZET at=0; at<na; at++) {
+	for(int at=0; at<na; at++) {
 		if(!CheckActive(at)) continue;
 		if(!(IteratedClass->PreIterationNode(at))) continue;
 		GetNeighborIndex(at,start,end);
-		for(OMD_SIZET i=start;i<end;i++) {
-			OMD_SIZET to=GetNeighbor(i);
+		for(int i=start;i<end;i++) {
+			int to=GetNeighbor(i);
 			if(!CheckActive(to)) continue;
 			if((CheckGhost(at)&&CheckGhost(to))) continue;
 			IteratedClass->IterationNode(at,to);
 		}
 	}
 }
+
+void VerletList::PrintInfo(ostream& ost) {
+	ost<<"id."<<id<<" "<<get_name()
+	<<": rebuild_period="<<RebuildPeriod<<" steps, "
+	<<"radius="<<VerletRadius<<" tolerance="<<RadiusTolerance<<std::endl;
+}
+

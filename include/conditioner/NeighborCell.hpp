@@ -54,10 +54,10 @@ class NeighborCell: public MDIterator {
 public:
 	
 	// refresh=0 means: never refresh
-	NeighborCell(OMD_INT refresh=0, OMD_FLOAT rtol=0.0){
+	NeighborCell(OMD_INT rebuild=0, OMD_FLOAT rtol=0.0){
 	 	set_name("NEIGHBORCELL");
 		register_class(get_name());
-		RefreshPeriod=refresh;
+		RebuildPeriod=rebuild;
 	 	SetConditionerType(COND_PRE_INTEGRATION|COND_PRE_CALCULATION);
 	 	TotalGrid=0;
 	 	CellGrid=NULL;
@@ -111,7 +111,7 @@ public:
 	}
 	
 	void CreateGrid() {
-		RCell=WorkSys->GetMaxCutRadius()+RadiusTolerance;
+		RCell=System->GetMaxCutRadius()+RadiusTolerance;
 		CalculateSystemBox();
 		GridNX=OMD_INT(Box.lx/RCell)+1;
 		GridNY=OMD_INT(Box.ly/RCell)+1;
@@ -322,7 +322,7 @@ public:
 
 	void PrintInfo(ostream& ost) {
 		ost<<"id."<<id<<" "<<get_name()
-		<<": refresh_period="<<RefreshPeriod<<" steps, "
+		<<": rebuild_period="<<RebuildPeriod<<" steps, "
 		<<"radius="<<RCell<<" tolerance="<<RadiusTolerance<<std::endl;
 	}
 
