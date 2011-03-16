@@ -79,7 +79,9 @@ public:
      * @brief Initialize the gadget
      * 
      * Atoms points to the same array and index of WorkSys->Atoms.
-     * The iterator is set to the system's iterator.
+     * The iterator is set to the system's iterator. This function reads and check
+	 * gadgets' parameter by invoking ReadParameter and CheckParameter function if
+	 * reimplemented in the child gadget class.
      * 
      */
     
@@ -182,9 +184,11 @@ public:
 	void PrintInfo(ostream& ost) {ost<<"id."<<id<<" "<<get_name()<<"\n";}
 	
 	OMD_INT NumberOfCalls(){return NCalls;}
-
 	void SyncData(OMD_INT mode) {System->SyncData(mode);}
 	void SyncData(OMD_INT mode, OMD_INT aidx) {System->SyncData(mode|aidx);}
+
+	virtual void ReadParameter(){}
+	virtual bool CheckParameter(){return true;}
 
 };
 

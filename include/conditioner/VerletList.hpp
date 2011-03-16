@@ -18,37 +18,36 @@
 #ifndef _VERLET_LIST_HPP_
 #define _VERLET_LIST_HPP_
 
-#include <fstream>
-#include <cmath>
-#include <OMD/gadgets.h>
+#include <omd/iterator.hpp>
 
 class VerletList: public MDIterator {
-	int UpdatePeriod;
-	int Step;
-	int U, V, W;
-	int NeighSize;
-	int *Link;
-	int *NeighborList;
-	int *NeighborIndex;
-	double VerletRadius;
-	
+	OMD_INT U, V, W;	
+	OMD_INT   nmean;
+	OMD_SIZET NeighSize;
+	OMD_SIZET AllocSize;
+	OMD_FLOAT VerletRadius;
+	OMD_INT   *Link;
+	OMD_SIZET *NeighborList;
+	OMD_SIZET *NeighborIndex;
+	SysBox    Box;
+
 public:
 	VerletList();
 	virtual ~VerletList();
-
-	void CellNumber(int, int&, int&, int&);
-	void Reallocate(int NewSize);
-	void RefreshTable();
-	void Init(SimSystem* WorkSys);
-	void PrintInfo() {
-		cerr << "ID." << id << " " << Name << " (Radius=" << VerletRadius 
-		     << "; Update=" << UpdatePeriod << " steps)\n";
-	}
-	void PreCalculation() {
-		if (Step>=UpdatePeriod)	{RefreshTable(); Step=0;}
-		Step++;
-	}
-	void DumpNeighborIndex();
+	
+	void ReadParameter();
+	bool CheckParameter();
+	void Update();
+	void Refresh();
+	void CellNumber(OMD_SIZET, OMD_SIZET&, OMD_SIZET&, OMD_SIZET&);
+	void Init(MDSystem* WorkSys);
+	void CalculateBox();
+	void PreIntegration();
+	void Iterate(MDGadget* IteratedClass, bool force_update=false);
+	void GetNeighborIndex(OMD_SIZET ni, OMD_SIZET& start, OMD_SIZET& end);
+	int  GetNeighbor(OMD_SIZET ni);
+	void Dump(string fname);
+	void PrintInfo();	
 
 };
 

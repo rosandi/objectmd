@@ -35,7 +35,6 @@
 
 class NeighborCell: public MDIterator {
 	OMD_INT GridNX, GridNY, GridNZ, TotalGrid;
-	OMD_INT RefreshPeriod;
 	OMD_FLOAT RCell;
 	
 	struct CellStruct {
@@ -112,6 +111,7 @@ public:
 	}
 	
 	void CreateGrid() {
+		RCell=WorkSys->GetMaxCutRadius()+RadiusTolerance;
 		CalculateSystemBox();
 		GridNX=OMD_INT(Box.lx/RCell)+1;
 		GridNY=OMD_INT(Box.ly/RCell)+1;
@@ -254,15 +254,6 @@ public:
 	void PreIntegration(){
 		CreateGrid();
 		SetConditionerType(COND_PRE_CALCULATION);
-	}
-	//-----------------------------------------------------------//
-	
-	void PreCalculation() {
-		if(!RefreshPeriod) return;
-		if(System->Step==0) return;
-		if(!(System->Step%RefreshPeriod)){
-			Refresh();
-		}
 	}
 
 /**

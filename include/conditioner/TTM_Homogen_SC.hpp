@@ -103,18 +103,18 @@ public:
 		SysParam->peek("ttm.stop_equ", stop_equ, false);
 	}
 
-	void CheckParameter(){
+	bool CheckParameter(){
 		blog("two-temperature-model: checking parameters...", LOGCREATE);
 		if(SysParam->exist("ttm.source_function_file")) source_type=function;
 		else if(SysParam->exist("ttm.temperature_input")) source_type=pulsetemp;
 		else if(pulse_width>0.0) source_type=pulse;
+		return true;
 	}
 
 	// requires temperature and pressure detector
 	void Init(MDSystem* WorkSys) {
 		Pre_Conditioner::Init(WorkSys);
 		ParallelGadget::Init(WorkSys);
-
 		
 		RegisterMessageSlot(new DataSlot("e_temp",2))
 			->SetFormat("%0.3E")->SetData(electron_temperature);
@@ -127,9 +127,6 @@ public:
 
 		RegisterMessageSlot(new DataSlot("int_Aen",2))
 		->SetFormat("%0.5E")->SetData(int_Aen); // total average energy given to lattice
-		
-		ReadParameter();
-		CheckParameter();
 
 		G.open(SysParam->string_value("ttm.electron-phonon_file"), "ELECTRON_PHONON_COUPLING");
 		G0=G.param.double_value("Constant");

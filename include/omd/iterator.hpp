@@ -38,6 +38,8 @@
 class MDIterator:public Conditioner {
 protected:
 	OMD_FLOAT RadiusTolerance;
+	OMD_INT   RebuildPeriod;
+	OMD_INT   UpdatePeriod;
 	bool dirty;
 	
 public:
@@ -48,19 +50,45 @@ public:
 		Active=0;
 		ActiveCode=-1;
 		RadiusTolerance=0.0;
+		RebuildPeriod=0;
+		UpdatePeriod=0;
 		dirty=true;
 	}
 	
 	virtual ~MDIterator(){}
 	
-	/** Update() is called every time before iteration loop */
+	/** 
+	 Called before the iteration if the iterator is dirty, set by SetDirty(), 
+	 or forced implicitly by the argument of Iterate() function.
+	 */
+	
 	virtual void Update(){}
 	
-	/** Refresh() is preserved for recreating/recalculating the neighbor cell */
+	/** 
+	 Preserved for recreating/recalculating the neighbor cell, for instance
+	 upon box size change, etc. This function is activated by activating the
+	 COND_PRE_CALCULATION conditioner type, SetConditionerType().
+	 */
+	
 	virtual void Refresh(){}
 	
-	virtual void SetRadiusTolerance(OMD_FLOAT tole){RadiusTolerance=tole;}
+	virtual void SetRadiusTolerance(OMD_FLOAT tole){
+		RadiusTolerance=tole;
+		blog("setting radius tolerance to "+as_string(RadiusTolerance));
+	}
+	
 	virtual void SetDirty(){dirty=true;}
+	
+	void PreCalculation() {
+		if(RebuildPeriod) {
+			if(NCalls)
+				if(!(System->Step%RebuildPeriod)) Refresh();
+		}
+		if(UpdatePeriod) {
+			if(NCalls)
+				if(!(System->Step%UpdatePeriod)) SetDirty();
+		}
+	}
 
 	/**
 	 * Perform iteration on all atoms in the system. When implementing an

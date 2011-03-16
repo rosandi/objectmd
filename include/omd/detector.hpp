@@ -111,13 +111,14 @@ public:
     virtual void Detect() {
     	if(System->GetMode()==STATIC_MODE) {
     		Measure();
+			NCalls++;
 		} else {
 			if(OnTime(NextSample)){
 				Measure();
 				NextSample+=TSample;
+				NCalls++;
 			}
 		}
-		NCalls++;
 	}
 
     OMD_FLOAT GetSampleTime(){return TSample;}

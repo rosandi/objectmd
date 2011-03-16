@@ -268,12 +268,20 @@ public:
 	string           search_path(string path, string fl);
 	virtual MDClass* set_id(OMD_INT nid) {id=nid;return this;}
 
-	virtual Atom&    Atoms(OMD_INT idx) 
-	{die("unimplemented function Atoms()");}
-	virtual Atom*    AtomPtr(OMD_INT idx)
-	{die("unimplemented function AtomPtr()");}
-	virtual OMD_SIZET     GetNAtom()
-	{die("unimplemented function GetNAtom()");}
+	virtual Atom& Atoms(OMD_INT idx) {
+		die("unimplemented function Atoms()"); 
+		/* no warning fake */ Atom* a; return *a /*---*/;
+	}
+	
+	virtual Atom* AtomPtr(OMD_INT idx) {
+		die("unimplemented function AtomPtr()"); 
+		return NULL;
+	}
+	
+	virtual OMD_SIZET GetNAtom() {
+		die("unimplemented function GetNAtom()"); 
+		return 0;
+	}
 
 	virtual bool     Check(){return true;}
 	

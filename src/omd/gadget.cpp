@@ -101,8 +101,10 @@ void MDGadget::Init(MDSystem* WorkSys){
 		if(TargetName=="-"||TargetName=="")Target=WorkSys;
 		else Target=SearchTarget(TargetName);
 	}
-
-	IsReady  = true;	
+	
+	ReadParameter();
+	assert(CheckParameter(), "check parameter failed");
+	IsReady  = true;
 }
 
 // redirect atom access to Target...    
