@@ -255,6 +255,7 @@ public:
 		CreateGrid();
 		SetConditionerType(COND_PRE_CALCULATION);
 	}
+	//-----------------------------------------------------------//
 
 /**
  * Execute iteration loop on the IteratedClass, which is of type MDGadget.
