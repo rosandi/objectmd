@@ -30,10 +30,10 @@
 class ClassNeighborList: public Calc_Conditioner {
 friend class Tersoff;
 
-	OMD_SIZET **list;
-	OMD_INT*  length;
-	OMD_INT*  alloc_size;
-	OMD_SIZET num_atom;
+	int **list;
+	int*  length;
+	int*  alloc_size;
+	int num_atom;
 	OMD_FLOAT cut_radius;
 
 public:
@@ -49,7 +49,7 @@ public:
 	}
 
 	virtual ~ClassNeighborList() {
-		for(OMD_SIZET i=0;i<num_atom;i++) MemFree(list[i]);
+		for(int i=0;i<num_atom;i++) MemFree(list[i]);
 		MemFree(list);
 		MemFree(length);
 		MemFree(alloc_size);
@@ -59,29 +59,29 @@ public:
 		Calc_Conditioner::Init(WorkSys);
 	}
 
-	void realloc_array(OMD_SIZET size) {
+	void realloc_array(int size) {
 
 		if(size<=num_atom) return;
 		MemRealloc(list, size*sizeof(int*));
 		MemRealloc(length, size*sizeof(int));
 		MemRealloc(alloc_size, size*sizeof(int));
 
-		for(OMD_SIZET i=num_atom; i<size; i++){
+		for(int i=num_atom; i<size; i++){
 			list[i]=NULL;
 			alloc_size[i]=0;
 		}
 
-		for(OMD_INT i=0;i<size;i++) length[i]=0;
+		for(int i=0;i<size;i++) length[i]=0;
 		num_atom=size;
 
 	}
 
-	void grow(OMD_SIZET idx, OMD_SIZET size) {
+	void grow(int idx, int size) {
 		if(size<=alloc_size[idx]) return;
 		MemRealloc(list[idx], size*sizeof(int));
 	}
 
-	void IterationNode(OMD_SIZET at, OMD_SIZET to) {
+	void IterationNode(int at, int to) {
 		if(CalcDistance(at,to)<System->GetMaxCutRadius()) {
 			grow(at,length[at]+1);
 //			grow(to,length[to]+1);
@@ -198,7 +198,7 @@ public:
 
 	}
 
-	void ComputeConnect(OMD_SIZET at, OMD_SIZET to, OMD_FLOAT &r,
+	void ComputeConnect(int at, int to, OMD_FLOAT &r,
 			            OMD_FLOAT &dx, OMD_FLOAT &dy, OMD_FLOAT &dz,
 			            OMD_FLOAT f_at[], OMD_FLOAT &pat, OMD_FLOAT f_to[], OMD_FLOAT &pto) {
 		// good numbers: sharpness=30, zbl_cut=1
@@ -256,11 +256,11 @@ public:
 		return 0.0;
 	}
 
-	void ComputeBondOrder(OMD_INT at, OMD_INT to, OMD_FLOAT rij,
+	void ComputeBondOrder(int at, int to, OMD_FLOAT rij,
 						  OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz) {
 
-		OMD_SIZET* list=NeighborList->list[at];
-		OMD_SIZET  nn=NeighborList->length[at];;
+		int* list=NeighborList->list[at];
+		int  nn=NeighborList->length[at];;
 		OMD_FLOAT g_cos_theta, dg_cos_theta;
 		OMD_FLOAT fc_rij, dfc_rij;
 
@@ -268,14 +268,14 @@ public:
 		OMD_FLOAT rij_hat[]={dx/rij,dy/rij,dz/rij};
 		OMD_FLOAT zeta=0.0, dzeta[]={0.,0,.0};
 		OMD_FLOAT dtmpx[nn], dtmpy[nn], dtmpz[nn];
-		OMD_SIZET nj;
+		int nj;
 
-		for(OMD_INT i=0;i<nn;i++) {
+		for(int i=0;i<nn;i++) {
 			dtmpx[i]=dtmpy[i]=dtmpz[i]=0.0;
 			if(list[i]==to) nj=i;
 		}
 
-		for(OMD_INT i=0; i<nn; i++) {
+		for(int i=0; i<nn; i++) {
 
 			if(list[i]==to) continue;
 
@@ -365,7 +365,7 @@ public:
 	}
 
 /*
-	void ComputeTersoff(OMD_SIZET at, OMD_SIZET to, OMD_FLOAT &r,
+	void ComputeTersoff(int at, int to, OMD_FLOAT &r,
 			            OMD_FLOAT &dx, OMD_FLOAT &dy, OMD_FLOAT &dz,
 			            OMD_FLOAT f_at[], OMD_FLOAT &pat, OMD_FLOAT f_to[], OMD_FLOAT &pto) {
 
@@ -387,7 +387,7 @@ public:
 	}
 */
 
-	void Compute(OMD_SIZET at, OMD_SIZET to) {
+	void Compute(int at, int to) {
 		OMD_FLOAT dx, dy, dz;
 		OMD_FLOAT r = sqrt(CalcSqrDistance(at, to, dx, dy, dz));
 

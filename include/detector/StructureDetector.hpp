@@ -6,7 +6,7 @@
 #include <vector>
 #include <detector/DataDumper.hpp>
 
-struct struct_neig {OMD_INT idx; OMD_FLOAT rsq;};
+struct struct_neig {int idx; OMD_FLOAT rsq;};
 
 /**
   @ingroup detector
@@ -25,7 +25,7 @@ struct struct_neig {OMD_INT idx; OMD_FLOAT rsq;};
 class StructureDetector: public DataDumper {
 	
 	vector<struct_neig> *neig;
-	OMD_INT nalloc,stidx;
+	int nalloc,stidx;
 	OMD_FLOAT sqrcut;
 	
 public:
@@ -39,7 +39,7 @@ public:
 	virtual ~StructureDetector(){MemDeleteArray(neig);}
 	void Init(MDSystem* WorkSys);
 	void Measure(){FindStructure();DataDumper::Measure();}
-	void IterationNode(OMD_SIZET at, OMD_SIZET to);
+	void IterationNode(int at, int to);
 	void FindStructure();
 };
 

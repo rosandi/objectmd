@@ -37,12 +37,12 @@ using std::string;
 
 class TEmbedding: public Conditioner {
 	friend class TForceEAM;
-	OMD_INT id_size;
-	OMD_INT NAlloc;
-	OMD_INT ED_idx;
+	int id_size;
+	int NAlloc;
+	int ED_idx;
 
 	// REMEMBER!! Not all the atoms use EAM force!!! AtomID list is needed!
-	OMD_INT          AtomID[MAX_ALLOWED_SPECIES][MAX_ALLOWED_SPECIES]; 	
+	int          AtomID[MAX_ALLOWED_SPECIES][MAX_ALLOWED_SPECIES]; 	
 	TableReader  edens[MAX_ALLOWED_SPECIES*(MAX_ALLOWED_SPECIES/2 + 1)]; 
 	TableReader  embed[MAX_ALLOWED_SPECIES];
 	OMD_FLOAT       CutRadius[MAX_ALLOWED_SPECIES];
@@ -52,8 +52,8 @@ class TEmbedding: public Conditioner {
 		virtual ~TEmbedding() {}
 		virtual void Init(MDSystem* WorkSys);
 		
-		virtual void AddTable(OMD_INT, string);
-		virtual void AddTable(OMD_INT, OMD_INT, string); //for different atom type
+		virtual void AddTable(int, string);
+		virtual void AddTable(int, int, string); //for different atom type
 
 		OMD_FLOAT GetRho(Atom &at);
 		OMD_FLOAT GetEmb(Atom &at);
@@ -89,7 +89,7 @@ public:
 
 	TForceEAM* SetEmbeddingClass(TEmbedding *EM) {emb=EM;return this;} 
 	TEmbedding* GetEmbeddingClass(){return emb;}
-	virtual TForceEAM* SetTable(const OMD_CHAR* PhiFile);
+	virtual TForceEAM* SetTable(const char* PhiFile);
 
 	virtual bool SearchAttachEmbeddingClass();
 	virtual void Init(MDSystem* WorkSys); 

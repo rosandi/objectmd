@@ -77,8 +77,8 @@ public:
 		OMD_FLOAT stemp=GetSystemTemperature();
 		if(stemp<=0.0) return;
 		OMD_FLOAT Factor=sqrt(1.+GetTimeStep()/Tau*(TempSet/stemp-1.));
-		OMD_INT na=GetNAtom();
-		for(OMD_INT i=0;i<na;i++) {
+		int na=GetNAtom();
+		for(int i=0;i<na;i++) {
 			if(CheckActive(i)) {
 				Atoms(i).vx*=Factor;
 				Atoms(i).vy*=Factor; 

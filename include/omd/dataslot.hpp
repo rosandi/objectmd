@@ -42,15 +42,15 @@ class DataSlot {
 
 	string *StrData;
 	OMD_FLOAT *DblData;
-	OMD_INT    *IntData;
-	OMD_INT priority;
+	int    *IntData;
+	int priority;
 
 	string default_data;
 	string Label;
 	string Format;
 	enum {m_undefined, m_int, m_float, m_string} DataType;
 	
-	OMD_CHAR   FormattedText[512];
+	char   FormattedText[512];
 	bool   Printable;
 
 public:
@@ -59,7 +59,7 @@ public:
 	 * label=text label to display. priority=order, lower means higher priority.
 	 */
 	
-	DataSlot(string vlabel="", OMD_INT vpriority=1) {
+	DataSlot(string vlabel="", int vpriority=1) {
 		Label.assign(vlabel);
 		priority=vpriority;
 		FormattedText[0]='\0';
@@ -69,16 +69,16 @@ public:
 	
 	virtual ~DataSlot(){}	
 	
-	OMD_INT GetPriority(){return priority;}
+	int GetPriority(){return priority;}
 	
 	bool    IsPrintable(){return Printable;}
 	
-	OMD_INT AsInt(){
+	int AsInt(){
 		switch(DataType) {
 			case m_int:
 				return *IntData;
 			case m_float:
-				return (OMD_INT)(*DblData);
+				return (int)(*DblData);
 			case m_string:
 				return(atoi(StrData->c_str()));
 			case m_undefined:
@@ -102,7 +102,7 @@ public:
 	}
 	
 	string AsString(){
-		OMD_CHAR st[128];
+		char st[128];
 		string retst;
 
 		switch(DataType) {
@@ -139,13 +139,12 @@ public:
 		}
 	}
 	
-	DataSlot* SetFormat(const OMD_CHAR* fmt){Format.assign(fmt);return this;}
+	DataSlot* SetFormat(const char* fmt){Format.assign(fmt);return this;}
 	DataSlot* SetPrintable(bool p){Printable=p;return this;}
-	DataSlot* SetData(OMD_SIZET& dat){IntData=(OMD_INT*)&dat;DataType=m_int;return this;}
-	DataSlot* SetData(OMD_INT& dat) {IntData=&dat;DataType=m_int;return this;}
+	DataSlot* SetData(int& dat) {IntData=&dat;DataType=m_int;return this;}
 	DataSlot* SetData(OMD_FLOAT& dat) {DblData=&dat;DataType=m_float;return this;}
 	DataSlot* SetData(string& dat){StrData=&dat;DataType=m_string;return this;}
-	DataSlot* SetLabel(const OMD_CHAR* dat){Label.assign(dat);return this;}
+	DataSlot* SetLabel(const char* dat){Label.assign(dat);return this;}
 	
 	DataSlot* SetDefaultData(string dat){
 		default_data=dat;
@@ -154,7 +153,7 @@ public:
 	}
 
 	string& GetLabel(){return Label;}
-	OMD_CHAR* GetFormattedText() {
+	char* GetFormattedText() {
 		string st;
 		if(Label.empty())st.assign(AsString());
 		else st.assign(Label+":"+AsString());		

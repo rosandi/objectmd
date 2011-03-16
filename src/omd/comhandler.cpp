@@ -37,7 +37,7 @@ CommunicationHandler::CommunicationHandler(){
 	opened=false;
 	System=NULL;
 	Hostname[0]='\0';
-	for(OMD_INT i=0;i<27;i++) {
+	for(int i=0;i<27;i++) {
 		SpaceSendBuffer[i]=NULL;
 		SpaceRecvBuffer[i]=NULL;
 		VectorSendBuffer[i]=NULL;
@@ -59,7 +59,7 @@ CommunicationHandler::CommunicationHandler(){
 CommunicationHandler::~CommunicationHandler() {
 	if(!opened) return;
 
-	for(OMD_INT i=0;i<27;i++) {
+	for(int i=0;i<27;i++) {
 		disable_log(LOGMEMORY);
 		MemFree(SpaceSendBuffer[i]);
 		MemFree(SpaceRecvBuffer[i]);
@@ -70,7 +70,7 @@ CommunicationHandler::~CommunicationHandler() {
 		enable_log(LOGMEMORY);
 	}
 
-	OMD_CHAR st[DEFAULT_TRANSFER_LENGTH];
+	char st[DEFAULT_TRANSFER_LENGTH];
 
 	std::cerr.flush();	
 	std::cerr << std::fixed << std::setprecision(4);
@@ -88,7 +88,7 @@ CommunicationHandler::~CommunicationHandler() {
 	tmsg.append(as_string(walltime)+"commtime: "+as_string(comtime)+" seconds");
 
 	if(GetRank()==ROOT) {
-		for(OMD_INT r=1;r<NProc;r++) {
+		for(int r=1;r<NProc;r++) {
 			RawReceive(r,st,DEFAULT_TRANSFER_LENGTH);
 			if(strncmp(st,"FINISHED",8)==0)
 				blog("Received from proc "+as_string(r)+" Message=\""+st+"\"");
@@ -108,17 +108,17 @@ CommunicationHandler::~CommunicationHandler() {
 }
 
 void CommunicationHandler::Link(MDSystemGrid* s) {
-	OMD_INT ln;
+	int ln;
 
 	System=s;
 
-	OMD_CHAR hh[MPI_MAX_PROCESSOR_NAME];
+	char hh[MPI_MAX_PROCESSOR_NAME];
 	assert(s->Argc&&s->Argv, "no valid arguments in the caller class");
 	MPI_Init(s->Argc,s->Argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &NProc);
 	MPI_Comm_rank(MPI_COMM_WORLD, &Rank);
 	MPI_Get_processor_name(hh, &ln);
-	OMD_INT nreqp=s->ClusterNX*s->ClusterNY*s->ClusterNZ;
+	int nreqp=s->ClusterNX*s->ClusterNY*s->ClusterNZ;
 	
 	assert(nreqp<=NProc,
 		   "failed to initiate sufficient number of processors: proc_required="+as_string(nreqp)+
@@ -133,21 +133,21 @@ void CommunicationHandler::Close() {
 	opened=false;
 }
 
-OMD_INT CommunicationHandler::RawSend(OMD_INT toproc, void *data, OMD_INT length){
+int CommunicationHandler::RawSend(int toproc, void *data, int length){
 	MPI_Send(data, length, MPI_CHAR, toproc, STREAMTAG, MPI_COMM_WORLD);
 	return length;
 }
 
-OMD_INT CommunicationHandler::RawReceive(OMD_INT fromproc, void* data, OMD_INT length){
+int CommunicationHandler::RawReceive(int fromproc, void* data, int length){
 	MPI_Status sta;
-	OMD_INT received;
+	int received;
 	MPI_Recv(data, length, MPI_CHAR, fromproc, STREAMTAG, MPI_COMM_WORLD, &sta);
 	MPI_Get_count(&sta, MPI_CHAR, &received);
 	return received;
 	
 }
 
-void CommunicationHandler::RootReduceSUM(OMD_FLOAT*source, OMD_FLOAT*dest, OMD_INT length){
+void CommunicationHandler::RootReduceSUM(OMD_FLOAT*source, OMD_FLOAT*dest, int length){
 	MPI_Reduce(source,dest,length,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
 }
 
@@ -236,7 +236,7 @@ void CommunicationHandler::PrepareForceBuffers(){
 	}
 }
 
-void CommunicationHandler::PrepareAuxBuffers(OMD_INT aidx){
+void CommunicationHandler::PrepareAuxBuffers(int aidx){
 	for(int i=0;i<27;i++){
 		int na=NeigRubix[i]->length;
 		int a;
@@ -259,13 +259,13 @@ void CommunicationHandler::PrepareAuxBuffers(OMD_INT aidx){
 void CommunicationHandler::CollectSendRecvNumber() {
 	MPI_Status  stat[54];
 	MPI_Request req[54];
-	OMD_INT nreq=0;
+	int nreq=0;
 
-	memset(SendNumber,0,27*sizeof(OMD_INT));
-	memset(RecvNumber,0,27*sizeof(OMD_INT));
+	memset(SendNumber,0,27*sizeof(int));
+	memset(RecvNumber,0,27*sizeof(int));
 
-	for(OMD_INT i=0;i<27;i++){
-		OMD_INT proc=System->GetNeighborRank(i);
+	for(int i=0;i<27;i++){
+		int proc=System->GetNeighborRank(i);
 		if(i==MYSELF||proc<0)continue;
 		SendNumber[i]=NeigRubix[i]->length;
 		MPI_Send_init(&SendNumber[i],1,MPI_INT,proc,SIZETAG+(26-i),MPI_COMM_WORLD,&req[nreq++]);
@@ -278,17 +278,17 @@ void CommunicationHandler::CollectSendRecvNumber() {
 }
 
 
-bool CommunicationHandler::CheckCellShift(OMD_INT b, OMD_FLOAT& xshift,OMD_FLOAT& yshift, OMD_FLOAT& zshift) {
-	OMD_INT rank=GetRank();
+bool CommunicationHandler::CheckCellShift(int b, OMD_FLOAT& xshift,OMD_FLOAT& yshift, OMD_FLOAT& zshift) {
+	int rank=GetRank();
 	// my grid coordinate
-	OMD_INT mx=System->ProcInfo.CellX[rank];
-	OMD_INT my=System->ProcInfo.CellY[rank];
-	OMD_INT mz=System->ProcInfo.CellZ[rank];
+	int mx=System->ProcInfo.CellX[rank];
+	int my=System->ProcInfo.CellY[rank];
+	int mz=System->ProcInfo.CellZ[rank];
 
 	// neigboring cell coordinate relative to the current cell
-	OMD_INT nx=b%3;
-	OMD_INT ny=(b/3)%3;
-	OMD_INT nz=(b/9)%3;
+	int nx=b%3;
+	int ny=(b/3)%3;
+	int nz=(b/9)%3;
 
 	bool do_shift=false;
 
@@ -308,19 +308,19 @@ bool CommunicationHandler::CheckCellShift(OMD_INT b, OMD_FLOAT& xshift,OMD_FLOAT
 
 		if(mx==0&&nx==0)
 		{xshift=-System->ProcInfo.Box.lx; do_shift=true;}
-		else if((mx==(OMD_INT)System->ClusterNX-1)&&(nx==2))
+		else if((mx==(int)System->ClusterNX-1)&&(nx==2))
 		{xshift=System->ProcInfo.Box.lx; do_shift=true;}
 		else xshift=0.0;
 
 		if(my==0&&ny==0)
 		{yshift=-System->ProcInfo.Box.ly;do_shift=true;}
-		else if((my==(OMD_INT)System->ClusterNY-1)&&(ny==2))
+		else if((my==(int)System->ClusterNY-1)&&(ny==2))
 		{yshift=System->ProcInfo.Box.ly;do_shift=true;}
 		else yshift=0.0;
 
 		if(mz==0&&nz==0)
 		{zshift=-System->ProcInfo.Box.lz;do_shift=true;}
-		else if((mz==(OMD_INT)System->ClusterNZ-1)&&(nz==2))
+		else if((mz==(int)System->ClusterNZ-1)&&(nz==2))
 		{zshift=System->ProcInfo.Box.lz;do_shift=true;}
 		else zshift=0.0;
 
@@ -330,18 +330,18 @@ bool CommunicationHandler::CheckCellShift(OMD_INT b, OMD_FLOAT& xshift,OMD_FLOAT
 }
 
 void CommunicationHandler::UnpackSpace() {
-	OMD_INT rank=GetRank();
-	OMD_SIZET newna=System->LocalAtomNumber;
+	int rank=GetRank();
+	int newna=System->LocalAtomNumber;
 	OMD_FLOAT xshift, yshift, zshift;
 	System->AtomStorage.Cut(System->LocalAtomNumber);
 
 	// appending all received atoms from other procs...
-	for(OMD_INT b=0;b<27;b++) {
+	for(int b=0;b<27;b++) {
 
 		if(System->GetNeighborRank(b)<0||b==MYSELF||RecvNumber[b]==0) continue;
 		
 		if(CheckCellShift(b,xshift,yshift,zshift)) {
-			for(OMD_INT c=0;c<RecvNumber[b];c++){
+			for(int c=0;c<RecvNumber[b];c++){
 				SpaceRecvBuffer[b][c].x+=xshift;
 				SpaceRecvBuffer[b][c].y+=yshift;
 				SpaceRecvBuffer[b][c].z+=zshift;
@@ -351,7 +351,7 @@ void CommunicationHandler::UnpackSpace() {
 		PackageSpace* X=SpaceRecvBuffer[b];
 		System->AtomStorage.Expand(newna+RecvNumber[b]);
 
-		for(OMD_INT c=0;c<RecvNumber[b];c++) {
+		for(int c=0;c<RecvNumber[b];c++) {
 			Atom* A=System->AtomPtr(c+newna);
 			A->id=X->id;
 			A->xid=X->xid;
@@ -371,16 +371,16 @@ void CommunicationHandler::UnpackSpace() {
 }
 
 void CommunicationHandler::UnpackPosition() {
-	OMD_INT rank=GetRank();
-	OMD_SIZET oldna=System->LocalAtomNumber;
-	OMD_SIZET newna=System->LocalAtomNumber;
+	int rank=GetRank();
+	int oldna=System->LocalAtomNumber;
+	int newna=System->LocalAtomNumber;
 	OMD_FLOAT xshift, yshift, zshift;
 	
-	for(OMD_INT b=0;b<27;b++) {
+	for(int b=0;b<27;b++) {
 		if(System->GetNeighborRank(b)<0||b==MYSELF||RecvNumber[b]==0) continue;
 
 		if(CheckCellShift(b,xshift,yshift,zshift)){
-			for(OMD_INT c=0;c<RecvNumber[b];c++){
+			for(int c=0;c<RecvNumber[b];c++){
 				VectorRecvBuffer[b][c].x+=xshift;
 				VectorRecvBuffer[b][c].y+=yshift;
 				VectorRecvBuffer[b][c].z+=zshift;
@@ -389,7 +389,7 @@ void CommunicationHandler::UnpackPosition() {
 		
 		newna+=RecvNumber[b];
 		PackageVector* X=VectorRecvBuffer[b];
-		for(OMD_INT c=0;c<RecvNumber[b];c++) {
+		for(int c=0;c<RecvNumber[b];c++) {
 			Atom* A=System->AtomPtr(c+oldna);
 			
 			if(A->nid!=X->nid)
@@ -410,18 +410,18 @@ void CommunicationHandler::UnpackPosition() {
 
 void CommunicationHandler::UnpackVelocity() {
 	
-	OMD_INT rank=GetRank();
-	OMD_SIZET oldna=System->LocalAtomNumber;
-	OMD_SIZET newna=System->LocalAtomNumber;
+	int rank=GetRank();
+	int oldna=System->LocalAtomNumber;
+	int newna=System->LocalAtomNumber;
 	
 	// appending all received atoms from other procs...
-	for(OMD_INT b=0;b<27;b++) {
+	for(int b=0;b<27;b++) {
 		
 		if(System->GetNeighborRank(b)<0||b==MYSELF||RecvNumber[b]==0) continue;
 		
 		newna+=RecvNumber[b];
 		PackageVector* X=VectorRecvBuffer[b];
-		for(OMD_INT c=0;c<RecvNumber[b];c++) {
+		for(int c=0;c<RecvNumber[b];c++) {
 			Atom* A=System->AtomPtr(c+oldna);
 			
 			if(A->nid!=X->nid)
@@ -443,18 +443,18 @@ void CommunicationHandler::UnpackVelocity() {
 
 void CommunicationHandler::UnpackForce() {
 	
-	OMD_INT rank=GetRank();
-	OMD_SIZET oldna=System->LocalAtomNumber;
-	OMD_SIZET newna=System->LocalAtomNumber;
+	int rank=GetRank();
+	int oldna=System->LocalAtomNumber;
+	int newna=System->LocalAtomNumber;
 	
 	// appending all received atoms from other procs...
-	for(OMD_INT b=0;b<27;b++) {
+	for(int b=0;b<27;b++) {
 		
 		if(System->GetNeighborRank(b)<0||b==MYSELF||RecvNumber[b]==0) continue;
 		
 		newna+=RecvNumber[b];
 		PackageVector* X=VectorRecvBuffer[b];
-		for(OMD_INT c=0;c<RecvNumber[b];c++) {
+		for(int c=0;c<RecvNumber[b];c++) {
 			Atom* A=System->AtomPtr(c+oldna);
 			
 			if(A->nid!=X->nid)
@@ -474,20 +474,20 @@ void CommunicationHandler::UnpackForce() {
 	
 }
 
-void CommunicationHandler::UnpackAux(OMD_INT aidx) {
+void CommunicationHandler::UnpackAux(int aidx) {
 
-	OMD_INT rank=GetRank();
-	OMD_SIZET oldna=System->LocalAtomNumber;
-	OMD_SIZET newna=System->LocalAtomNumber;
+	int rank=GetRank();
+	int oldna=System->LocalAtomNumber;
+	int newna=System->LocalAtomNumber;
 
 	// appending all received atoms from other procs...
-	for(OMD_INT b=0;b<27;b++) {
+	for(int b=0;b<27;b++) {
 
 		if(System->GetNeighborRank(b)<0||b==MYSELF||RecvNumber[b]==0) continue;
 
 		newna+=RecvNumber[b];
 		PackageScalar* X=ScalarRecvBuffer[b];
-		for(OMD_INT c=0;c<RecvNumber[b];c++) {
+		for(int c=0;c<RecvNumber[b];c++) {
 			Atom* A=System->AtomPtr(c+oldna);
 
 			if(A->nid!=X->nid)
@@ -507,18 +507,18 @@ void CommunicationHandler::UnpackAux(OMD_INT aidx) {
 
 }
 
-void CommunicationHandler::SendReceiveData(void* sendpack[], void* recvpack[], OMD_SIZET unitlength){
+void CommunicationHandler::SendReceiveData(void* sendpack[], void* recvpack[], int unitlength){
 	MPI_Status  stat[54];
 	MPI_Request req[54];
-	OMD_INT nreq=0;
+	int nreq=0;
 	
 	for(int i=0;i<27;i++) {
 		if((i==MYSELF)||(System->GetNeighborRank(i)<0||RecvNumber[i]<=0))continue;
 		MemRealloc(recvpack[i], RecvNumber[i]*unitlength);
 	}
 
-	for(OMD_INT i=0;i<27;i++){
-		OMD_INT proc=System->GetNeighborRank(i);
+	for(int i=0;i<27;i++){
+		int proc=System->GetNeighborRank(i);
 		if(i==MYSELF||proc<0)continue;
 		
 		if(SendNumber[i]) MPI_Send_init(sendpack[i],SendNumber[i]*unitlength,
@@ -533,11 +533,11 @@ void CommunicationHandler::SendReceiveData(void* sendpack[], void* recvpack[], O
 
 	MPI_Startall(nreq,req);
 	MPI_Waitall(nreq,req,stat);
-	for(OMD_INT i=0;i<nreq;i++) MPI_Request_free(&req[i]);
+	for(int i=0;i<nreq;i++) MPI_Request_free(&req[i]);
 
 }
 
-void CommunicationHandler::SendReceive(OMD_INT mode){
+void CommunicationHandler::SendReceive(int mode){
 	timeval tstart, tend;
 	gettimeofday(&tstart,NULL);
 
@@ -573,7 +573,7 @@ void CommunicationHandler::SendReceive(OMD_INT mode){
 	}
 	
 	if(mode&SYNC_AUX) {
-		OMD_INT aidx=mode&0x00FF;
+		int aidx=mode&0x00FF;
 		PrepareAuxBuffers(aidx);
 		SendReceiveData((void**)   ScalarSendBuffer, 
 						(void**)   ScalarRecvBuffer, sizeof(PackageScalar));
@@ -584,20 +584,20 @@ void CommunicationHandler::SendReceive(OMD_INT mode){
 	TotalComtime+=(OMD_FLOAT)((tend.tv_sec-tstart.tv_sec)+1e-6*(tend.tv_usec-tstart.tv_usec));
 }
 
-OMD_INT CommunicationHandler::TakeSUM(OMD_INT a){
-	OMD_INT mv;
+int CommunicationHandler::TakeSUM(int a){
+	int mv;
 	MPI_Allreduce(&a,&mv,1,MPI_INT,MPI_SUM,MPI_COMM_WORLD);
 	return mv;
 }
 
-OMD_INT CommunicationHandler::TakeMAX(OMD_INT a){
-	OMD_INT mv;
+int CommunicationHandler::TakeMAX(int a){
+	int mv;
 	MPI_Allreduce(&a,&mv,1,MPI_INT,MPI_MAX,MPI_COMM_WORLD);
 	return mv;
 }
 
-OMD_INT CommunicationHandler::TakeMIN(OMD_INT a){
-	OMD_INT mv;
+int CommunicationHandler::TakeMIN(int a){
+	int mv;
 	MPI_Allreduce(&a,&mv,1,MPI_INT,MPI_MIN,MPI_COMM_WORLD);
 	return mv;
 }
@@ -624,15 +624,15 @@ OMD_FLOAT CommunicationHandler::TakeMIN(OMD_FLOAT a){
 /** Gather variable values from childs. The target buffer must be
  *  allocated prior to the function call **/
 
-void CommunicationHandler::Gather(void *data, void* buffer, OMD_INT length){
+void CommunicationHandler::Gather(void *data, void* buffer, int length){
 	MPI_Gather(data, length, MPI_CHAR, buffer, length, MPI_CHAR, 0, MPI_COMM_WORLD);
 }
 
-void CommunicationHandler::AllGather(void *send, void* receive, OMD_INT senlen, OMD_INT reclen){
+void CommunicationHandler::AllGather(void *send, void* receive, int senlen, int reclen){
 	MPI_Allgather(send, senlen, MPI_CHAR, receive, reclen, MPI_CHAR, MPI_COMM_WORLD);
 }
 
-void CommunicationHandler::Broadcast(void* a, OMD_INT size){
+void CommunicationHandler::Broadcast(void* a, int size){
 	MPI_Bcast(a,size,MPI_CHAR,0,MPI_COMM_WORLD);
 }
 
@@ -645,7 +645,7 @@ void CommunicationHandler::Abort() {
 
 void CommunicationHandler::DistributeAtomIndexSlab(int slab) {
 
-	OMD_INT center=slab+4, south=slab+1, north=slab+7, west=slab+3, east=slab+5;
+	int center=slab+4, south=slab+1, north=slab+7, west=slab+3, east=slab+5;
 	if(System->GetNeighborRank(center)<0) return;
 
 	OMD_FLOAT rcut=System->GetMaxCutRadius()+CellRadiusTolerance;
@@ -656,13 +656,13 @@ void CommunicationHandler::DistributeAtomIndexSlab(int slab) {
 				as_string(System->ProcInfo.LCellY)+","+
 				as_string(System->ProcInfo.LCellZ)+") border radius="+as_string(rcut));
 
-	OMD_INT na=System->GetLocalAtomNumber();
+	int na=System->GetLocalAtomNumber();
 	SysBox Border=System->GetCellBorder();
 
 	switch(slab) {
 	case BottomSlab:
 
-		for(OMD_INT i=0;i<na;i++)
+		for(int i=0;i<na;i++)
 			if(Atoms(i).z<(Border.z0+rcut)) NeigRubix[center]->push(i);
 
 		break;
@@ -675,7 +675,7 @@ void CommunicationHandler::DistributeAtomIndexSlab(int slab) {
 
 	case TopSlab:
 
-		for(OMD_INT i=0;i<na;i++)
+		for(int i=0;i<na;i++)
 			if(Atoms(i).z>(Border.z1-rcut)) NeigRubix[center]->push(i);
 
 		break;
@@ -764,6 +764,6 @@ void CommunicationHandler::DistributeAtomIndex() {
 }
 
 
-Atom& CommunicationHandler::Atoms(OMD_INT idx){return System->Atoms(idx);}
-Atom* CommunicationHandler::AtomPtr(OMD_INT idx){return System->AtomPtr(idx);}
-OMD_SIZET CommunicationHandler::GetNAtom(){return System->GetNAtom();}
+Atom& CommunicationHandler::Atoms(int idx){return System->Atoms(idx);}
+Atom* CommunicationHandler::AtomPtr(int idx){return System->AtomPtr(idx);}
+int CommunicationHandler::GetNAtom(){return System->GetNAtom();}

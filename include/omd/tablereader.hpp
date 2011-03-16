@@ -28,7 +28,7 @@ class TableReader:public MDClass {
 	// Coefficient a is the value it self
 	struct CoefStruct {OMD_FLOAT a, b, c, d;} *coef;
 	enum tabel_format {plain, rmult} format;
-	OMD_INT	n_data;
+	int	n_data;
 	bool allow_outrange_low;
 	bool allow_outrange_hi;
 	OMD_FLOAT outrange_low;
@@ -52,7 +52,7 @@ class TableReader:public MDClass {
 		void   read(OMD_FLOAT r,OMD_FLOAT& val,OMD_FLOAT& dval);
 		OMD_FLOAT dread(OMD_FLOAT r);
 		OMD_FLOAT dread2(OMD_FLOAT r);
-		void   dump(string filename, OMD_INT resolution=1000);
+		void   dump(string filename, int resolution=1000);
 		void   dump_var();
 };
 

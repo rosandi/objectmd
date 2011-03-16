@@ -27,13 +27,13 @@
 
 class CrystalFCC111:public AtomContainer {
 protected:
-	OMD_INT xml, yml, zml;
+	int xml, yml, zml;
 	OMD_FLOAT lattice_constant;
 	OMD_FLOAT XMLDist, YMLDist, ZMLDist;
 
 public: 
-	CrystalFCC111(OMD_INT XMLayer, OMD_INT YMLayer, OMD_INT ZMLayer, string mat_file);
-	CrystalFCC111(const OMD_CHAR* fname, string mat_file);
+	CrystalFCC111(int XMLayer, int YMLayer, int ZMLayer, string mat_file);
+	CrystalFCC111(const char* fname, string mat_file);
 	virtual AtomContainer* Create();
 	virtual SysBox& CalcBox();
 };

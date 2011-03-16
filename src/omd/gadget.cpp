@@ -41,7 +41,7 @@ MDGadget::MDGadget() {
 	register_class("GADGET");
 }
 
-OMD_INT MDGadget::GetContainerID(string name){
+int MDGadget::GetContainerID(string name){
 	return System->GetContainerID(name);
 }
 
@@ -49,11 +49,11 @@ AtomContainer* MDGadget::SearchTarget(string name, bool strict){
 	if(name==System->get_name()) return System;
 
 	// Atom group has priority...
-	for(OMD_SIZET i=0;i<System->SystemAtomGroups.size();i++)
+	for(int i=0;i<System->SystemAtomGroups.size();i++)
 		if(name==System->SystemAtomGroups[i]->get_name())
 			return System->SystemAtomGroups[i];
 
-	for(OMD_SIZET i=0;i<System->SystemAtoms.size();i++)
+	for(int i=0;i<System->SystemAtoms.size();i++)
 		if(name==System->SystemAtoms[i]->get_name())
 			return System->SystemAtoms[i];
 
@@ -62,12 +62,12 @@ AtomContainer* MDGadget::SearchTarget(string name, bool strict){
 }
 
 MDGadget* MDGadget::SearchGadget(string name, bool strict) {
-	for(OMD_SIZET i=0;i<System->Detectors.size();i++) {
+	for(int i=0;i<System->Detectors.size();i++) {
 		if(System->Detectors[i]->get_name()==name)
 			return System->Detectors[i];
 	}
 	
-	for(OMD_SIZET i=0;i<System->Conditioners.size();i++) {
+	for(int i=0;i<System->Conditioners.size();i++) {
 		if(System->Conditioners[i]->get_name()==name)
 			return System->Conditioners[i];
 	}
@@ -79,11 +79,11 @@ MDGadget* MDGadget::SearchGadget(string name, bool strict) {
 // case insensitive
 MDGadget* MDGadget::SearchGadgetType(string type, bool strict) {
 	type=(replace_char(lower_case(type), ' ', '_'));
-	for(OMD_SIZET i=0;i<System->Detectors.size();i++)
+	for(int i=0;i<System->Detectors.size();i++)
 		if(System->Detectors[i]->type_of(type))
 			return System->Detectors[i];
 
-	for(OMD_SIZET i=0;i<System->Conditioners.size();i++)
+	for(int i=0;i<System->Conditioners.size();i++)
 		if(System->Conditioners[i]->type_of(type))
 			return System->Conditioners[i];
 
@@ -108,22 +108,22 @@ void MDGadget::Init(MDSystem* WorkSys){
 }
 
 // redirect atom access to Target...    
-Atom&  MDGadget::Atoms(OMD_INT idx) {return Target->Atoms(idx);}
-Atom*  MDGadget::AtomPtr(OMD_INT idx) {return Target->AtomPtr(idx);}
-OMD_SIZET   MDGadget::GetNAtom() {return Target->GetNAtom();}
+Atom&  MDGadget::Atoms(int idx) {return Target->Atoms(idx);}
+Atom*  MDGadget::AtomPtr(int idx) {return Target->AtomPtr(idx);}
+int   MDGadget::GetNAtom() {return Target->GetNAtom();}
 OMD_FLOAT MDGadget::GetTimeStep() {return System->Integrator->TimeStep;}
 OMD_FLOAT MDGadget::GetElapsedTime() {return System->ElapsedTime;}
 OMD_FLOAT MDGadget::GetMass(Atom &a) {return System->SystemAtoms[a.id]->M;}
 OMD_FLOAT MDGadget::GetMass(Atom *a) {return System->SystemAtoms[a->id]->M;}
-OMD_FLOAT MDGadget::GetMass(OMD_SIZET idx) {return System->GetMass(idx);}
+OMD_FLOAT MDGadget::GetMass(int idx) {return System->GetMass(idx);}
 
 OMD_FLOAT MDGadget::GetZ(Atom &a) {return System->SystemAtoms[a.id]->Z;}
-OMD_FLOAT MDGadget::GetZ(OMD_SIZET idx) {return System->GetZ(idx);}
+OMD_FLOAT MDGadget::GetZ(int idx) {return System->GetZ(idx);}
 
-OMD_SIZET   MDGadget::ClaimFlagBit() {return System->ClaimFlagBit(this);}
+int   MDGadget::ClaimFlagBit() {return System->ClaimFlagBit(this);}
 bool   MDGadget::OnTime(OMD_FLOAT tm){return System->OnTime(tm);}
-OMD_FLOAT&MDGadget::AuxVariable(OMD_SIZET i){return Atoms(i).aux[AuxIdx];}
-OMD_SIZET   MDGadget::ClaimAuxVariable(bool printable, const OMD_CHAR* tag, const OMD_CHAR* sformat) {
+OMD_FLOAT&MDGadget::AuxVariable(int i){return Atoms(i).aux[AuxIdx];}
+int   MDGadget::ClaimAuxVariable(bool printable, const char* tag, const char* sformat) {
 	AuxIdx=System->ClaimAuxVariable(this,printable,tag,sformat);
 	return (AuxIdx);
 }
@@ -154,7 +154,7 @@ OMD_FLOAT MDGadget::CalcSqrDistance(Atom &at, Atom &to, OMD_FLOAT &dx, OMD_FLOAT
 	return r2;
 }
 
-OMD_INT MDGadget::IsActive(OMD_INT Code) {
+int MDGadget::IsActive(int Code) {
 	if(Code) return Code&Active;
 	return ActiveCode&Active;
 }
@@ -170,7 +170,7 @@ void MDGadget::RestartVariable(string tag, OMD_FLOAT &val){
 	assert(System, "attempt to read restart variable before initialization");
 	DataSlot *m=NULL;
 
-	for(OMD_SIZET i=0;i<System->RestartVars.size();i++) {
+	for(int i=0;i<System->RestartVars.size();i++) {
 		if(System->RestartVars[i]->GetLabel()==tag) m=System->RestartVars[i];
 	}
 	
@@ -185,11 +185,11 @@ void MDGadget::RestartVariable(string tag, OMD_FLOAT &val){
 
 }
 
-void MDGadget::RestartVariable(string tag, OMD_INT &val){
+void MDGadget::RestartVariable(string tag, int &val){
 	assert(System, "attempt to read restart variable befor initialization");
 	DataSlot *m=NULL;
 
-	for(OMD_SIZET i=0;i<System->RestartVars.size();i++) {
+	for(int i=0;i<System->RestartVars.size();i++) {
 		if(System->RestartVars[i]->GetLabel()==tag) m=System->RestartVars[i];
 	}
 	

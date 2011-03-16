@@ -58,9 +58,9 @@ class TTM_Homogen: public Force_Conditioner {
 	bool stopped;
 	
 	// for non homogen temperature distribution
-	OMD_INT    allocated_length;
-	OMD_INT    atemp;
-	OMD_INT    adens;
+	int    allocated_length;
+	int    atemp;
+	int    adens;
 	
 	enum {none, function, pulsetemp, pulse} source_type;
 	
@@ -142,7 +142,7 @@ public:
 		
 		// finds the right detector
 		temp_detector=NULL;
-		for(OMD_INT i=0;i<WorkSys->Detectors.size();i++){
+		for(int i=0;i<WorkSys->Detectors.size();i++){
 			if(WorkSys->Detectors[i]->type_of("tpdetector")){
 				temp_detector=dynamic_cast<TempPressDetector*>(WorkSys->Detectors[i]);
 				temp_detector->SetIntensive(true);
@@ -173,7 +173,7 @@ public:
 private:
 
 	void fd_main_loop(){
-		OMD_INT na=GetNAtom();
+		int na=GetNAtom();
 
 		OMD_FLOAT atomtemp=temp_detector->GetTemperatureAvg();
 		
@@ -199,7 +199,7 @@ private:
 	}
 
 	void friction_force() {
-		OMD_INT na=GetNAtom();
+		int na=GetNAtom();
 		OMD_FLOAT *sumvx, *sumvy, *sumvz;
 		temp_detector->GetCMVelocities(sumvx, sumvy, sumvz);
 		OMD_FLOAT volcut=temp_detector->GetDetectVolume();
@@ -207,9 +207,9 @@ private:
 		
 		// \Delta t_FD = \Delta t_MD
 		OMD_FLOAT sum_eng=0.0;
-		OMD_INT neng=0;
+		int neng=0;
 		
-		for(OMD_INT i=0;i<na;i++){
+		for(int i=0;i<na;i++){
 			Atom* a=AtomPtr(i);
 
 			if (a->flag&FLAG_GHOST) continue;

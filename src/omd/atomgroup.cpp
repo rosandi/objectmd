@@ -46,13 +46,13 @@ AtomGroup* AtomGroup::Source(AtomContainer* ac) {
 AtomGroup* AtomGroup::Union(AtomContainer& a) { // warning! combining may take time!
 	AtomKeeper tmpa(AtomKeeper::Referral);
 	tmpa.disable_log(LOGMEMORY);
-	OMD_SIZET na=a.GetNAtom();
-	OMD_SIZET nm=scratch_ak.GetNAtom();
+	int na=a.GetNAtom();
+	int nm=scratch_ak.GetNAtom();
 
-	for(OMD_SIZET i=0;i<na;i++) {
+	for(int i=0;i<na;i++) {
 		Atom* A=a.AtomPtr(i);
 		bool doit=true;
-		for(OMD_SIZET m=0;m<nm;m++) if(A==scratch_ak.AtomPtr(m)) {doit=false;break;}
+		for(int m=0;m<nm;m++) if(A==scratch_ak.AtomPtr(m)) {doit=false;break;}
 		if(doit) tmpa.IndexBook.push(i);
 	}
 
@@ -65,9 +65,9 @@ AtomGroup* AtomGroup::Union(AtomContainer& a) { // warning! combining may take t
 AtomGroup* AtomGroup::Insert(Atom& a) {
 	Atom *pA=&a;
 	bool doit=true;
-	OMD_SIZET nm=scratch_ak.GetNAtom();
+	int nm=scratch_ak.GetNAtom();
 
-	for(OMD_SIZET m=0;m<nm;m++)
+	for(int m=0;m<nm;m++)
 		if(pA==scratch_ak.AtomPtr(m)) {doit=false;break;}
 
 	if(doit)scratch_ak.Attach(a);
@@ -78,10 +78,10 @@ AtomGroup* AtomGroup::Insert(Atom& a) {
  * idx_array must be terminated by a negative value
  */
 
-AtomGroup* AtomGroup::Select(OMD_INT* idx_array) {
+AtomGroup* AtomGroup::Select(int* idx_array) {
 	AtomKeeper tmpa(AtomKeeper::Referral);
 	tmpa.disable_log(LOGMEMORY);
-	OMD_INT *a=idx_array;
+	int *a=idx_array;
 
 	while(*a>=0){
 
@@ -101,9 +101,9 @@ AtomGroup* AtomGroup::Select(OMD_INT* idx_array) {
 AtomGroup* AtomGroup::SelectType(int type_id) {
 	AtomKeeper tmpa(AtomKeeper::Referral);
 	tmpa.disable_log(LOGMEMORY);
-	OMD_SIZET na=scratch_ak.GetNAtom();
+	int na=scratch_ak.GetNAtom();
 
-	for(OMD_SIZET i=0;i<na;i++) {
+	for(int i=0;i<na;i++) {
 		if(scratch_ak[i].id==type_id) tmpa.IndexBook.push(i);
 	}
 
@@ -115,9 +115,9 @@ AtomGroup* AtomGroup::SelectType(int type_id) {
 AtomGroup* AtomGroup::SelectXID(int xid) {
 	AtomKeeper tmpa(AtomKeeper::Referral);
 	tmpa.disable_log(LOGMEMORY);
-	OMD_SIZET na=scratch_ak.GetNAtom();
+	int na=scratch_ak.GetNAtom();
 
-	for(OMD_SIZET i=0;i<na;i++) {
+	for(int i=0;i<na;i++) {
 		if(scratch_ak[i].xid==xid) tmpa.IndexBook.push(i);
 	}
 
@@ -129,9 +129,9 @@ AtomGroup* AtomGroup::SelectXID(int xid) {
 AtomGroup* AtomGroup::SelectLT(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z) {
 	AtomKeeper tmpa(AtomKeeper::Referral);
 	tmpa.disable_log(LOGMEMORY);
-	OMD_SIZET na=scratch_ak.GetNAtom();
+	int na=scratch_ak.GetNAtom();
 
-	for(OMD_SIZET i=0;i<na;i++) {
+	for(int i=0;i<na;i++) {
 		if((scratch_ak[i].x<x)&&(scratch_ak[i].y<y)&&(scratch_ak[i].z<z)) tmpa.IndexBook.push(i);
 	}
 
@@ -144,8 +144,8 @@ AtomGroup* AtomGroup::SelectLT(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z) {
 AtomGroup* AtomGroup::SelectGT(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z)  {
 	AtomKeeper tmpa(AtomKeeper::Referral);
 	tmpa.disable_log(LOGMEMORY);
-	OMD_SIZET na=scratch_ak.GetNAtom();
-	for(OMD_SIZET i=0;i<na;i++) {
+	int na=scratch_ak.GetNAtom();
+	for(int i=0;i<na;i++) {
 		if((scratch_ak[i].x>x)&&(scratch_ak[i].y>y)&&(scratch_ak[i].z>z)) tmpa.IndexBook.push(i);
 	}
 	tmpa.AssignByIndex(scratch_ak);
@@ -156,9 +156,9 @@ AtomGroup* AtomGroup::SelectGT(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z)  {
 AtomGroup* AtomGroup::SelectGE(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z) {
 	AtomKeeper tmpa(AtomKeeper::Referral);
 	tmpa.disable_log(LOGMEMORY);
-	OMD_SIZET na=scratch_ak.GetNAtom();
+	int na=scratch_ak.GetNAtom();
 
-	for(OMD_SIZET i=0;i<na;i++) {
+	for(int i=0;i<na;i++) {
 		if((scratch_ak[i].x>=x)&&(scratch_ak[i].y>=y)&&(scratch_ak[i].z>=z)) tmpa.IndexBook.push(i);
 	}
 
@@ -170,9 +170,9 @@ AtomGroup* AtomGroup::SelectGE(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z) {
 AtomGroup* AtomGroup::SelectLE(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z) {
 	AtomKeeper tmpa(AtomKeeper::Referral);
 	tmpa.disable_log(LOGMEMORY);
-	OMD_SIZET na=scratch_ak.GetNAtom();
+	int na=scratch_ak.GetNAtom();
 
-	for(OMD_SIZET i=0;i<na;i++) {
+	for(int i=0;i<na;i++) {
 		if((scratch_ak[i].x<=x)&&(scratch_ak[i].y<=y)&&(scratch_ak[i].z<=z)) tmpa.IndexBook.push(i);
 	}
 
@@ -181,6 +181,6 @@ AtomGroup* AtomGroup::SelectLE(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z) {
 	return this;
 }
 
-OMD_FLOAT AtomGroup::GetMass(OMD_SIZET idx) {
+OMD_FLOAT AtomGroup::GetMass(int idx) {
 	return System->GetMass(idx);
 }

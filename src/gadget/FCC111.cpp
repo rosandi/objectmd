@@ -4,7 +4,7 @@
 
 //------------------Crystal-------------------//
 
-CrystalFCC111::CrystalFCC111(OMD_INT XMLayer, OMD_INT YMLayer, OMD_INT ZMLayer, string mat_file)
+CrystalFCC111::CrystalFCC111(int XMLayer, int YMLayer, int ZMLayer, string mat_file)
 :AtomContainer(mat_file) {
     
     if(param.exist("lattice_constant"))
@@ -42,13 +42,13 @@ AtomContainer* CrystalFCC111::Create() {
 #define V08S6             (5./6. * sqrt(6.))
 #define V13S3             (4./3. * sqrt(3.))
     
-    OMD_INT     ATOMS_PER_UC=6;
+    int     ATOMS_PER_UC=6;
      
     OMD_FLOAT  XUCOffset, YUCOffset, ZUCOffset,
 		XRelPos[ATOMS_PER_UC], YRelPos[ATOMS_PER_UC], ZRelPos[ATOMS_PER_UC],
 		XOrg, YOrg, ZOrg, XPos, YPos, ZPos, Deviation, hlc;
 
-    OMD_INT     XMLayerPerUC, YMLayerPerUC, ZMLayerPerUC,
+    int     XMLayerPerUC, YMLayerPerUC, ZMLayerPerUC,
             XUCs, YUCs, ZUCs, Count, i, j, k, l;
 	
 	assert(xml&&yml&&zml, "crystal monolayers are not defined");
@@ -118,7 +118,7 @@ AtomContainer* CrystalFCC111::Create() {
         }
     }
 
-    OMD_INT na = Count;
+    int na = Count;
     Allocate(na);
     Count=0;
     /* Then create crystal */

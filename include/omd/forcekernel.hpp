@@ -61,7 +61,7 @@ class ForceKernel:public MDGadget {
 	Conditioner* force_eval;
 
 protected:
-	OMD_INT A, B;
+	int A, B;
 
 public:
 	OMD_FLOAT CutRadius;
@@ -103,23 +103,23 @@ public:
 	 */
 
 	virtual void Compute(Atom &at, Atom &to) {die("Compute() is not implemented!!");}
-	virtual void Compute(OMD_SIZET at, OMD_SIZET to) {Compute(Atoms(at), Atoms(to));}
+	virtual void Compute(int at, int to) {Compute(Atoms(at), Atoms(to));}
 
 	/**
 	 * makes sure that the for calculate the right interacting atoms
 	 */
 	
-	virtual void CheckCompute(OMD_SIZET at, OMD_SIZET to, OMD_INT atid, OMD_INT toid) {
+	virtual void CheckCompute(int at, int to, int atid, int toid) {
 		if(atid==A&&toid==B){Compute(at,to);return;}
 		if(atid==B&&toid==A){Compute(at,to);return;}
 		die("wrong type id of interacting atoms ids: "+as_string(atid)+" - "+as_string(toid));
 	}
 
 	virtual void   Correction() {}
-	ForceKernel*   SetAtomID(OMD_INT a, OMD_INT b) {A=a; B=b; return this;}
+	ForceKernel*   SetAtomID(int a, int b) {A=a; B=b; return this;}
 	ForceKernel*   SetEvaluator(Conditioner* feval){force_eval=feval; return this;}
 
-	bool CheckAtomID(OMD_INT a, OMD_INT b) {
+	bool CheckAtomID(int a, int b) {
 		// commutative...
 		if(a==A&&b==B) return true;
 		if(a==B&&b==A) return true;

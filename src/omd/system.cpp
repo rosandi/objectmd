@@ -38,7 +38,7 @@
 
 //-----------SIGNAL-HANDLING------------------------//
 sig_atomic_t sig_int_accept=0;
-void SignalHandler(OMD_INT signo){sig_int_accept=(sig_atomic_t)signo;}
+void SignalHandler(int signo){sig_int_accept=(sig_atomic_t)signo;}
 
 // registers
 
@@ -54,7 +54,7 @@ public:
 
 class dummy_force: public ForceKernel {
 public:
-	void CheckCompute(OMD_SIZET at, OMD_SIZET to, OMD_INT atid, OMD_INT toid){}
+	void CheckCompute(int at, int to, int atid, int toid){}
 	void Compute(Atom &at, Atom &to){}
 };
 
@@ -92,7 +92,7 @@ void MDSystem::SystemInit(){
 	ClaimFlagBit(this, "FLAG_OUTSIDE");
 	ClaimFlagBit(this, "FLAG_GHOST");
 	ClaimFlagBit(this, "FLAG_MIRROR");
-	for(OMD_INT i=0;i<MAXAUXVAR;i++)PrintableAux[i]=false;
+	for(int i=0;i<MAXAUXVAR;i++)PrintableAux[i]=false;
 	AuxFormat=NULL;
 	AtomStorage.set_logger(this);
 	ExitCode=0;
@@ -101,7 +101,7 @@ void MDSystem::SystemInit(){
 	silent_mode=false;
 }
 
-MDSystem::MDSystem(OMD_INT &argc, OMD_CHAR** &argv){
+MDSystem::MDSystem(int &argc, char** &argv){
 	SystemInit();
 	SetArgument(argc,argv);
 }
@@ -113,19 +113,19 @@ MDSystem::MDSystem(){
 // The atoms are not freed from each atom container
 
 MDSystem::~MDSystem() {
-	for (OMD_SIZET i=0; i<Detectors.size(); i++) {
+	for (int i=0; i<Detectors.size(); i++) {
 		delete Detectors[i];
 	}
-	for (OMD_SIZET i=0; i<Conditioners.size(); i++) {
+	for (int i=0; i<Conditioners.size(); i++) {
 		delete Conditioners[i];
 	}
-	for (OMD_SIZET i=0; i<SystemAtoms.size(); i++) {
+	for (int i=0; i<SystemAtoms.size(); i++) {
 		delete SystemAtoms[i];
 	}
 	delete Integrator;
 
 	if(AuxFormat){
-		for(OMD_SIZET i=0;i<SAuxFormat.size();i++) MemFree(AuxFormat[i]);
+		for(int i=0;i<SAuxFormat.size();i++) MemFree(AuxFormat[i]);
 		MemFree(AuxFormat);
 	}	
 }
@@ -148,7 +148,7 @@ MDSystem::~MDSystem() {
  *
 */
 
-OMD_INT MDSystem::Run(OMD_INT mode) {
+int MDSystem::Run(int mode) {
 
 	ExitCode=EXIT_SUCCESS;
 	Mode=mode;
@@ -161,7 +161,7 @@ OMD_INT MDSystem::Run(OMD_INT mode) {
 			case STATIC_MODE: RunStatic(); break;
 		}
 	}
-	catch(const OMD_CHAR* errst) {
+	catch(const char* errst) {
 		ErrorHandler(errst);
 	}
 	catch(const string &errst) {
@@ -228,14 +228,14 @@ void MDSystem::ReadParameters() {
 
 }
 
-void MDSystem::ErrorHandler(const OMD_CHAR* errst) {
+void MDSystem::ErrorHandler(const char* errst) {
 	blog(string(errst), LOGINFO);
 	ExitCode=EXIT_FAILURE;
 }
 
 void MDSystem::PrintContainerInfo(ostream& ost) {
 	ost << "\n*** Atom containers ***\n";
-	for (OMD_SIZET i=0; i<SystemAtoms.size(); i++) {
+	for (int i=0; i<SystemAtoms.size(); i++) {
 		ost << "=>"; SystemAtoms[i]->PrintInfo(ost);
 	}
 }
@@ -246,11 +246,11 @@ void MDSystem::PrintGadgetInfo(ostream& ost) {
 	Integrator->PrintInfo(ost);
 	
 	ost << "\n*** Conditioners ***\n";
-	for (OMD_SIZET i=0; i<Conditioners.size(); i++) {
+	for (int i=0; i<Conditioners.size(); i++) {
 		ost << "=>"; Conditioners[i]->PrintInfo(ost);
 	}
 	ost << "\n*** Detectors ***\n";
-	for (OMD_SIZET i=0; i<Detectors.size(); i++) {
+	for (int i=0; i<Detectors.size(); i++) {
 		ost << "=>"; Detectors[i]->PrintInfo(ost);
 	}
 	
@@ -316,8 +316,8 @@ void MDSystem::PrintTime(ostream& ost)
 
 void MDSystem::EnumerateAtoms(bool force) {
 	if((!Enumerated)||force) {
-		OMD_SIZET na=GetNAtom();
-		for(OMD_SIZET i=0;i<na;i++) {
+		int na=GetNAtom();
+		for(int i=0;i<na;i++) {
 			Atoms(i).nid=i;
 		}
 	}
@@ -339,31 +339,31 @@ void MDSystem::EnumerateAtoms(bool force) {
 */
 
 void MDSystem::UnificateAtoms() {
-    OMD_INT na=0;
+    int na=0;
     
-    for (OMD_SIZET i=0;i<SystemAtoms.size();i++) na+=SystemAtoms[i]->GetNAtom();
+    for (int i=0;i<SystemAtoms.size();i++) na+=SystemAtoms[i]->GetNAtom();
     assert(na>0, "no atom to simulate (NAtom=0)");
    
     AtomStorage.Allocate(na);
     AtomStorage.Clear();
 
-    for (OMD_SIZET i=0;i<SystemAtoms.size();i++) {
+    for (int i=0;i<SystemAtoms.size();i++) {
     	assert(SystemAtoms[i]->M>0.0&&SystemAtoms[i]->Z>0.0,
     	       "uninitialized atom properties (mass and number)",
     	       SystemAtoms[i]->get_name());
 
 		SystemAtoms[i]->SetMaster(this);
 		AtomKeeper* ak=&(SystemAtoms[i]->GetAtomStorage());
-		OMD_INT n=AtomStorage.GetNAtom();
+		int n=AtomStorage.GetNAtom();
 		AtomStorage.Append(*ak);
-		OMD_INT na=ak->GetNAtom();
+		int na=ak->GetNAtom();
 		ak->Release();
 		ak->Allocate(na,AtomKeeper::Referral);
-		for(OMD_SIZET i=n;i<AtomStorage.GetNAtom();i++)ak->Attach(AtomStorage[i]);
+		for(int i=n;i<AtomStorage.GetNAtom();i++)ak->Attach(AtomStorage[i]);
     }
     TotalAtom=GetNAtom();
 	
-	for (OMD_SIZET i=0; i<TotalAtom; i++) {
+	for (int i=0; i<TotalAtom; i++) {
 		Atoms(i).potential=0.0;
 		Atoms(i).virial=0.0;
 	}
@@ -387,7 +387,7 @@ void MDSystem::CreationFunction() {
     else
     	CreateSystem();
     	
-    for(OMD_SIZET i=0;i<SystemAtoms.size();i++)SystemAtoms[i]->set_id(i);
+    for(int i=0;i<SystemAtoms.size();i++)SystemAtoms[i]->set_id(i);
     CreateGadget();
 }
 
@@ -403,7 +403,7 @@ SysBox& MDSystem::CalcBox() {
 	bb.x1=bb.y1=bb.z1=-DBL_MAX;
 
 	// find bounding box...
-	for (OMD_INT i=0; i<SystemAtoms.size(); i++) {
+	for (int i=0; i<SystemAtoms.size(); i++) {
 		ba=SystemAtoms[i]->GetBox();
 		if(bb.x0>ba.x0)bb.x0=ba.x0;
 		if(bb.y0>ba.y0)bb.y0=ba.y0;
@@ -452,7 +452,7 @@ void MDSystem::AdjustSystem() {
 void MDSystem::InitGadgets() {
 
 	// Search for the Iterator. Add if not found.
-   	for (OMD_SIZET i=0; i<(Conditioners.size()); i++) {
+   	for (int i=0; i<(Conditioners.size()); i++) {
 		if(Conditioners[i]->type_of("iterator"))
 			Iterator=dynamic_cast<MDIterator*>(Conditioners[i]);
 	}
@@ -476,18 +476,18 @@ void MDSystem::InitGadgets() {
 	}
 
 	// insert forces and initiate integrator
-	for(OMD_SIZET i=0;i<force_reg.size();i++) Integrator->AddForce(force_reg[i]);
+	for(int i=0;i<force_reg.size();i++) Integrator->AddForce(force_reg[i]);
 	Integrator->Init(this);	
 
 	// Initiate all gadgets
-	for (OMD_SIZET i=0;i<Conditioners.size();i++) Conditioners[i]->Init(this);
-	for (OMD_SIZET i=0;i<Detectors.size();i++) Detectors[i]->Init(this);
+	for (int i=0;i<Conditioners.size();i++) Conditioners[i]->Init(this);
+	for (int i=0;i<Detectors.size();i++) Detectors[i]->Init(this);
 
 	// Convert aux format string to array of string
-	MemAlloc(AuxFormat,SAuxFormat.size()*sizeof(OMD_CHAR*));
-	for(OMD_SIZET i=0;i<SAuxFormat.size();i++){
-		OMD_SIZET sz=(SAuxFormat[i].size()+1);
-		MemAlloc(AuxFormat[i],sz*sizeof(OMD_CHAR));
+	MemAlloc(AuxFormat,SAuxFormat.size()*sizeof(char*));
+	for(int i=0;i<SAuxFormat.size();i++){
+		int sz=(SAuxFormat[i].size()+1);
+		MemAlloc(AuxFormat[i],sz*sizeof(char));
 		memset(AuxFormat[i],'\0',sz);
 		SAuxFormat[i].copy(AuxFormat[i],sz);
 	}
@@ -496,18 +496,18 @@ void MDSystem::InitGadgets() {
 
 void MDSystem::ArrangeMessageSlots() {
 	vector<DataSlot*> tslot;
-	OMD_INT pri=1000;
+	int pri=1000;
 	
 	// search minimum priority number
-	for(OMD_SIZET i=0; i<MessageSlots.size(); i++) {
+	for(int i=0; i<MessageSlots.size(); i++) {
 		if(pri>MessageSlots[i]->GetPriority())
 			pri=MessageSlots[i]->GetPriority();
 			tslot.push_back(MessageSlots[i]);
 	}
 	
-	OMD_SIZET adi=0;
+	int adi=0;
 	while(adi<MessageSlots.size()) {	
-		for(OMD_SIZET i=0; i<tslot.size(); i++) {
+		for(int i=0; i<tslot.size(); i++) {
 			if(tslot[i]->GetPriority()==pri) {
 				MessageSlots[adi++]=tslot[i];
 				if(adi>MessageSlots.size()) break;
@@ -545,7 +545,7 @@ void MDSystem::Initiate() {
 	
 	if(write_mode&WM_ID) {
 		// ID? name material_file
-		for(OMD_SIZET i=0;i<SystemAtoms.size();i++){
+		for(int i=0;i<SystemAtoms.size();i++){
 			PushInfo("$ ID"+as_string(i)+" "+
    			   SystemAtoms[i]->get_name()+" "+
 			   SystemAtoms[i]->GetMaterialFile());
@@ -574,8 +574,8 @@ void MDSystem::SetRestartFilename(string filename){
 
 void MDSystem::SaveVariables(FILE* fl){	
 	fwrite(&SimBeginTime, sizeof(time_t), 1, fl);
-	fwrite(&Step, sizeof(OMD_INT), 1, fl);
-	fwrite(&PBoundary, sizeof(OMD_INT), 1, fl);
+	fwrite(&Step, sizeof(int), 1, fl);
+	fwrite(&PBoundary, sizeof(int), 1, fl);
 	fwrite(&Energy, sizeof(OMD_FLOAT), 1, fl);
 	fwrite(&Kinetic, sizeof(OMD_FLOAT), 1, fl);
 	fwrite(&Virial, sizeof(OMD_FLOAT), 1, fl);
@@ -583,13 +583,13 @@ void MDSystem::SaveVariables(FILE* fl){
 	fwrite(&BasePotential, sizeof(OMD_FLOAT), 1, fl);
 	fwrite(&ElapsedTime, sizeof(OMD_FLOAT), 1, fl);
 	fwrite(&Box, sizeof(SysBox), 1, fl);
-	fwrite(&write_mode, sizeof(OMD_INT), 1, fl);	
+	fwrite(&write_mode, sizeof(int), 1, fl);	
 }
 
 void MDSystem::LoadVariables(FILE* fl){
 	fread(&SimBeginTime, sizeof(time_t), 1, fl);
-	fread(&Step, sizeof(OMD_INT), 1, fl);
-	fread(&PBoundary, sizeof(OMD_INT), 1, fl);
+	fread(&Step, sizeof(int), 1, fl);
+	fread(&PBoundary, sizeof(int), 1, fl);
 	fread(&Energy, sizeof(OMD_FLOAT), 1, fl);
 	fread(&Kinetic, sizeof(OMD_FLOAT), 1, fl);
 	fread(&Virial, sizeof(OMD_FLOAT), 1, fl);
@@ -597,29 +597,29 @@ void MDSystem::LoadVariables(FILE* fl){
 	fread(&BasePotential, sizeof(OMD_FLOAT), 1, fl);
 	fread(&ElapsedTime, sizeof(OMD_FLOAT), 1, fl);
 	fread(&Box, sizeof(SysBox), 1, fl);
-	fread(&write_mode, sizeof(OMD_INT), 1, fl);
+	fread(&write_mode, sizeof(int), 1, fl);
 }
 
 AtomContainer* MDSystem::Save(string fname, string mode) {
-	for (OMD_SIZET cr=0; cr<SystemAtoms.size(); cr++)
+	for (int cr=0; cr<SystemAtoms.size(); cr++)
 		SystemAtoms[cr]->Save(fname.c_str(), "a");	
 	return this;
 }
 
 #define WRITEST(STR, FL) { \
-	OMD_INT sz=(STR).size()+1; \
-	OMD_CHAR longst[sz]; \
+	int sz=(STR).size()+1; \
+	char longst[sz]; \
 	memset(longst,0,sz); \
 	(STR).copy(longst, sz-1); \
-	fwrite(&sz, sizeof(OMD_INT), 1, FL); \
-	fwrite(longst, sizeof(OMD_CHAR), sz, FL); \
+	fwrite(&sz, sizeof(int), 1, FL); \
+	fwrite(longst, sizeof(char), sz, FL); \
 }
 
 #define READST(STR, FL) { \
-	OMD_INT sz; \
-	fread(&sz, sizeof(OMD_INT), 1, FL); \
-	OMD_CHAR longst[sz]; \
-	fread(longst, sizeof(OMD_CHAR), sz, FL); \
+	int sz; \
+	fread(&sz, sizeof(int), 1, FL); \
+	char longst[sz]; \
+	fread(longst, sizeof(char), sz, FL); \
 	(STR).assign(longst); \
 }
 
@@ -643,41 +643,41 @@ AtomContainer* MDSystem::Save(string fname, string mode) {
  */
 
 void MDSystem::SaveSimulationConfig(string binfile) {
-	OMD_CHAR cname[32];
+	char cname[32];
 	FILE* fl = fopen(binfile.c_str(), "w");
 	assert(fl, "unable to create binary file to save simulation", binfile);
 	
 	memset(cname,0,32);
 	sprintf(cname,"OMD (c) Y ROSANDI");
-	fwrite(cname, sizeof(OMD_CHAR), 32, fl);
+	fwrite(cname, sizeof(char), 32, fl);
 	
 	// saving time...
 	time_t savetime; time(&savetime); memset(cname,0,32);
 	sprintf(cname, "%s", ctime(&savetime));
-	fwrite(cname, sizeof(OMD_CHAR), 32, fl);
+	fwrite(cname, sizeof(char), 32, fl);
 	
 	SaveVariables(fl);
 
 	// restart variables
-	OMD_SIZET nresvar=RestartVars.size();
-	fwrite(&nresvar, sizeof(OMD_INT), 1, fl);		
-	for(OMD_SIZET i=0; i<nresvar;i++) {
+	int nresvar=RestartVars.size();
+	fwrite(&nresvar, sizeof(int), 1, fl);		
+	for(int i=0; i<nresvar;i++) {
 		WRITEST(RestartVars[i]->GetLabel(), fl);
 		WRITEST(RestartVars[i]->AsString(), fl);
 	}
 
-	OMD_SIZET NumCont=SystemAtoms.size();
-	fwrite(&NumCont, sizeof(OMD_INT), 1, fl);	
+	int NumCont=SystemAtoms.size();
+	fwrite(&NumCont, sizeof(int), 1, fl);	
 
-	for (OMD_SIZET i=0; i<NumCont; i++) {
+	for (int i=0; i<NumCont; i++) {
 		memset(cname,0,32);
 		strncpy(cname, SystemAtoms[i]->get_name().c_str(), 31);
-		fwrite(cname, sizeof(OMD_CHAR), 32, fl);
+		fwrite(cname, sizeof(char), 32, fl);
 	}	
 	
 	memset(cname,0,32);
 	sprintf(cname, "== END OF CONFIG HEADER ===");
-	fwrite(cname, sizeof(OMD_CHAR), 32, fl);
+	fwrite(cname, sizeof(char), 32, fl);
 
 	assert(!ferror(fl), "error writing restart file");
 	fclose(fl);
@@ -701,20 +701,20 @@ void MDSystem::SaveSimulation(string binfile) {
 void MDSystem::LoadSimulation() {
 
 	#define TOLE 100
-	OMD_SIZET NumCont;
-	OMD_SIZET nresvar;
-	OMD_CHAR cname[32];
+	int NumCont;
+	int nresvar;
+	char cname[32];
 	
 	string LoadFromFile(GetRestartFilename());
 
 	FILE* fl = fopen(LoadFromFile.c_str(), "r");
 	assert(fl, "unable to read restart file", LoadFromFile);
 	
-	fread(cname, sizeof(OMD_CHAR), 32, fl);
+	fread(cname, sizeof(char), 32, fl);
 	assert(string("OMD (c) Y ROSANDI")==cname,
 	       "wrong binary file"+LoadFromFile);
 	       
-	fread(cname, sizeof(OMD_CHAR), 32, fl);
+	fread(cname, sizeof(char), 32, fl);
 	string stm(cname);
 	stm=replace_char(stm, '\r', ' ');
 	stm=replace_char(stm, '\n', ' ');
@@ -722,8 +722,8 @@ void MDSystem::LoadSimulation() {
 
 	LoadVariables(fl);
 	
-	fread(&nresvar, sizeof(OMD_INT), 1, fl);
-	for(OMD_SIZET i=0;i<nresvar;i++) {
+	fread(&nresvar, sizeof(int), 1, fl);
+	for(int i=0;i<nresvar;i++) {
 		string st; string vst;
 		READST(st, fl); READST(vst, fl);
 		DataSlot *m=new DataSlot(st);
@@ -732,9 +732,9 @@ void MDSystem::LoadSimulation() {
 	}
 
 	SystemAtoms.clear();
-	fread(&NumCont, sizeof(OMD_INT), 1, fl);
-	for (OMD_SIZET i=0; i<NumCont; i++) {
-		fread(cname, sizeof(OMD_CHAR), 32, fl);
+	fread(&NumCont, sizeof(int), 1, fl);
+	for (int i=0; i<NumCont; i++) {
+		fread(cname, sizeof(char), 32, fl);
 		AddAtom(new AtomContainer)->set_name(cname);
 	}
 
@@ -742,7 +742,7 @@ void MDSystem::LoadSimulation() {
 	fclose(fl);
 
 	// Loads all atoms for each atom containers
-	for (OMD_SIZET cr=0; cr<NumCont; cr++)
+	for (int cr=0; cr<NumCont; cr++)
 		SystemAtoms[cr]->Load(LoadFromFile);
 
 }
@@ -790,25 +790,25 @@ void MDSystem::FirstRun() {
 	MeasurePotential();
 	MeasureKinetic();
 	BasePotential=Potential;
-	for(OMD_SIZET i=0;i<GetNAtom();i++){Atoms(i).fx=Atoms(i).fy=Atoms(i).fz=0.0;}
+	for(int i=0;i<GetNAtom();i++){Atoms(i).fx=Atoms(i).fy=Atoms(i).fz=0.0;}
 }
 
-void MDSystem::ExecuteConditioners(OMD_INT contype) {
-	OMD_INT consize=Conditioners.size();
-	for(OMD_INT i=0;i<consize;i++){
+void MDSystem::ExecuteConditioners(int contype) {
+	int consize=Conditioners.size();
+	for(int i=0;i<consize;i++){
 		Conditioners[i]->Execute(contype);
 	}
 }
 
 void MDSystem::ExecuteDetectors() {	
-	OMD_INT detsize=Detectors.size();
-    for(OMD_INT i=0;i<detsize;i++) 
+	int detsize=Detectors.size();
+    for(int i=0;i<detsize;i++) 
 		if(Detectors[i]->IsActive()) Detectors[i]->Detect();
 }
 
 void MDSystem::PrintMessages(ostream& ost) {
-	OMD_INT printed=0;
-	for(OMD_SIZET i=0;i<MessageSlots.size();i++){
+	int printed=0;
+	for(int i=0;i<MessageSlots.size();i++){
 		if(MessageSlots[i]->IsPrintable()) {
 			ost << MessageSlots[i]->GetFormattedText() << " ";
 			printed++;
@@ -829,15 +829,15 @@ void MDSystem::CheckBeforeRun() {
 	// Check all gadgets
 	assert(Integrator->Check(), "force integrator is not ready");
 
-	for (OMD_SIZET i=0;i<Conditioners.size();i++) 
+	for (int i=0;i<Conditioners.size();i++) 
 		assert(Conditioners[i]->Check(), "conditioner not ready", Conditioners[i]->get_name());
 
-	for (OMD_SIZET i=0;i<Detectors.size();i++)
+	for (int i=0;i<Detectors.size();i++)
 		assert(Detectors[i]->Check(), "detector not ready",Detectors[i]->get_name());
 
 	assert(GetNAtom()>1, "insufficient number of atom", as_string(GetNAtom()));
 
-	for(OMD_SIZET i=0;i<Detectors.size();i++){
+	for(int i=0;i<Detectors.size();i++){
 		if(OutputDirectory!="") {
 			Detectors[i]->SetFilenamePrefix(OutputDirectory+"/");
 		}
@@ -860,7 +860,7 @@ void MDSystem::PrintHeader(ostream& ost) {
  *  - OMD_TABLE: the path to the tables (potentials, etc)
  */
 
-void MDSystem::SetArgument(OMD_INT &argc, OMD_CHAR** &argv) {
+void MDSystem::SetArgument(int &argc, char** &argv) {
 	Argc=&argc;Argv=&argv;
 	param.append(argc, argv);
 	if(param.exist("load")) {
@@ -962,7 +962,7 @@ void MDSystem::RunStatic() {
 	BeforeRun();
 	SyncData(SYNC_ALL);
 
-	for(OMD_SIZET i=0; i<GetNAtom(); i++){
+	for(int i=0; i<GetNAtom(); i++){
 		Atom* a=AtomPtr(i);
 		a->fx=a->fy=a->fz=a->virial=a->potential=0.0;		
 	}
@@ -987,9 +987,9 @@ void MDSystem::RunStatic() {
 
 void MDSystem::MeasurePotential()
 {
-	OMD_INT na=GetNAtom();
+	int na=GetNAtom();
 	Potential=Virial=0;
-	for(OMD_INT i=0;i<na;i++){
+	for(int i=0;i<na;i++){
 		Atom* a=AtomPtr(i);
 		if(a->flag&FLAG_GHOST) continue;
 		
@@ -1009,8 +1009,8 @@ void MDSystem::MeasureKinetic() {
     Kinetic=0.0;
     SqrMaxVelocity=0.0;
     
-    OMD_INT natom=GetNAtom();    
-    for(OMD_INT i=0;i<natom;i++) {
+    int natom=GetNAtom();    
+    for(int i=0;i<natom;i++) {
     	Atom* a=AtomPtr(i);
 		if(a->flag&FLAG_GHOST) continue;
 		if(a->flag&FLAG_ACTIVE) {
@@ -1038,8 +1038,8 @@ void MDSystem::MeasureKinetic() {
 
 void MDSystem::CheckBoundary() {
 	if (PBoundary) {
-		OMD_INT na=GetNAtom();
-		for (OMD_INT i=0; i<na; i++) {
+		int na=GetNAtom();
+		for (int i=0; i<na; i++) {
 			Atom* a=AtomPtr(i);
 			if(CheckActive(i)){
 				if (PBoundary&PERIODIC_X) {
@@ -1106,7 +1106,7 @@ ForceKernel* MDSystem::AddForce(ForceKernel* force) {
 	return force;
 }
 
-ForceKernel* MDSystem::AddForce(ForceKernel* force, const OMD_CHAR* from, const OMD_CHAR* to) {
+ForceKernel* MDSystem::AddForce(ForceKernel* force, const char* from, const char* to) {
 	force->set_logger(logger);
 	force->SetAtomID(GetContainerID(from), GetContainerID(to));
 	force_reg.push_back(force);
@@ -1136,7 +1136,7 @@ AtomContainer* MDSystem::AddAtom(AtomContainer* Atm) {
 	Atm->set_logger(this);
 	if(!Atm->created) Atm->Create();
 	if(Atm->get_name()=="ATOM_CONTAINER"){
-		OMD_CHAR nst[32];
+		char nst[32];
 		sprintf(nst,"ATOM_%d",AtomID);
 		Atm->set_name(nst);
 	}
@@ -1159,7 +1159,7 @@ AtomGroup* MDSystem::AddAtomGroup(string group_name) {
 	return ag;
 }
 
-void MDSystem::ChangeAtomID(OMD_SIZET idx, OMD_INT NewID) 
+void MDSystem::ChangeAtomID(int idx, int NewID) 
 {
 	assert(idx<GetNAtom(), 
 	       "changing atom id out of bound index="+as_string(idx)+
@@ -1167,25 +1167,25 @@ void MDSystem::ChangeAtomID(OMD_SIZET idx, OMD_INT NewID)
 	Atoms(idx).id=NewID;
 }
 
-void MDSystem::ChangeAtomID(OMD_SIZET start, OMD_SIZET end, OMD_INT NewID)
+void MDSystem::ChangeAtomID(int start, int end, int NewID)
 {
 	assert(start>=0&&end<GetNAtom(),
 	       "changing atom id out of bound start="+as_string(start)+
 	       " end="+as_string(end)+" to id="+as_string(NewID));
-	for (OMD_SIZET i=start;i<=end;i++) Atoms(i).id=NewID;
+	for (int i=start;i<=end;i++) Atoms(i).id=NewID;
 }
 
 OMD_FLOAT MDSystem::GetMaxCutRadius(){return Integrator->MaxCutRadius;}
 OMD_FLOAT MDSystem::GetMaxVelocity(){return sqrt(SqrMaxVelocity);}
 
-OMD_FLOAT MDSystem::GetMass(OMD_SIZET idx){return SystemAtoms[Atoms(idx).id]->M;}
+OMD_FLOAT MDSystem::GetMass(int idx){return SystemAtoms[Atoms(idx).id]->M;}
 OMD_FLOAT MDSystem::GetMass(Atom* a){return SystemAtoms[a->id]->M;}
 OMD_FLOAT MDSystem::GetMass(Atom& a){return SystemAtoms[a.id]->M;}
 
-OMD_FLOAT MDSystem::GetZ(OMD_SIZET idx){return SystemAtoms[Atoms(idx).id]->Z;}
+OMD_FLOAT MDSystem::GetZ(int idx){return SystemAtoms[Atoms(idx).id]->Z;}
 
-OMD_SIZET MDSystem::ClaimFlagBit(MDClass* user,string sinfo) {
-	OMD_SIZET a=1<<FlagBitUsed;
+int MDSystem::ClaimFlagBit(MDClass* user,string sinfo) {
+	int a=1<<FlagBitUsed;
 	FlagBitUsed++;
 	
 	string scode(user->get_name());
@@ -1217,13 +1217,13 @@ OMD_SIZET MDSystem::ClaimFlagBit(MDClass* user,string sinfo) {
  * 
  */
 
-OMD_SIZET MDSystem::ClaimAuxVariable(
+int MDSystem::ClaimAuxVariable(
 					MDClass* user, 
 					bool printable,
-					const OMD_CHAR* tag,
-					const OMD_CHAR* sformat)
+					const char* tag,
+					const char* sformat)
 {
-		OMD_INT AuxIdx=AuxVariableUsed;
+		int AuxIdx=AuxVariableUsed;
 		PrintableAux[AuxIdx]=printable;
 		AuxVariableUsed++;		
 		AuxUser.push_back(user->get_name());
@@ -1245,7 +1245,7 @@ OMD_SIZET MDSystem::ClaimAuxVariable(
 
 		if(AuxVariableUsed>MAXAUXVAR) {
 			string serr("Maximum aux variable exceeded. Users:");
-			for(OMD_SIZET i=0;i<AuxUser.size();i++){
+			for(int i=0;i<AuxUser.size();i++){
 				serr.append(" ");
 				serr.append(AuxUser[i]);
 			}
@@ -1255,7 +1255,7 @@ OMD_SIZET MDSystem::ClaimAuxVariable(
 }
 
 DataSlot* MDSystem::GetMessageSlot(string slotlabel){
-	for(OMD_SIZET i=0;i<MessageSlots.size();i++){
+	for(int i=0;i<MessageSlots.size();i++){
 		if(slotlabel.compare(MessageSlots[i]->GetLabel())==0)
 			return MessageSlots[i];
 	}
@@ -1263,8 +1263,8 @@ DataSlot* MDSystem::GetMessageSlot(string slotlabel){
 	return NULL; // avoids warning
 }
 
-OMD_SIZET MDSystem::GetFlagBitMask(const OMD_CHAR* usagecode) {
-	OMD_SIZET i;
+int MDSystem::GetFlagBitMask(const char* usagecode) {
+	int i;
 	bool found=false;
 	for(i=0;i<FlagUser.size();i++) {
 		string sss("<");sss.append(usagecode);sss.append(">");
@@ -1274,7 +1274,7 @@ OMD_SIZET MDSystem::GetFlagBitMask(const OMD_CHAR* usagecode) {
 	return (1<<i);
 }
 
-void MDSystem::AcceptSignal(OMD_INT signo) {
+void MDSystem::AcceptSignal(int signo) {
 	struct sigaction act;
 	memset(&act,0,sizeof(act));
 	act.sa_handler=&SignalHandler;
@@ -1282,20 +1282,20 @@ void MDSystem::AcceptSignal(OMD_INT signo) {
 }
 
 MDGadget* MDSystem::SearchGadget(string name) {
-	for(OMD_SIZET i=0;i<Detectors.size();i++) {
+	for(int i=0;i<Detectors.size();i++) {
 		if(Detectors[i]->get_name()==name) return Detectors[i];
 	}
 	
-	for(OMD_SIZET i=0;i<Conditioners.size();i++) {
+	for(int i=0;i<Conditioners.size();i++) {
 		if(Conditioners[i]->get_name()==name) return Conditioners[i];
 	}
 	
 	return NULL;
 }
 
-OMD_INT MDSystem::GetContainerID(string name){
-	OMD_INT cnum=SystemAtoms.size();
-	for(OMD_INT i=0;i<cnum;i++) {
+int MDSystem::GetContainerID(string name){
+	int cnum=SystemAtoms.size();
+	for(int i=0;i<cnum;i++) {
 		if(SystemAtoms[i]->get_name()==name) return i;
 	}
 	die("atom "+name+" does not exist");
@@ -1310,10 +1310,10 @@ bool MDSystem::OnTime(OMD_FLOAT tm) {
 }
 
 bool MDSystem::GadgetExist(MDGadget* gad){
-	for(OMD_SIZET i=0;i<Detectors.size();i++){
+	for(int i=0;i<Detectors.size();i++){
 		if(Detectors[i]==gad) return true;
 	}
-	for(OMD_SIZET i=0;i<Conditioners.size();i++){
+	for(int i=0;i<Conditioners.size();i++){
 		if(Conditioners[i]==gad) return true;
 	}
 	return false;
@@ -1329,9 +1329,9 @@ AtomContainer* MDSystem::Import(string fname){
 	p.read_pseudo(fname);
 	string ids("ID0");
 
-	OMD_INT ia=0;
+	int ia=0;
 	while(p.exist(ids)) {
-		OMD_INT idx=p.index_of(ids);
+		int idx=p.index_of(ids);
 		AddAtom(new AtomContainer(p[idx+2]))
 			->Import(fname,ia)
 			->SetName(p[idx+1]);
@@ -1340,7 +1340,7 @@ AtomContainer* MDSystem::Import(string fname){
 	
 	if(p.exist("Box")) {
 		blog("reading saved box geometry", LOGCREATE);
-		OMD_INT idx=p.index_of("Box")+1;
+		int idx=p.index_of("Box")+1;
 		Box.x0=p.double_value(idx++);
 		Box.y0=p.double_value(idx++);
 		Box.z0=p.double_value(idx++);
@@ -1371,7 +1371,7 @@ AtomContainer* MDSystem::Import(string fname){
 }
 
 void MDSystem::CheckInterruption(){
-	InterruptFlag=(OMD_INT)sig_int_accept;
+	InterruptFlag=(int)sig_int_accept;
 	if(InterruptFlag) {
 		std::cerr << "#### INTERRUPT SIGNAL: " << InterruptFlag << " ####\n";
 		blog("interrupt signal caught: "+as_string(InterruptFlag));

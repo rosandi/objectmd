@@ -37,12 +37,12 @@ TEmbedding::TEmbedding() {
 	Active=ActiveCode=COND_PRE_CALCULATION|COND_FORCE_MODIFIER;
 	register_class("embedding_function");
 	set_name("TABLE_EMBEDDING_FUNCTION");
-	for (OMD_INT i=0; i<MAX_ALLOWED_SPECIES; i++) 
-		for (OMD_INT j=0; j<MAX_ALLOWED_SPECIES; j++) AtomID[i][j]=-1;
+	for (int i=0; i<MAX_ALLOWED_SPECIES; i++) 
+		for (int j=0; j<MAX_ALLOWED_SPECIES; j++) AtomID[i][j]=-1;
 }
 
 // for the same atom type 
-void TEmbedding::AddTable(OMD_INT aid, string tabfile) {
+void TEmbedding::AddTable(int aid, string tabfile) {
 	assert(aid<MAX_ALLOWED_SPECIES, "attempt to insert table for atom.id="+as_string(aid)+
 	       " "+as_string(MAX_ALLOWED_SPECIES)+" maximum allowed atom species exeeded!");
 	AtomID[aid][aid]=id_size;
@@ -51,7 +51,7 @@ void TEmbedding::AddTable(OMD_INT aid, string tabfile) {
 }
 
 // for different atom type
-void TEmbedding::AddTable(OMD_INT aid_at, OMD_INT aid_to, string tabfile) {
+void TEmbedding::AddTable(int aid_at, int aid_to, string tabfile) {
 	assert(aid_at<MAX_ALLOWED_SPECIES&&aid_to<MAX_ALLOWED_SPECIES,
 	       "attempt to insert table for atom.id=("+as_string(aid_at)+","+as_string(aid_to)+
 	       ") "+as_string(MAX_ALLOWED_SPECIES)+" maximum allowed atom species exeeded!");
@@ -73,13 +73,13 @@ void TEmbedding::Init(MDSystem* WorkSys) {
 	ED_idx=ClaimAuxVariable();
 
 	assert(id_size>0, "uninitialized electron density table");	
-	for (OMD_INT i=0; i<id_size; i++) CutRadius[i]=edens[i].max_range();
+	for (int i=0; i<id_size; i++) CutRadius[i]=edens[i].max_range();
 }
 
 void TEmbedding::IterationNode(Atom &at, Atom &to) {	
 	OMD_FLOAT R, Dens, Dx, Dy, Dz;
-	OMD_INT   Tab;	
-	Tab=AtomID[(OMD_SIZET)(at.id)][(OMD_SIZET)(to.id)]; // Take edens table index
+	int   Tab;	
+	Tab=AtomID[(int)(at.id)][(int)(to.id)]; // Take edens table index
 	if (Tab<0) return; // avoids non eam interactions
 	R=sqrt(CalcSqrDistance(at, to, Dx, Dy, Dz));
 	if (R<=CutRadius[Tab]) {
@@ -95,15 +95,15 @@ void TEmbedding::IterationNode(Atom &at, Atom &to) {
  */
 
 void TEmbedding::PreCalculation() {
-	OMD_SIZET na=GetNAtom();
-	for (OMD_SIZET i = 0; i<na; i++) Atoms(i).aux[ED_idx]=0.0;
+	int na=GetNAtom();
+	for (int i = 0; i<na; i++) Atoms(i).aux[ED_idx]=0.0;
 	Iterator->Iterate(this);
 	SyncData(SYNC_AUX,ED_idx);
 }
 
 void TEmbedding::Dump() {
 	ofstream fl("dump.rho");
-	for (OMD_SIZET i = 0; i < GetNAtom(); i++) 
+	for (int i = 0; i < GetNAtom(); i++) 
 		fl << Atoms(i).x << " " 
 		   << Atoms(i).y << " " 
 		   << Atoms(i).z << " "
@@ -112,31 +112,31 @@ void TEmbedding::Dump() {
 }
 
 OMD_FLOAT TEmbedding::GetEmb(Atom &at) {
-	OMD_INT id=at.id;
+	int id=at.id;
 	return embed[AtomID[id][id]].read(at.aux[ED_idx]);
 }
 
 OMD_FLOAT TEmbedding::GetEmbDeriv(Atom &at) {
-	OMD_INT id=at.id;
+	int id=at.id;
 	return embed[AtomID[id][id]].dread(at.aux[ED_idx]);
 }
 
 OMD_FLOAT TEmbedding::GetRho(Atom &at) {return at.aux[ED_idx];}
 
 OMD_FLOAT TEmbedding::GetRhoDeriv(OMD_FLOAT r, Atom &at) {
-	OMD_INT id=at.id;
+	int id=at.id;
 	if (r>CutRadius[AtomID[id][id]]) return 0.0;
 	return edens[AtomID[id][id]].dread(r);
 }
 
 // The correction by electron density is done here.. 
 void TEmbedding::ForceModifier() {
-	OMD_SIZET na=GetNAtom();
-	for(OMD_SIZET i=0;i<na;i++) {
+	int na=GetNAtom();
+	for(int i=0;i<na;i++) {
 		Atom* a=AtomPtr(i);
 		if(a->flag&FLAG_GHOST)continue;
 		if(a->flag&FLAG_ACTIVE){
-			OMD_INT id=a->id;
+			int id=a->id;
 			if(0<=AtomID[id][id]) a->potential+=2.0*GetEmb(*a);
 		}
 	}
@@ -145,14 +145,14 @@ void TEmbedding::ForceModifier() {
 void TEmbedding::PrintInfo(ostream& ost) {
 	ost<<"id."<<id<<" "<<get_name()<< "\n";
 	ost<<" electron_density:\n";
-	for(OMD_INT i=0;i<id_size;i++)
-		for(OMD_INT j=i;j<id_size;j++)
+	for(int i=0;i<id_size;i++)
+		for(int j=i;j<id_size;j++)
 		if(AtomID[i][j]>=0) 
 			ost <<"  "<<System->SystemAtoms[i]->get_name()<<"."<<i<<"<-->"
 			    <<System->SystemAtoms[j]->get_name()<<"."<<j<<" "
 		        <<edens[AtomID[i][j]].filename<< "\n";
 	ost <<" embedding function:\n";
-	for(OMD_INT i=0;i<id_size;i++)
+	for(int i=0;i<id_size;i++)
 		if(AtomID[i][i]>=0) 
 			ost <<"  "<<System->SystemAtoms[i]->get_name()<<"."<<i
 		        <<" "<<embed[AtomID[i][i]].filename << "\n";
@@ -168,7 +168,7 @@ TForceEAM::TForceEAM(string PhiFile, TEmbedding *EM) {
 	register_class(get_name());
 }
 
-TForceEAM* TForceEAM::SetTable(const OMD_CHAR* PhiFile) {
+TForceEAM* TForceEAM::SetTable(const char* PhiFile) {
 	tablefile.assign(PhiFile);
 	return this;
 }
@@ -182,7 +182,7 @@ bool TForceEAM::SearchAttachEmbeddingClass() {
 	}
 
 	// find first the Embedding energy handler in conditioner list
-	for (OMD_SIZET i=0; i<(System->Conditioners.size()); i++) {
+	for (int i=0; i<(System->Conditioners.size()); i++) {
 			
 		if(System->Conditioners[i]->type_of("EMBEDDING_FUNCTION")){
 			emb=dynamic_cast<TEmbedding*>(System->Conditioners[i]);

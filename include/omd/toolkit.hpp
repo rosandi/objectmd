@@ -46,9 +46,6 @@ using std::ostream;
 #define _OMD_TYPES_
 
 #define OMD_FLOAT double
-#define OMD_INT   int
-#define OMD_SIZET uint
-#define OMD_CHAR  char
 
 #endif
 
@@ -79,7 +76,7 @@ extern ofstream memlogstream;
 class MDToolkit {
 
 	string object_name;
-	OMD_INT logflags;
+	int logflags;
 	vector<string> class_type;
 	
 	
@@ -109,10 +106,10 @@ public:
 
 	string get_name(){return object_name;}
 	void set_name(string newname){object_name.assign(newname);}	
-	void enable_log(OMD_INT flags=0xFF){logflags|=flags;}
-	void disable_log(OMD_INT flags=0xFF){logflags&=(~flags);}
-	void log_flagset(OMD_INT flags){logflags=flags;}
-	OMD_INT log_enabled(OMD_INT flags=0xFF){return logflags&flags;}
+	void enable_log(int flags=0xFF){logflags|=flags;}
+	void disable_log(int flags=0xFF){logflags&=(~flags);}
+	void log_flagset(int flags){logflags=flags;}
+	int log_enabled(int flags=0xFF){return logflags&flags;}
 
 	void debug_enable() {debug_flag=true;}
 	void debug_disable() {debug_flag=false;}
@@ -123,13 +120,13 @@ public:
 	virtual void sendlog(string slog){blogstream<<slog<<std::endl;}
 	virtual void sendmemlog(string slog){memlogstream<<slog<<std::endl;}
 
-	virtual void blog(string logtext, OMD_INT flags=0xFF){
+	virtual void blog(string logtext, int flags=0xFF){
 		if(logflags|flags){
 			logger->sendlog("'"+get_name()+"' "+logtext);
 		}
 	}
 
-	virtual void blog(string logprefix, string logtext, OMD_INT flags=0xFF){
+	virtual void blog(string logprefix, string logtext, int flags=0xFF){
 		if(logflags|flags){
 			logger->sendlog("'"+get_name()+"' "+logprefix+" "+logtext);
 		}
@@ -140,13 +137,13 @@ public:
 			logger->sendmemlog("free '"+get_name()+"' "+as_string(ptr));
 	}
 
-	virtual void logmem(void* ptr, OMD_SIZET size){ // allocate
+	virtual void logmem(void* ptr, int size){ // allocate
 		if(log_enabled(LOGMEMORY))
 			logger->sendmemlog("malloc '"+get_name()+"' "+
 			        as_string(ptr)+" "+as_string(size));
 	}
 	
-	virtual void logmem(void* oldptr, void* newptr, OMD_SIZET size){ // reallocate
+	virtual void logmem(void* oldptr, void* newptr, int size){ // reallocate
 		logger->sendmemlog("realloc '"+get_name()+"' "+
 			as_string(oldptr)+" "+as_string(newptr)+" "+as_string(size));
 	}
@@ -180,37 +177,33 @@ public:
 		return true;
 	}
 
-	string as_string(OMD_INT val, const OMD_CHAR* format=NULL){
-		OMD_CHAR st[256];
+	string as_string(int val, const char* format=NULL){
+		char st[256];
 		if(format)sprintf(st,format,val);
 		else sprintf(st,"%d",val);
 		return string(st);
 	}
 
-	string as_string(OMD_SIZET val, const OMD_CHAR* format=NULL){
-		return as_string((OMD_INT)val);
-	}
-
-	string as_string(OMD_FLOAT val, const OMD_CHAR* format=NULL){
-		OMD_CHAR st[256];
+	string as_string(OMD_FLOAT val, const char* format=NULL){
+		char st[256];
 		if(format)sprintf(st,format,val);
 		else sprintf(st,"%0.2f",val);
 		return string(st);
 	}
 
 	string as_string(void* val){
-		OMD_CHAR st[256];
+		char st[256];
 		sprintf(st,"%lX",(long int)val);
 		return string(st);
 	}
 
 	string lower_case(string str){
-		for(OMD_SIZET i=0;i<str.size();i++)str[i]=tolower(str[i]);
+		for(int i=0;i<str.size();i++)str[i]=tolower(str[i]);
 		return str;
 	}
 	
-	string replace_char(string str, OMD_CHAR cold, OMD_CHAR cnew) {
-		for(OMD_SIZET i=0;i<str.size();i++){
+	string replace_char(string str, char cold, char cnew) {
+		for(int i=0;i<str.size();i++){
 			if(str[i]==cold) str[i]=cnew;
 		}
 		return str;		
@@ -220,7 +213,7 @@ public:
 	bool type_of(string type) {
     	type=lower_case(type);
     	type=replace_char(type, ' ', '_');		
-		for(OMD_SIZET i=0;i<class_type.size();i++) {
+		for(int i=0;i<class_type.size();i++) {
 			if(class_type[i]==type) return true;
 		}
 		return false;
@@ -232,7 +225,7 @@ public:
 
 	string descent_type() {
 		string ty;
-		for(OMD_SIZET i=0;i<class_type.size();i++){
+		for(int i=0;i<class_type.size();i++){
 			ty.append(class_type[i]+" ");
 		}
 		return ty;

@@ -18,12 +18,12 @@ using std::ifstream;
 */
 
 class ParticlePath: public Calc_Conditioner {	
-	OMD_INT Index, NPath, CurrentPath, Interrupt;
+	int Index, NPath, CurrentPath, Interrupt;
 	OMD_FLOAT *x, *y, *z;
 	bool Circulate;
 	
 	public:		
-		void ReadFile(const OMD_CHAR* tablefile) {
+		void ReadFile(const char* tablefile) {
 			vector<OMD_FLOAT> px;
 			vector<OMD_FLOAT> py;
 			vector<OMD_FLOAT> pz;
@@ -42,14 +42,14 @@ class ParticlePath: public Calc_Conditioner {
 			x=new OMD_FLOAT[NPath];
 			y=new OMD_FLOAT[NPath];
 			z=new OMD_FLOAT[NPath];
-			for(OMD_INT i=0;i<NPath;i++) {
+			for(int i=0;i<NPath;i++) {
 				x[i]=px[i];
 				y[i]=py[i];
 				z[i]=pz[i];
 			}
 		}
 		
-		ParticlePath(const OMD_CHAR* TargetAtom, const OMD_CHAR* tablefile, bool circ=true, OMD_INT idx=0) {
+		ParticlePath(const char* TargetAtom, const char* tablefile, bool circ=true, int idx=0) {
 			TargetName=TargetAtom;
 			Index=idx;
 			set_name("Particle Path");

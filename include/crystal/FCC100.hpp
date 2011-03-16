@@ -16,7 +16,7 @@
 
 class CrystalFCC100: public CrystalFCC111 {
 public:
-	CrystalFCC100(OMD_INT XMLayer, OMD_INT YMLayer, OMD_INT ZMLayer, string mat_file):
+	CrystalFCC100(int XMLayer, int YMLayer, int ZMLayer, string mat_file):
 	CrystalFCC111(XMLayer, YMLayer, ZMLayer, mat_file) {}
 
 	/**

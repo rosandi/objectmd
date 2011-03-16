@@ -11,23 +11,23 @@ class NonReflecting: public Conditioner, private ParallelGadget {
 	OMD_FLOAT termzone;
 	OMD_FLOAT gridthick;
 	
-	OMD_INT    n_layer;
-	OMD_INT    tzid;
-	OMD_INT    tzflag;
-	OMD_INT    bot_force;
-	OMD_INT    top_force;
+	int    n_layer;
+	int    tzid;
+	int    tzflag;
+	int    bot_force;
+	int    top_force;
 	bool   printforce;
 	bool   evaluating;
 	
 	OMD_FLOAT *force_layer_average;
-	OMD_INT    *layer_population;
+	int    *layer_population;
 
 public:
 
 	NonReflecting(
 	    OMD_FLOAT impedance,
         OMD_FLOAT force_constant,
-        OMD_INT    terminating_zone_id,
+        int    terminating_zone_id,
         OMD_FLOAT grid_layer_thickness,
         bool print_force=false)
 	{
@@ -69,7 +69,7 @@ public:
 		bot_force=ClaimAuxVariable(printforce, "fbot");
 		
 		OMD_FLOAT zmax=-DBL_MAX, zmin=DBL_MAX;
-		for(OMD_INT i=0;i<GetNAtom(); i++) {   
+		for(int i=0;i<GetNAtom(); i++) {   
 			if(Atoms(i).group_of(tzid)) {
 				if(zmax<Atoms(i).z)zmax=Atoms(i).z;
 				if(zmin>Atoms(i).z)zmin=Atoms(i).z;
@@ -80,15 +80,15 @@ public:
 		zmin=TakeMIN(zmin);
 		
 		termzone=zmax+0.5*gridthick;
-		n_layer=(OMD_INT)((termzone-zmin)/gridthick);
+		n_layer=(int)((termzone-zmin)/gridthick);
 		
 		MemAlloc(force_layer_average, sizeof(OMD_FLOAT)*n_layer);
-		MemAlloc(layer_population, sizeof(OMD_INT)*n_layer);
+		MemAlloc(layer_population, sizeof(int)*n_layer);
 		
-		for(OMD_INT i=0;i<GetNAtom(); i++) {
+		for(int i=0;i<GetNAtom(); i++) {
             if(Atoms(i).z<=termzone) {
             	
-                OMD_INT ly=(OMD_INT)floor((Atoms(i).z-System->Box.z0)/gridthick);
+                int ly=(int)floor((Atoms(i).z-System->Box.z0)/gridthick);
                 if(ly<0)ly=0;
                 if(ly>=n_layer)ly=n_layer-1;
                 Atoms(i).xid=ly;
@@ -100,8 +100,8 @@ public:
 	}
 	
 	void PreCalculation(){
-		OMD_INT na=GetNAtom();   
-        for(OMD_INT i=0; i<na; i++){
+		int na=GetNAtom();   
+        for(int i=0; i<na; i++){
             Atoms(i).aux[top_force]=0.0;
             Atoms(i).aux[bot_force]=0.0;
         }
@@ -111,16 +111,16 @@ public:
 	void ForceModifier(){
 		if(!evaluating) die("not evaluating force!");
 		
-        OMD_INT na=GetNAtom();
+        int na=GetNAtom();
 
-        vector<OMD_INT> blist[n_layer];
+        vector<int> blist[n_layer];
 
-        for(OMD_INT i=0;i<n_layer;i++) {
+        for(int i=0;i<n_layer;i++) {
         	force_layer_average[i]=0.0;
         	layer_population[i]=0;
 		}
         
-        for(OMD_INT i=0;i<na;i++) {
+        for(int i=0;i<na;i++) {
             Atom* a=AtomPtr(i);
             if(a->flag&tzflag){
             	
@@ -135,9 +135,9 @@ public:
             }
         }
 
-        for(OMD_INT l=0;l<n_layer;l++) {
+        for(int l=0;l<n_layer;l++) {
         	OMD_FLOAT favg=force_layer_average[l]/(OMD_FLOAT)layer_population[l];
-            for(OMD_INT i=0;i<blist[l].size();i++) {
+            for(int i=0;i<blist[l].size();i++) {
                 Atoms(blist[l].at(i)).fz=favg;
             }
         }

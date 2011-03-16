@@ -19,15 +19,15 @@
 
 class CoordClamp: public Force_Conditioner {
 	bool use_range;
-	OMD_INT axis;
-	OMD_INT xid;	
+	int axis;
+	int xid;	
 	OMD_FLOAT West, East, South, North, Bottom, Top;
-	OMD_INT NClamp;
-	OMD_INT ClampBit;
+	int NClamp;
+	int ClampBit;
 	
 	public:
 
-		CoordClamp(string clamped_name, OMD_INT clamped_axis)
+		CoordClamp(string clamped_name, int clamped_axis)
 		{
 			TargetName=clamped_name;
 			axis=clamped_axis;
@@ -36,7 +36,7 @@ class CoordClamp: public Force_Conditioner {
 			xid=-1;
 		}
 		
-		CoordClamp(string clamped_name, OMD_INT clamped_xid, OMD_INT clamped_axis) {
+		CoordClamp(string clamped_name, int clamped_xid, int clamped_axis) {
 			TargetName=clamped_name;
 			xid=clamped_xid;
 			axis=clamped_axis;
@@ -62,8 +62,8 @@ class CoordClamp: public Force_Conditioner {
 			if(!use_range)return;
 			
 			NClamp=0;
-			OMD_INT na=GetNAtom();
-			for(OMD_INT i=0; i<na; i++) {
+			int na=GetNAtom();
+			for(int i=0; i<na; i++) {
 				if( (Atoms(i).x>West   && Atoms(i).x<East)  &&
 					(Atoms(i).y>South  && Atoms(i).y<North) &&
 					(Atoms(i).z>Bottom && Atoms(i).z<Top))
@@ -81,7 +81,7 @@ class CoordClamp: public Force_Conditioner {
 			ClampBit=ClaimFlagBit();
 			if(xid>=0) {
 				NClamp=0;
-				for(OMD_INT i=0;i<GetNAtom();i++){
+				for(int i=0;i<GetNAtom();i++){
 					if(Atoms(i).xid==xid){
 						Atoms(i).flag|=ClampBit;
 						NClamp++;
@@ -95,8 +95,8 @@ class CoordClamp: public Force_Conditioner {
 		}
 		
 		void ForceModifier() {
-			OMD_INT na=Target->GetNAtom();
-			for (OMD_INT i=0;i<na;i++) {
+			int na=Target->GetNAtom();
+			for (int i=0;i<na;i++) {
 				if (!CheckFlag(i,ClampBit)) continue;
 				if (axis|CLAMP_X) Target->Atoms(i).fx=Target->Atoms(i).vx=0.0;
 				if (axis|CLAMP_Y) Target->Atoms(i).fy=Target->Atoms(i).vy=0.0;

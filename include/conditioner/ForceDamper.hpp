@@ -36,7 +36,7 @@ public:
 	void PrintInfo(ostream&);
 	void Init(MDSystem* WorkSys);
 	void ForceModifier();
-	virtual void Modify(OMD_INT idx);
+	virtual void Modify(int idx);
 	
 	
 };
@@ -73,7 +73,7 @@ void ForceDamper::Init(MDSystem* WorkSys)
 // in "impact-code" there is 0.5*Factor is used
 // here, put all numbers inside Factor!
 
-void ForceDamper::Modify(OMD_INT idx) {
+void ForceDamper::Modify(int idx) {
 	Atoms(idx).fx -= Factor*Atoms(idx).vx;
 	Atoms(idx).fy -= Factor*Atoms(idx).vy;
 	Atoms(idx).fz -= Factor*Atoms(idx).vz;
@@ -82,7 +82,7 @@ void ForceDamper::Modify(OMD_INT idx) {
 void ForceDamper::ForceModifier()
 {
 	OMD_FLOAT na=Target->GetNAtom();
- 	for(OMD_INT i=0;i<na;i++) {
+ 	for(int i=0;i<na;i++) {
  		
  		// check also free surfaces.. beyond free surface -> free!
  		

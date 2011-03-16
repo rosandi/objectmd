@@ -38,8 +38,8 @@
 class MDIterator:public Conditioner {
 protected:
 	OMD_FLOAT RadiusTolerance;
-	OMD_INT   RebuildPeriod;
-	OMD_INT   UpdatePeriod;
+	int   RebuildPeriod;
+	int   UpdatePeriod;
 	bool dirty;
 	
 public:
@@ -102,10 +102,10 @@ public:
 
 	virtual void Iterate(MDGadget* IteratedClass, bool force_update=false) {
 		if(dirty||force_update) Update();
-		OMD_SIZET na=GetNAtom();
-		for(OMD_SIZET at=0;at<na-1;at++) {
+		int na=GetNAtom();
+		for(int at=0;at<na-1;at++) {
 			if(!IteratedClass->PreIterationNode(at))continue;
-			for(OMD_SIZET to=(at+1);to<na;to++) {
+			for(int to=(at+1);to<na;to++) {
 				IteratedClass->IterationNode(at,to);
 			}
 		}

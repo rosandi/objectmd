@@ -52,16 +52,16 @@ class MDGadget: public MDClass {
 protected:
     MDSystem* System;
     AtomContainer* Target;
-	OMD_INT  Active;
-	OMD_INT  ActiveCode;
+	int  Active;
+	int  ActiveCode;
 	string TargetName;
 	bool Ready;
 	MDIterator* Iterator;
 	MDIntegrator* Integrator;
-	OMD_INT AuxIdx;
+	int AuxIdx;
 	MDUnit* Unit;
 
-	OMD_INT NCalls;
+	int NCalls;
 	ParamHandler *SysParam;
 	
 public:
@@ -69,7 +69,7 @@ public:
     bool IsReady;
 	
     MDGadget();
-    OMD_INT GetContainerID(string name);
+    int GetContainerID(string name);
 
     AtomContainer* SearchTarget(string name, bool strict=true);
     MDGadget* SearchGadget(string name, bool strict=true);
@@ -109,22 +109,22 @@ public:
 	 * The atom reference version.
 	 */
 	
-    virtual bool PreIterationNode(OMD_SIZET at){
+    virtual bool PreIterationNode(int at){
     	return PreIterationNode(Atoms(at));
     }
     
 
-    virtual void IterationNode(OMD_SIZET at,OMD_SIZET to){
+    virtual void IterationNode(int at,int to){
     	IterationNode(Atoms(at), Atoms(to));
     }
 
-    Atom&  Atoms(OMD_INT idx);
-    Atom*  AtomPtr(OMD_INT idx);
-    OMD_SIZET   GetNAtom();
-    OMD_FLOAT GetMass(OMD_SIZET idx);
+    Atom&  Atoms(int idx);
+    Atom*  AtomPtr(int idx);
+    int   GetNAtom();
+    OMD_FLOAT GetMass(int idx);
     OMD_FLOAT GetMass(Atom &a);
 	OMD_FLOAT GetMass(Atom *a);
-    OMD_FLOAT GetZ(OMD_SIZET idx);
+    OMD_FLOAT GetZ(int idx);
     OMD_FLOAT GetZ(Atom &a);
     OMD_FLOAT GetTimeStep();
     OMD_FLOAT GetElapsedTime();
@@ -133,13 +133,13 @@ public:
 	MDGadget* Activate() {Active|=ActiveCode; return this;}
 	MDGadget* Deactivate() {Active=0; return this;}
 	MDGadget* SetSystem(MDSystem* WorkSys){System=WorkSys; return this;}
-	OMD_SIZET ClaimFlagBit();
-	OMD_SIZET ClaimAuxVariable(bool printable, const OMD_CHAR* tag, const OMD_CHAR* sformat=NULL);
-	OMD_SIZET ClaimAuxVariable(){return ClaimAuxVariable(false,NULL,NULL);}
-	OMD_FLOAT& AuxVariable(OMD_SIZET i);
+	int ClaimFlagBit();
+	int ClaimAuxVariable(bool printable, const char* tag, const char* sformat=NULL);
+	int ClaimAuxVariable(){return ClaimAuxVariable(false,NULL,NULL);}
+	OMD_FLOAT& AuxVariable(int i);
 
 	bool OnTime(OMD_FLOAT tm);	
-	OMD_INT IsActive(OMD_INT Code=0);
+	int IsActive(int Code=0);
 
 	/**
 	 * Calculates the square distance of two atoms, identified by their index.
@@ -151,7 +151,7 @@ public:
 	OMD_FLOAT CalcSqrDistance(Atom &at, Atom &to, 
 						   OMD_FLOAT &dx, OMD_FLOAT &dy, OMD_FLOAT &dz, bool check=true);
 	
-	OMD_FLOAT CalcSqrDistance(OMD_SIZET at, OMD_SIZET to, 
+	OMD_FLOAT CalcSqrDistance(int at, int to, 
 						   OMD_FLOAT &dx, OMD_FLOAT &dy, OMD_FLOAT &dz, bool check=true){
 		return CalcSqrDistance(Atoms(at), Atoms(to), dx, dy, dz);
 	}
@@ -161,7 +161,7 @@ public:
 		return CalcSqrDistance(at, to, dx, dy, dz, check);
 	}
 
-	OMD_FLOAT CalcSqrDistance(OMD_INT at, OMD_INT to, bool check=true) {
+	OMD_FLOAT CalcSqrDistance(int at, int to, bool check=true) {
 		return CalcSqrDistance(Atoms(at), Atoms(to), check);
 	}
 	
@@ -170,7 +170,7 @@ public:
 	}
 	
 
-	OMD_FLOAT CalcDistance(OMD_INT at, OMD_INT to, bool check=true) {
+	OMD_FLOAT CalcDistance(int at, int to, bool check=true) {
 		return sqrt(CalcSqrDistance(Atoms(at), Atoms(to), check));
 	}
 
@@ -179,13 +179,13 @@ public:
 	DataSlot* RegisterMessageSlot(DataSlot* slot);
 	
 	void RestartVariable(string tag, OMD_FLOAT &val);
-	void RestartVariable(string tag, OMD_INT &val);
+	void RestartVariable(string tag, int &val);
 	
 	void PrintInfo(ostream& ost) {ost<<"id."<<id<<" "<<get_name()<<"\n";}
 	
-	OMD_INT NumberOfCalls(){return NCalls;}
-	void SyncData(OMD_INT mode) {System->SyncData(mode);}
-	void SyncData(OMD_INT mode, OMD_INT aidx) {System->SyncData(mode|aidx);}
+	int NumberOfCalls(){return NCalls;}
+	void SyncData(int mode) {System->SyncData(mode);}
+	void SyncData(int mode, int aidx) {System->SyncData(mode|aidx);}
 
 	virtual void ReadParameter(){}
 	virtual bool CheckParameter(){return true;}

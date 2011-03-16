@@ -35,8 +35,8 @@ public:
 	void PostIntegration() 
 	{
 		if (last_pot<System->Potential) {
-			OMD_INT na=Target->GetNAtom();			
-			for (OMD_INT i=0; i<na; i++) {
+			int na=Target->GetNAtom();			
+			for (int i=0; i<na; i++) {
 				Target->Atoms(i).vx*=factor;
 				Target->Atoms(i).vy*=factor;
 				Target->Atoms(i).vz*=factor;

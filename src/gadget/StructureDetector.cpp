@@ -33,7 +33,7 @@ void StructureDetector::Init(MDSystem* WorkSys){
 	MemNewArray(neig, vector<struct_neig>, nalloc);
 }
 
-void StructureDetector::IterationNode(OMD_SIZET at, OMD_SIZET to){
+void StructureDetector::IterationNode(int at, int to){
 	OMD_FLOAT sqr=CalcSqrDistance(at,to);
 	if(sqr<sqrcut){
 		struct_neig sat={to,sqr};
@@ -44,7 +44,7 @@ void StructureDetector::IterationNode(OMD_SIZET at, OMD_SIZET to){
 }
 
 void StructureDetector::FindStructure(){
-	OMD_INT na=GetNAtom();
+	int na=GetNAtom();
 	
 	// reallocate if needed
 	if(nalloc<na){
@@ -53,25 +53,25 @@ void StructureDetector::FindStructure(){
 		MemNewArray(neig, vector<struct_neig>, nalloc);
 	}
 
-	for(OMD_INT i=0;i<na;i++)neig[i].clear();
+	for(int i=0;i<na;i++)neig[i].clear();
 	Iterator->Iterate(this);
 	
-	for(OMD_INT i=0;i<na;i++){
+	for(int i=0;i<na;i++){
 		Atom* Ai=AtomPtr(i);
 		
 		sort(neig[i].begin(),neig[i].end(),CmpDist);
 		OMD_FLOAT Rsq0=0.0;
-		for(OMD_INT n=0;n<6;n++){
-			if(n<(OMD_INT)neig[i].size()) Rsq0+=neig[i].at(n).rsq;
+		for(int n=0;n<6;n++){
+			if(n<(int)neig[i].size()) Rsq0+=neig[i].at(n).rsq;
 		}
 		Rsq0/=6.0;
 		
 		OMD_FLOAT dist0=1.45*Rsq0;
 		OMD_FLOAT dist1=1.55*Rsq0;
-		vector<OMD_INT> neig_n0;
+		vector<int> neig_n0;
 		
-		OMD_INT n0,n1=0;
-		for(OMD_INT n=0;n<(OMD_INT)neig[i].size();n++){
+		int n0,n1=0;
+		for(int n=0;n<(int)neig[i].size();n++){
 			if(neig[i].at(n).rsq<dist0)
 				neig_n0.push_back(neig[i].at(n).idx);
 			if(neig[i].at(n).rsq<dist1) n1++;
@@ -79,16 +79,16 @@ void StructureDetector::FindStructure(){
 		n0=neig_n0.size();
 		
 		// evaluate angles
-		OMD_INT c[8];
-		memset(c,0,sizeof(OMD_INT)*8);
+		int c[8];
+		memset(c,0,sizeof(int)*8);
 		
-		for(OMD_INT j=0;j<n0-1;j++){
+		for(int j=0;j<n0-1;j++){
 			Atom* Aj=AtomPtr(neig_n0[j]);
 			OMD_FLOAT dxj=Ai->x-Aj->x;
 			OMD_FLOAT dyj=Ai->y-Aj->y;
 			OMD_FLOAT dzj=Ai->z-Aj->z;
 			OMD_FLOAT dj=sqrt(dxj*dxj+dyj*dyj+dzj*dzj);
-			for(OMD_INT k=j+1;k<(OMD_INT)neig_n0.size();k++){
+			for(int k=j+1;k<(int)neig_n0.size();k++){
 				Atom* Ak=AtomPtr(neig_n0[k]);
 				OMD_FLOAT dxk=Ai->x-Ak->x;
 				OMD_FLOAT dyk=Ai->y-Ak->y;

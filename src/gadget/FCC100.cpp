@@ -3,14 +3,14 @@
 #include <crystal/FCC100.hpp>
 
 AtomContainer* CrystalFCC100::Create() { 
-  OMD_INT     ATOMS_PER_UC=4;
+  int     ATOMS_PER_UC=4;
   OMD_FLOAT  XUCOffset, YUCOffset, ZUCOffset,
 		  XRelPos[ATOMS_PER_UC], YRelPos[ATOMS_PER_UC], ZRelPos[ATOMS_PER_UC],
 		  XOrg, YOrg, ZOrg,
 		  XPos, YPos, ZPos,
 		  Deviation, hlc;
 
-  OMD_INT     XMLayerPerUC, YMLayerPerUC, ZMLayerPerUC,
+  int     XMLayerPerUC, YMLayerPerUC, ZMLayerPerUC,
 		  XUCs, YUCs, ZUCs,
 		  Count,
 		  i, j, k, l;
@@ -75,7 +75,7 @@ AtomContainer* CrystalFCC100::Create() {
 		}
 	} 
 
-	OMD_INT na=Count;
+	int na=Count;
 	Allocate(na);
 	
 	Count=0;

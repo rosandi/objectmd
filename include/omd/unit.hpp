@@ -95,9 +95,9 @@ public:
 		fac_pressure=fpress;
 	}
 
-	void SetUnit(const OMD_CHAR* stime, const OMD_CHAR* slength, const OMD_CHAR* smass, 
-                 const OMD_CHAR* sforce, const OMD_CHAR* senergy, 
-                 const OMD_CHAR* stemp, const OMD_CHAR* spress)
+	void SetUnit(const char* stime, const char* slength, const char* smass, 
+                 const char* sforce, const char* senergy, 
+                 const char* stemp, const char* spress)
 	{
 		st_length.assign(slength);
 		st_mass.assign(smass);
@@ -108,9 +108,9 @@ public:
 	}
 
 	// to be implemented
-	void Set(const OMD_CHAR* unitstr){}
+	void Set(const char* unitstr){}
 	
-	MDUnit(const OMD_CHAR* unitstr=NULL) {
+	MDUnit(const char* unitstr=NULL) {
 		default_format.assign("%0.5e");
 		if(unitstr)Set(unitstr);
 		else {
@@ -149,41 +149,41 @@ public:
 	virtual OMD_FLOAT InGigaPascal(OMD_FLOAT v){return v/fac_pressure;}
 
 	
-	virtual string Format(OMD_FLOAT v, const OMD_CHAR* stformat=NULL){
-		OMD_CHAR st[128];
+	virtual string Format(OMD_FLOAT v, const char* stformat=NULL){
+		char st[128];
 		if(stformat)sprintf(st,stformat,v);
 		else sprintf(st,default_format.c_str(),v);
 		return st;
 	}
 	
-	void SetFormat(const OMD_CHAR* stformat)
+	void SetFormat(const char* stformat)
 	{default_format.assign(stformat);}
 	
-	virtual string FormatTime(OMD_FLOAT v, const OMD_CHAR* stformat=NULL)
+	virtual string FormatTime(OMD_FLOAT v, const char* stformat=NULL)
 	{return Format(Time(v),stformat)+" "+st_time;}
 
-	virtual string FormatLength(OMD_FLOAT v, const OMD_CHAR* stformat=NULL)
+	virtual string FormatLength(OMD_FLOAT v, const char* stformat=NULL)
 	{return Format(Length(v),stformat)+" "+st_length;}
 
-	virtual string FormatMass(OMD_FLOAT v, const OMD_CHAR* stformat=NULL)
+	virtual string FormatMass(OMD_FLOAT v, const char* stformat=NULL)
 	{return Format(Mass(v),stformat)+" "+st_mass;}
 
-	virtual string FormatForce(OMD_FLOAT v, const OMD_CHAR* stformat=NULL)
+	virtual string FormatForce(OMD_FLOAT v, const char* stformat=NULL)
 	{return Format(Force(v),stformat)+" "+st_force;}
 	
-	virtual string FormatEnergy(OMD_FLOAT v, const OMD_CHAR* stformat=NULL)
+	virtual string FormatEnergy(OMD_FLOAT v, const char* stformat=NULL)
 	{return Format(Energy(v),stformat)+" "+st_energy;}
 
-	virtual string FormatTemperature(OMD_FLOAT v, const OMD_CHAR* stformat=NULL)
+	virtual string FormatTemperature(OMD_FLOAT v, const char* stformat=NULL)
 	{return Format(Temperature(v),stformat)+" "+st_temperature;}
 
-	virtual string FormatPressure(OMD_FLOAT v, const OMD_CHAR* stformat=NULL)
+	virtual string FormatPressure(OMD_FLOAT v, const char* stformat=NULL)
 	{return Format(Pressure(v),stformat)+" "+st_pressure;}
 	
-	virtual string FormatVolume(OMD_FLOAT v, const OMD_CHAR* stformat=NULL)
+	virtual string FormatVolume(OMD_FLOAT v, const char* stformat=NULL)
 	{return Format(v*fac_length*fac_length*fac_length,stformat)+" "+st_length+"^3";}
 
-	virtual string FormatArea(OMD_FLOAT v, const OMD_CHAR* stformat=NULL)
+	virtual string FormatArea(OMD_FLOAT v, const char* stformat=NULL)
 	{return Format(v*fac_length*fac_length,stformat)+" "+st_length+"^2";}
 	
 };

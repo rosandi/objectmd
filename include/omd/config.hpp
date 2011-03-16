@@ -33,11 +33,6 @@
 // types
 #define OMD_FLOAT double
 
-// FIXME! delete this, and use only int!
-#define OMD_INT   int
-#define OMD_SIZET uint
-#define OMD_CHAR  char
-
 #define mdrseed() srand(getpid())
 #define mdrand() ((OMD_FLOAT)rand()/(OMD_FLOAT)RAND_MAX)
 

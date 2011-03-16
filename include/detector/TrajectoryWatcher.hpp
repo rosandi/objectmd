@@ -14,9 +14,9 @@ class TrajectoryWatcher: public Detector, public ParallelGadget {
 
 	ofstream fl;
 	string filename;
-	OMD_INT xid;
-	OMD_INT watchflag;
-	OMD_CHAR st[256];
+	int xid;
+	int watchflag;
+	char st[256];
 	
 	public:
 		
@@ -24,7 +24,7 @@ class TrajectoryWatcher: public Detector, public ParallelGadget {
 			TargetName=TargetAtom; xid=-1; filename=fname;
 		}
 
-		TrajectoryWatcher(OMD_INT x_id, string fname) {
+		TrajectoryWatcher(int x_id, string fname) {
 			xid=x_id; filename=fname;
 		}
 		
@@ -46,7 +46,7 @@ class TrajectoryWatcher: public Detector, public ParallelGadget {
 			
 			if(GetNAtom()) {
 				if(xid>=0) {
-					for(OMD_INT i=0; i<GetNAtom(); i++)
+					for(int i=0; i<GetNAtom(); i++)
 						if(Atoms(i).xid==xid){SetFlag(i, watchflag);break;}
 				} else {SetFlag(0, watchflag);}
 			}
@@ -55,11 +55,11 @@ class TrajectoryWatcher: public Detector, public ParallelGadget {
 
 		void Measure() {
 			// may be the container is empty.....
-			OMD_INT na=GetNAtom();
-			OMD_INT idx=0;
+			int na=GetNAtom();
+			int idx=0;
 
 			if(na>1) {
-				for(OMD_INT i=0;i<na;i++) if(CheckFlag(i, watchflag)){idx=i;break;}
+				for(int i=0;i<na;i++) if(CheckFlag(i, watchflag)){idx=i;break;}
 			}
 
 			if(na){

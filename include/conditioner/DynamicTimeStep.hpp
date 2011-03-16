@@ -22,12 +22,12 @@
 class DynamicTimeStep: public Pre_Conditioner, public ParallelGadget {
 	OMD_FLOAT maxp;
 	OMD_FLOAT maxdt;
-	OMD_INT upd;
+	int upd;
 	
 public:
 
 	// maxpath is typically 10% lattice constant
-	DynamicTimeStep(OMD_FLOAT maxpath=-1.0, OMD_FLOAT max_time_step=0.001, OMD_INT update_period=5) {
+	DynamicTimeStep(OMD_FLOAT maxpath=-1.0, OMD_FLOAT max_time_step=0.001, int update_period=5) {
 		set_name("DYNAMIC TIME STEP");
 		register_class(get_name());
 		maxp=maxpath;

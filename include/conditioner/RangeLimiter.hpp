@@ -49,7 +49,7 @@ public:
 	}
 			 
 	void PostIntegration() {
-		for(OMD_INT i=0; i<GetNAtom(); i++) {			
+		for(int i=0; i<GetNAtom(); i++) {			
 			if(Atoms(i).x<lW){SetActive(i,false);continue;}
 			if(Atoms(i).x>lE){SetActive(i,false);continue;}
 			if(Atoms(i).y<lS){SetActive(i,false);continue;}

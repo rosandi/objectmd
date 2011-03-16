@@ -112,10 +112,10 @@ enum stage_type {
 
 class Atom {
 public:
-    OMD_CHAR  id;              ///< atom's type id: interaction and container membership
-    OMD_CHAR  xid;             ///< extended id, tagging, grouping, etc
-    OMD_SIZET nid;			   ///< enumerated id
-    OMD_SIZET flag;            ///< the status and multi-purpose flag
+    char  id;              ///< atom's type id: interaction and container membership
+    char  xid;             ///< extended id, tagging, grouping, etc
+    int nid;			   ///< enumerated id
+    int flag;            ///< the status and multi-purpose flag
     OMD_FLOAT x,   y,  z;
     OMD_FLOAT vx, vy, vz;
     OMD_FLOAT fx, fy, fz;
@@ -142,7 +142,7 @@ public:
 		ListElement* next;
 	} *head, *tail, *iter;
 
-	OMD_SIZET length, current;
+	int length, current;
 
 	IndexList() {
 		head=tail=iter=NULL;
@@ -249,36 +249,36 @@ class MDClass:public MDToolkit {
 private:
 	
 protected:
-	OMD_INT mem_alloc_cnt[3]; // free, alloc, realloc counter
+	int mem_alloc_cnt[3]; // free, alloc, realloc counter
 
 public:
 
 	ParamHandler param;
-	OMD_INT id;
+	int id;
 	MDClass();
 	virtual ~MDClass(){}
 
-	OMD_INT* get_alloc_count() {return mem_alloc_cnt;}
-	OMD_INT  get_id() {return id;}
+	int* get_alloc_count() {return mem_alloc_cnt;}
+	int  get_id() {return id;}
 
 	virtual void mem_free(void*& ptr);
 	virtual void mem_alloc(void*& ptr, size_t size);
 	virtual void mem_realloc(void*& ptr, size_t size);	
 
 	string           search_path(string path, string fl);
-	virtual MDClass* set_id(OMD_INT nid) {id=nid;return this;}
+	virtual MDClass* set_id(int nid) {id=nid;return this;}
 
-	virtual Atom& Atoms(OMD_INT idx) {
+	virtual Atom& Atoms(int idx) {
 		die("unimplemented function Atoms()"); 
 		/* no warning fake */ Atom* a; return *a /*---*/;
 	}
 	
-	virtual Atom* AtomPtr(OMD_INT idx) {
+	virtual Atom* AtomPtr(int idx) {
 		die("unimplemented function AtomPtr()"); 
 		return NULL;
 	}
 	
-	virtual OMD_SIZET GetNAtom() {
+	virtual int GetNAtom() {
 		die("unimplemented function GetNAtom()"); 
 		return 0;
 	}
@@ -286,16 +286,16 @@ public:
 	virtual bool     Check(){return true;}
 	
 	//---- Atom checking & management ---//
-	bool CheckActive(OMD_INT idx){return(Atoms(idx).flag&FLAG_ACTIVE);}
-	bool CheckInside(OMD_INT idx){return(!(Atoms(idx).flag&FLAG_OUTSIDE));}
-	bool CheckGhost(OMD_INT idx) {return((Atoms(idx).flag&FLAG_GHOST));}
-	bool CheckFlag(OMD_INT idx, const unsigned OMD_INT f){return(Atoms(idx).flag&f);}
+	bool CheckActive(int idx){return(Atoms(idx).flag&FLAG_ACTIVE);}
+	bool CheckInside(int idx){return(!(Atoms(idx).flag&FLAG_OUTSIDE));}
+	bool CheckGhost(int idx) {return((Atoms(idx).flag&FLAG_GHOST));}
+	bool CheckFlag(int idx, const unsigned int f){return(Atoms(idx).flag&f);}
 
-	void SetFlag(OMD_INT idx, OMD_INT f){Atoms(idx).flag|=f;}
-	void UnsetFlag(OMD_INT idx, OMD_INT f){Atoms(idx).flag&=(~f);}
-	void SetActive(OMD_INT idx, bool a=true);
-	void SetOutside(OMD_INT idx, bool a=true);	
-	void SetGhost(OMD_INT idx, bool a=true);
+	void SetFlag(int idx, int f){Atoms(idx).flag|=f;}
+	void UnsetFlag(int idx, int f){Atoms(idx).flag&=(~f);}
+	void SetActive(int idx, bool a=true);
+	void SetOutside(int idx, bool a=true);	
+	void SetGhost(int idx, bool a=true);
 
 	virtual void PrintInfo(ostream& ost);	
 };
@@ -360,9 +360,9 @@ class AtomKeeper:public MDClass {
 	Atom* AtomArray;
 	struct Ptr{Atom *p;} *AtomIndex;
 	AtomKeeper* MyClone;
-	OMD_INT NBlock;
-	OMD_INT NAtom;
-	OMD_INT NAlloc;
+	int NBlock;
+	int NAtom;
+	int NAlloc;
 
 public:
 
@@ -380,32 +380,32 @@ public:
 	
 	//----Atom acces methods----/
 		
-	Atom& operator[](OMD_INT idx);	
-	Atom& Atoms(OMD_INT idx, MDClass *caller);
-	Atom& Atoms(OMD_INT idx) {return Atoms(idx,this);}	
-	Atom* AtomPtr(OMD_INT idx);
+	Atom& operator[](int idx);	
+	Atom& Atoms(int idx, MDClass *caller);
+	Atom& Atoms(int idx) {return Atoms(idx,this);}	
+	Atom* AtomPtr(int idx);
 	
 	//---- storage management methods ----//
 	
-	void Allocate(OMD_INT sz, KeeperType t=Storage);
+	void Allocate(int sz, KeeperType t=Storage);
 	void ChangeType(KeeperType tp);	
 	bool GetType() {return Type;}
-	void Expand(OMD_INT sz);
-	void Cut(OMD_INT Offset) {Expand(Offset);}
+	void Expand(int sz);
+	void Cut(int Offset) {Expand(Offset);}
 	void Clear() {NAtom=0;}	
 	
 	void  Append(AtomKeeper& ak);
 	void  Attach(Atom* pa);
 	void  Attach(Atom& a){Attach(&a);}
 	void  AssignByIndex(AtomKeeper& ak);
-	void  Dispose(OMD_INT idx);
+	void  Dispose(int idx);
 	void  Copy(AtomKeeper& ak);
 	void  CloneArray(AtomKeeper& ak);
 	void  ReferArray(AtomKeeper& ak);
 	Atom* GetArrayPtr(){return AtomArray;}
-	Ptr*  GetIndexPtr(OMD_INT offset=0){return(AtomIndex+offset);}
-	OMD_SIZET GetNAtom(){return NAtom;}
-	OMD_SIZET GetAllocSize(){return NAlloc;}	
+	Ptr*  GetIndexPtr(int offset=0){return(AtomIndex+offset);}
+	int GetNAtom(){return NAtom;}
+	int GetAllocSize(){return NAlloc;}	
 
 };
 

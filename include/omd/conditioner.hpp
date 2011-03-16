@@ -67,7 +67,7 @@ public:
 		ost<<"id."<<id<<" "<<get_name()<<" -- target: "<<Target->get_name()<<std::endl;
 	}
 	
-	void SetConditionerType(OMD_INT condtype) {Active=ActiveCode=condtype;} 
+	void SetConditionerType(int condtype) {Active=ActiveCode=condtype;} 
 
     virtual void PreIntegration()  {} // before integration
     virtual void PreCalculation()  {} // before force calculation loop
@@ -76,7 +76,7 @@ public:
     virtual void EvaluateForce        // inserted in force loop (before ReturnForce)
     		(Atom &a, Atom &b, OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz, OMD_FLOAT fr, OMD_FLOAT pot) {}
 
-    virtual void Execute(OMD_INT condtype) {
+    virtual void Execute(int condtype) {
     	if(condtype&COND_PRE_INTEGRATION&Active)  PreIntegration();
     	if(condtype&COND_PRE_CALCULATION&Active)  PreCalculation();
     	if(condtype&COND_FORCE_MODIFIER&Active)   ForceModifier();

@@ -43,21 +43,21 @@ using std::string;
 
 class DataDumper: public Detector {
 protected:
-    OMD_INT FileSeq, FileMax;
-    OMD_INT XLength;
+    int FileSeq, FileMax;
+    int XLength;
     string FieldsDef;
     DataDumper* MainDumper;
 
 public:
     
-   	DataDumper(string TargetAtom="",OMD_FLOAT tm=-1.0,string fn="Data",OMD_INT extlen=3):
+   	DataDumper(string TargetAtom="",OMD_FLOAT tm=-1.0,string fn="Data",int extlen=3):
    	Detector(tm) {
         TargetName=TargetAtom;
 		SetFilename(fn);
         FileSeq=0;
         XLength=(extlen<EXLN)?extlen:EXLN;
         if (XLength==0) FileMax=100000;
-        else FileMax=OMD_INT(pow(10, XLength+1));
+        else FileMax=int(pow(10, XLength+1));
         MainDumper=NULL;
         
         set_name("DATA DUMPER");
@@ -85,8 +85,8 @@ public:
 	}
  
     virtual string GetFilename() {
-        OMD_INT i=0,j;
-        OMD_CHAR st[64];
+        int i=0,j;
+        char st[64];
 		
 		if (XLength==0)	return (FilenamePrefix+Filename);
 			
@@ -131,7 +131,7 @@ public:
 
     virtual bool Check(){
     	if(MainDumper==NULL){
-			for(OMD_INT a=0;a<MAXAUXVAR;a++)
+			for(int a=0;a<MAXAUXVAR;a++)
 				if(System->PrintableAux[a])
 					FieldsDef.append(" "+System->AuxNameTag.at(a));
 		}

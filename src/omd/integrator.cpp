@@ -37,19 +37,19 @@ MDIntegrator::MDIntegrator(OMD_FLOAT time_step)
     MaxCutRadius  = 0.0;
 	register_class("INTEGRATOR");
 	set_name("VERLET_INTEGRATOR");
-    for (OMD_INT i=0;i<MAXATOMTYPE;i++) 
-    	for (OMD_INT j=0;j<MAXATOMTYPE;j++) Forces[i][j]=NULL;
+    for (int i=0;i<MAXATOMTYPE;i++) 
+    	for (int j=0;j<MAXATOMTYPE;j++) Forces[i][j]=NULL;
 }
 
 MDIntegrator::~MDIntegrator() {
-	for (OMD_SIZET i=0; i<ActForces.size(); i++) delete ActForces[i];
+	for (int i=0; i<ActForces.size(); i++) delete ActForces[i];
 }
 
 void MDIntegrator::PrintInfo(ostream& ost) {
     ost<<get_name()<< " - interaction forces:\n\n";
     
-	for (OMD_SIZET i=0; i<(System->SystemAtoms.size()); i++)
-		for (OMD_SIZET j=i; j<(System->SystemAtoms.size()); j++) {
+	for (int i=0; i<(System->SystemAtoms.size()); i++)
+		for (int j=i; j<(System->SystemAtoms.size()); j++) {
 			if (GetForce(i, j)!=NULL) {
 				ost << System->SystemAtoms[i]->get_name() << "*" 
 					<< System->SystemAtoms[j]->get_name() << " = ";
@@ -78,9 +78,9 @@ void MDIntegrator::Init(MDSystem* WorkSys) {
     NType = WorkSys->SystemAtoms.size();
     
 	// put forces into the kernel matrix
-	for(OMD_SIZET i=0;i<ActForces.size();i++){
-		OMD_SIZET from=ActForces[i]->A;
-		OMD_SIZET to  =ActForces[i]->B;
+	for(int i=0;i<ActForces.size();i++){
+		int from=ActForces[i]->A;
+		int to  =ActForces[i]->B;
 
 		assert(from<NType&&to<NType, "wrong atom IDs in the interaction force ("+
 		       as_string(from)+","+as_string(to)+")");
@@ -100,7 +100,7 @@ void MDIntegrator::Init(MDSystem* WorkSys) {
 	}
 	
 	MaxCutRadius=-1.0;
-	for(OMD_SIZET i=0;i<ActForces.size();i++) {
+	for(int i=0;i<ActForces.size();i++) {
 		ActForces[i]->Init(WorkSys);
 		if (ActForces[i]->CutRadius>MaxCutRadius)
 			MaxCutRadius=ActForces[i]->CutRadius;
@@ -128,8 +128,8 @@ void MDIntegrator::Init(MDSystem* WorkSys) {
 */
 	
 bool MDIntegrator::Check() {
-	for(OMD_SIZET i=0;i<NType;i++)
-	  for(OMD_SIZET j=0;j<NType;j++)
+	for(int i=0;i<NType;i++)
+	  for(int j=0;j<NType;j++)
 	    if(Forces[i][j]==NULL) {
 		  if(i==j && System->SystemAtoms[i]->GetNAtom()<=1)continue;		  
 		  die("incomplete interaction between "+
@@ -160,7 +160,7 @@ bool MDIntegrator::Check() {
 
 MDIntegrator* MDIntegrator::AddForce(ForceKernel *forc) 
 {
-	OMD_INT from=forc->A; OMD_INT to=forc->B;
+	int from=forc->A; int to=forc->B;
 	assert(from<MAXATOMTYPE&&to<MAXATOMTYPE, "MAXATOMTYPE exceeded");
 	forc->set_id(ForcID++);
 	forc->SetUnit(Unit);
@@ -175,11 +175,11 @@ MDIntegrator* MDIntegrator::AddForce(ForceKernel *forc)
  * class.
  */
 
-void MDIntegrator::IterationNode(OMD_SIZET at, OMD_SIZET to)
+void MDIntegrator::IterationNode(int at, int to)
 {	
 	int atid=Atoms(at).id;
 	int toid=Atoms(to).id;
-	Forces[(OMD_SIZET)(atid)][(OMD_SIZET)(toid)]->CheckCompute(at,to,atid,toid);
+	Forces[(int)(atid)][(int)(toid)]->CheckCompute(at,to,atid,toid);
 }
 
 /**
@@ -199,14 +199,14 @@ void MDIntegrator::IterationNode(OMD_SIZET at, OMD_SIZET to)
 void MDIntegrator::Iterate() {
 	SyncData(SYNC_SPACE);
     System->ExecuteConditioners(COND_PRE_CALCULATION);
-	OMD_INT na=GetNAtom();
-	for(OMD_INT i=0; i<na; i++){
+	int na=GetNAtom();
+	for(int i=0; i<na; i++){
 		Atom* a=AtomPtr(i);
 		a->fx=a->fy=a->fz=a->virial=a->potential=0.0;		
 	}
-	for(OMD_SIZET i=0;i<ActForces.size();i++) ActForces[i]->ClearAccumulators();
+	for(int i=0;i<ActForces.size();i++) ActForces[i]->ClearAccumulators();
 	Iterator->Iterate(this);
-	for (OMD_SIZET i=0; i<ActForces.size(); i++) ActForces[i]->Correction();
+	for (int i=0; i<ActForces.size(); i++) ActForces[i]->Correction();
 	SyncData(SYNC_FORCE);
     System->ExecuteConditioners(COND_FORCE_MODIFIER);
 }
@@ -223,9 +223,9 @@ void MDIntegrator::Integrate() {
 	OMD_FLOAT half_dt=0.5*TimeStep;
 
 	// first velocity and position update
-	OMD_INT natom=System->GetLocalAtomNumber();
+	int natom=System->GetLocalAtomNumber();
 
-    for (OMD_INT i=0;i<natom;i++) {
+    for (int i=0;i<natom;i++) {
     	if(CheckActive(i)) {
 			Atom* a=AtomPtr(i);
 			OMD_FLOAT Mass = GetMass(a);
@@ -242,7 +242,7 @@ void MDIntegrator::Integrate() {
     Iterate();
 
 	// second velocity update
-    for(OMD_INT i=0;i<natom;i++) {
+    for(int i=0;i<natom;i++) {
     	if(CheckActive(i)){
 			Atom* a=AtomPtr(i);
 			OMD_FLOAT Mass = GetMass(a);

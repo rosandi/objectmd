@@ -79,8 +79,8 @@ protected:
 
 // variables to save ---------------------
 	string mat_file;
-	OMD_INT posprec,valprec;
-	OMD_INT write_mode;
+	int posprec,valprec;
+	int write_mode;
 
 public:	
 	bool created;
@@ -119,18 +119,18 @@ public:
 
 	/** Access an atom data from the atom structure. This function may be used
 	 *  both as left or right value on an expression **/
-	virtual Atom& Atoms(OMD_INT idx){
+	virtual Atom& Atoms(int idx){
 		return AtomStorage.Atoms(idx,this);
 	}
 	
 	/** Take the pointer of an atom **/
-	virtual Atom* AtomPtr(OMD_INT idx){
+	virtual Atom* AtomPtr(int idx){
 		return AtomStorage.AtomPtr(idx);
 	}
 	
-	virtual MDClass* set_id(OMD_INT nid);
-	virtual AtomContainer*       SetID(OMD_INT nid){set_id(nid); return this;}
-	virtual AtomContainer*       SetXID(OMD_INT nid);
+	virtual MDClass* set_id(int nid);
+	virtual AtomContainer*       SetID(int nid){set_id(nid); return this;}
+	virtual AtomContainer*       SetXID(int nid);
 
 	/** Sets the name of the AtomContainer. By default a newly created 
 	 *  class is named "AtomContainer" **/
@@ -151,17 +151,17 @@ public:
 	AtomContainer* ReadMaterial(string material_file);
 	
 	/** set the write mode in DumpAtoms() function.**/
-	AtomContainer* SetWriteMode(OMD_INT wm){write_mode|=wm;return this;}
-	AtomContainer* UnsetWriteMode(OMD_INT wm){write_mode&=(~wm);return this;}
+	AtomContainer* SetWriteMode(int wm){write_mode|=wm;return this;}
+	AtomContainer* UnsetWriteMode(int wm){write_mode&=(~wm);return this;}
 	AtomContainer* ClearWriteMode(){write_mode=0;return this;}
-	OMD_INT GetWriteMode(){return write_mode;}
+	int GetWriteMode(){return write_mode;}
 
 	/** Get the number of atoms stored in or referred by the container **/
-	virtual OMD_SIZET GetNAtom(){return AtomStorage.GetNAtom();}
+	virtual int GetNAtom(){return AtomStorage.GetNAtom();}
 
 	// calling compatibility...
-	virtual OMD_FLOAT GetMass(OMD_SIZET idx){return M;}
-	virtual OMD_FLOAT GetZ(OMD_SIZET idx){return Z;}
+	virtual OMD_FLOAT GetMass(int idx){return M;}
+	virtual OMD_FLOAT GetZ(int idx){return Z;}
 
 	/** Take the reference to the primitive atom keeper, AtomKeeper **/
 	virtual AtomKeeper& GetAtomStorage(){return AtomStorage;}
@@ -171,7 +171,7 @@ public:
 
 	/** prints the information of the class **/
  	virtual void           PrintInfo(ostream& ost);
-	virtual void           Allocate(OMD_INT na, bool clear=true, AtomKeeper::KeeperType type=AtomKeeper::Storage);
+	virtual void           Allocate(int na, bool clear=true, AtomKeeper::KeeperType type=AtomKeeper::Storage);
 	
 	virtual AtomContainer* Create(){
 		if(CanImport())Import(filename);
@@ -179,19 +179,19 @@ public:
 		return this;
 	}	
 	
-    virtual AtomContainer* Import(string fname,OMD_INT aid=-1);
+    virtual AtomContainer* Import(string fname,int aid=-1);
     
 	virtual AtomContainer* DumpAtoms(AtomKeeper& ak, 
 									 string fname, 
-									 OMD_INT mode=0, 
+									 int mode=0, 
 									 bool* AuxPrintable=NULL, 
-									 OMD_CHAR* AuxFormat[]=NULL, 
+									 char* AuxFormat[]=NULL, 
 									 string AuxNames="");
 									
 	virtual AtomContainer* DumpAtoms(string fname="",
-	                                 OMD_INT mode=0, 
+	                                 int mode=0, 
 	                                 bool* AuxPrintable=NULL, 
-	                                 OMD_CHAR* AuxFormat[]=NULL, 
+	                                 char* AuxFormat[]=NULL, 
 	                                 string AuxNames="");
 	                                 
 	AtomContainer*         Combine(AtomContainer& a);
@@ -201,7 +201,7 @@ public:
 	
 	AtomContainer*         Shift(OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz);
 	AtomContainer*         AddVelocity(OMD_FLOAT vx, OMD_FLOAT vy, OMD_FLOAT vz){
-								for(OMD_SIZET i=0;i<GetNAtom();i++){
+								for(int i=0;i<GetNAtom();i++){
 									Atoms(i).vx+=vx;
 									Atoms(i).vy+=vy;
 									Atoms(i).vz+=vz;
@@ -218,13 +218,13 @@ public:
 	virtual SysBox& CalcBox();
 	virtual SysBox& GetBox();
 
-	AtomContainer* Deactivate() {for(OMD_SIZET i=0; i<GetNAtom(); i++)SetActive(i,false);return this;}
-	AtomContainer* Activate() {for (OMD_SIZET i=0;i<GetNAtom();i++)SetActive(i,true); return this;}
-	AtomContainer* ActivateAtom(OMD_INT idx){SetActive(idx,true); return this;}
-	AtomContainer* DeactivateAtom(OMD_INT idx){SetActive(idx,false);return this;}
-	AtomContainer* SetPrecision(OMD_INT prec, OMD_INT vprec=0){posprec=prec;valprec=vprec?vprec:prec;return this;}
+	AtomContainer* Deactivate() {for(int i=0; i<GetNAtom(); i++)SetActive(i,false);return this;}
+	AtomContainer* Activate() {for (int i=0;i<GetNAtom();i++)SetActive(i,true); return this;}
+	AtomContainer* ActivateAtom(int idx){SetActive(idx,true); return this;}
+	AtomContainer* DeactivateAtom(int idx){SetActive(idx,false);return this;}
+	AtomContainer* SetPrecision(int prec, int vprec=0){posprec=prec;valprec=vprec?vprec:prec;return this;}
 	
-    AtomContainer* PopInfo(OMD_INT cnt=1){while(0<cnt--)StringInfo.pop_back();return this;}
+    AtomContainer* PopInfo(int cnt=1){while(0<cnt--)StringInfo.pop_back();return this;}
     AtomContainer* PushInfo(string sp){StringInfo.push_back(sp);return this;}
     
     string GetMaterialFile(){return mat_file;}

@@ -15,10 +15,6 @@
  *
 */
 
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
-#include <fstream>
 #include <conditioner/VerletList.hpp>
 
 using std::cerr;

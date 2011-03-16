@@ -69,27 +69,27 @@
 #define DEFAULT_TRANSFER_LENGTH 4096
 
 struct PackageVector {
-	OMD_INT nid;
+	int nid;
 	OMD_FLOAT x,y,z;
 };
 
 struct PackageScalar {
-	OMD_INT nid;
+	int nid;
 	OMD_FLOAT value;
 };
 
 struct PackageSpace {
-    OMD_CHAR  id;              ///< atom's type id: interaction and container membership
-    OMD_CHAR  xid;             ///< extended id, tagging, etc
-    OMD_SIZET nid;			   ///< enumerated id
-    OMD_SIZET flag;            ///< the status and multi-purpose flag
+    char  id;              ///< atom's type id: interaction and container membership
+    char  xid;             ///< extended id, tagging, etc
+    int nid;			   ///< enumerated id
+    int flag;            ///< the status and multi-purpose flag
     OMD_FLOAT x,   y,  z;
     OMD_FLOAT vx, vy, vz;
 };
 
 class CommunicationHandler:public MDClass {
-	OMD_INT NProc;
-	OMD_INT Rank;
+	int NProc;
+	int Rank;
 	class MDSystemGrid *System;
 
 	PackageSpace* SpaceSendBuffer[27];
@@ -99,13 +99,13 @@ class CommunicationHandler:public MDClass {
 	PackageScalar* ScalarSendBuffer[27];
 	PackageScalar* ScalarRecvBuffer[27];
 
-	OMD_INT      SendNumber[27];
-	OMD_INT      RecvNumber[27];
+	int      SendNumber[27];
+	int      RecvNumber[27];
 	IndexList*   NeigRubix[27];
 
 	string Hostname;
 	bool opened;
-	OMD_INT MirrorMask;
+	int MirrorMask;
 	OMD_FLOAT TotalComtime;
 	OMD_FLOAT CellRadiusTolerance;
 
@@ -115,12 +115,12 @@ public:
 	CommunicationHandler();
 	virtual ~CommunicationHandler();
 
-	Atom&    Atoms(OMD_INT idx);
-	Atom*    AtomPtr(OMD_INT idx);
-	OMD_SIZET     GetNAtom();
+	Atom&    Atoms(int idx);
+	Atom*    AtomPtr(int idx);
+	int     GetNAtom();
 
-	OMD_INT GetRank(){return Rank;}
-	OMD_INT GetSize(){return NProc;}
+	int GetRank(){return Rank;}
+	int GetSize(){return NProc;}
 
 	IndexList** GetRubix(){return NeigRubix;}
 
@@ -135,34 +135,34 @@ public:
 
 	virtual void   CollectSendRecvNumber();
 	virtual void   DistributeAtomIndex();
-	virtual void   SendReceiveData(void** sendpack, void** recvpack, OMD_SIZET unitlength);
-	virtual void   SendReceive(OMD_INT mode);
+	virtual void   SendReceiveData(void** sendpack, void** recvpack, int unitlength);
+	virtual void   SendReceive(int mode);
 	virtual void   PrepareSpaceBuffers();
 	virtual void   PreparePositionBuffers();
 	virtual void   PrepareVelocityBuffers();
 	virtual void   PrepareForceBuffers();
-	virtual void   PrepareAuxBuffers(OMD_INT aidx);
+	virtual void   PrepareAuxBuffers(int aidx);
 	virtual void   UnpackSpace();
 	virtual void   UnpackPosition();
 	virtual void   UnpackVelocity();	
 	virtual void   UnpackForce();
-	virtual void   UnpackAux(OMD_INT aidx);
-	virtual bool   CheckCellShift(OMD_INT b, OMD_FLOAT& xshift, OMD_FLOAT& yshift, OMD_FLOAT& zshift);
+	virtual void   UnpackAux(int aidx);
+	virtual bool   CheckCellShift(int b, OMD_FLOAT& xshift, OMD_FLOAT& yshift, OMD_FLOAT& zshift);
 	virtual void   SyncProcesses();
 	virtual void   Abort();
 
-	virtual OMD_INT    RawSend(OMD_INT toproc, void *data, OMD_INT length);
-	virtual OMD_INT    RawReceive(OMD_INT fromproc, void* data, OMD_INT length=DEFAULT_TRANSFER_LENGTH);
-	virtual void   RootReduceSUM(OMD_FLOAT*source,OMD_FLOAT*dest,OMD_INT length);
-	virtual OMD_INT    TakeSUM(OMD_INT a);
-	virtual OMD_INT    TakeMAX(OMD_INT a);
-	virtual OMD_INT    TakeMIN(OMD_INT a);
+	virtual int    RawSend(int toproc, void *data, int length);
+	virtual int    RawReceive(int fromproc, void* data, int length=DEFAULT_TRANSFER_LENGTH);
+	virtual void   RootReduceSUM(OMD_FLOAT*source,OMD_FLOAT*dest,int length);
+	virtual int    TakeSUM(int a);
+	virtual int    TakeMAX(int a);
+	virtual int    TakeMIN(int a);
 	virtual OMD_FLOAT TakeSUM(OMD_FLOAT a);
 	virtual OMD_FLOAT TakeMAX(OMD_FLOAT a);
 	virtual OMD_FLOAT TakeMIN(OMD_FLOAT a);
-	virtual void   Gather(void *idata, void *buffer, OMD_INT length);
-	virtual void   AllGather(void *send, void *receive, OMD_INT senlen, OMD_INT reclen);
-	virtual void   Broadcast(void* a, OMD_INT size);
+	virtual void   Gather(void *idata, void *buffer, int length);
+	virtual void   AllGather(void *send, void *receive, int senlen, int reclen);
+	virtual void   Broadcast(void* a, int size);
 
 };
 

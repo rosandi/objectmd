@@ -50,7 +50,7 @@ class MDSystemGrid: public MDSystem {
 
 public:
 	// negative values needed for GRID_AUTO?
-	OMD_INT ClusterNX, ClusterNY, ClusterNZ;
+	int ClusterNX, ClusterNY, ClusterNZ;
 
 protected:
 	
@@ -72,12 +72,12 @@ protected:
 	 */
 
 	struct StructInfo {
-		OMD_INT   NeighborList[MAXPROC][27];
+		int   NeighborList[MAXPROC][27];
 		SysBox    Border[MAXPROC];
-		OMD_SIZET CellX[MAXPROC],CellY[MAXPROC],CellZ[MAXPROC];
-		OMD_CHAR  AtomNames[MAXATOMTYPE][32];
-		OMD_SIZET NumberOfContainers;
-		OMD_SIZET TotalAtom;
+		int CellX[MAXPROC],CellY[MAXPROC],CellZ[MAXPROC];
+		char  AtomNames[MAXATOMTYPE][32];
+		int NumberOfContainers;
+		int TotalAtom;
 		OMD_FLOAT LCellX,LCellY,LCellZ;
 		SysBox    Box;
 	} ProcInfo;
@@ -86,14 +86,14 @@ protected:
 	AtomKeeper GhostBuffer;
 	AtomKeeper LocalBuffer;
 
-	OMD_SIZET  LocalAtomNumber;
-	OMD_INT CommRefreshPeriod;
+	int  LocalAtomNumber;
+	int CommRefreshPeriod;
 	bool FirstSync;
 
 public:
 
 	//----Constructions and destructions----//
-	MDSystemGrid(OMD_INT &argc, OMD_CHAR** &argv, OMD_INT nx=1, OMD_INT ny=1, OMD_INT nz=1);
+	MDSystemGrid(int &argc, char** &argv, int nx=1, int ny=1, int nz=1);
 	MDSystemGrid();
 	
 	virtual ~MDSystemGrid();
@@ -101,14 +101,14 @@ public:
 	void CommInit();
 
 	//----utilities----//
-	OMD_SIZET GetGridSize(){return Communicator->GetSize();}	
-	OMD_SIZET GetRank(){return Communicator->GetRank();}
+	int GetGridSize(){return Communicator->GetSize();}	
+	int GetRank(){return Communicator->GetRank();}
 
-	void SetClusterArch(OMD_INT nx, OMD_INT ny=1, OMD_INT nz=1){
+	void SetClusterArch(int nx, int ny=1, int nz=1){
 		ClusterNX=nx;ClusterNY=ny;ClusterNZ=nz;
 	}
 	
-	OMD_INT GetCellIndex(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z);
+	int GetCellIndex(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z);
 	bool CheckOwnership(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z);
 
 	/**
@@ -124,11 +124,11 @@ public:
 	 * 
 	 */
 
-	OMD_INT GetNeighborRank(OMD_INT relcoord){
+	int GetNeighborRank(int relcoord){
 		return ProcInfo.NeighborList[Communicator->GetRank()][relcoord];
 	}
 	
-	SysBox& GetCellBorder(OMD_INT rank=-1){
+	SysBox& GetCellBorder(int rank=-1){
 		if(rank<0)rank=Communicator->GetRank();
 		return ProcInfo.Border[rank];
 	}
@@ -139,7 +139,7 @@ public:
 	
 	// cancels boundary's minimum distance convention: image atoms copy is used
 	virtual void BoundaryCorrectDistances(OMD_FLOAT& dx, OMD_FLOAT& dy, OMD_FLOAT& dz){}
-	virtual OMD_SIZET GetTotalAtom(){return ProcInfo.TotalAtom;}
+	virtual int GetTotalAtom(){return ProcInfo.TotalAtom;}
 	
 	//----Master(Root) routines----//
 	virtual void Root_ArrangeNeighbor();	
@@ -151,7 +151,7 @@ public:
 	virtual bool CheckComm();
 
 	virtual void FlattenAtomBox();
-//	virtual void Unpack(OMD_INT package);
+//	virtual void Unpack(int package);
 	
 	//----Creation----//
 	virtual void LoadAtoms();
@@ -163,16 +163,16 @@ public:
 	
 	virtual AtomContainer* DumpAtoms(AtomKeeper& ak, 
 	                       string fname,
-	                       OMD_INT mode=0,
+	                       int mode=0,
 	                       bool* AuxPrintable=NULL,
-	                       OMD_CHAR* AuxFormat[]=NULL,
+	                       char* AuxFormat[]=NULL,
 	                       string AuxNames=""); 
 
 	virtual AtomContainer* DumpAtoms(
 	                       string fname,
-	                       OMD_INT mode=0, 
+	                       int mode=0, 
 	                       bool* AuxPrintable=NULL,
-	                       OMD_CHAR* AuxFormat[]=NULL,
+	                       char* AuxFormat[]=NULL,
 	                       string AuxNames="");
 	
 	
@@ -183,21 +183,21 @@ public:
 	virtual void LoadVariables(FILE* fl);
 	virtual void CreationFunction();
 	virtual void InitGadgets();
-	virtual void SyncData(OMD_INT syncmode);
+	virtual void SyncData(int syncmode);
 	virtual void SyncEnvironment();
 	virtual void SyncVariable();
 	virtual bool CheckRun();
 	virtual void AdjustSystem();
 	virtual void FirstRun();
 	virtual void Initiate();
-	virtual void ErrorHandler(const OMD_CHAR* errst);
+	virtual void ErrorHandler(const char* errst);
 	virtual void MeasurePotential();
 	virtual void MeasureKinetic();
 	virtual void PrintMessages(ostream& ost);
-	virtual void SetCommRefreshPeriod(OMD_INT peri) {CommRefreshPeriod=peri;}
+	virtual void SetCommRefreshPeriod(int peri) {CommRefreshPeriod=peri;}
 	string  GetGridConfiguration();
 	virtual void ReadParameters();
-	OMD_SIZET GetLocalAtomNumber(){return LocalAtomNumber;}
+	int GetLocalAtomNumber(){return LocalAtomNumber;}
 	virtual void DistributeContainers();
 	virtual void UpdateRadiusTolerance();
 };

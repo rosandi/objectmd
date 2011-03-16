@@ -51,53 +51,53 @@ public:
 		sysptr=WorkSys;
 	}
 		
-	OMD_INT RawSend(OMD_INT toproc, void *data, OMD_INT length) {
+	int RawSend(int toproc, void *data, int length) {
 		if(Communicator) return Communicator->RawSend(toproc, data, length);
 		else sysptr->die("Attempt to use RawSend() in a non parallel OMD application");
 		return 0;
 	}
 	
-	OMD_INT RawReceive(OMD_INT fromproc, void* data, OMD_INT length=DEFAULT_TRANSFER_LENGTH) {
+	int RawReceive(int fromproc, void* data, int length=DEFAULT_TRANSFER_LENGTH) {
 		if(Communicator) return Communicator->RawReceive(fromproc, data, length);
 		else sysptr->die("Attempt to use RawReceive() in a non parallel OMD application");
 		return 0;
 	}
 	
-	void RootReduceSUM(OMD_FLOAT*source,OMD_FLOAT*dest,OMD_INT length){
+	void RootReduceSUM(OMD_FLOAT*source,OMD_FLOAT*dest,int length){
 		if(Communicator) Communicator->RootReduceSUM(source,dest,length);
 		else sysptr->die("Attempt to use RootReduceSUM() in a non parallel OMD application");
 
 	}
-	void Gather(void *idata, void *buffer, OMD_INT length){
+	void Gather(void *idata, void *buffer, int length){
 		if(Communicator) Communicator->Gather(idata,buffer,length);
 		else sysptr->die("Attempt to use Gather() in a non parallel OMD application");
 	}
 	
 
-	void AllGather(void *send, void *receive, OMD_INT senlen, OMD_INT reclen){
+	void AllGather(void *send, void *receive, int senlen, int reclen){
 		if(Communicator) Communicator->AllGather(send,receive,senlen,reclen);
 		else sysptr->die("Attempt to use AllGather() in a non parallel OMD application");
 	}
 	
 	// may be use in serial OMD:
 
-	OMD_INT GetRank() {
+	int GetRank() {
 		if(Communicator) return Communicator->GetRank();
 		return 0;
 	}
 
 	
-	OMD_INT TakeSUM(OMD_INT a) {
+	int TakeSUM(int a) {
 		if(Communicator) return Communicator->TakeSUM(a);
 		return a;
 	}
 	
-	OMD_INT TakeMAX(OMD_INT a) {
+	int TakeMAX(int a) {
 		if(Communicator) return Communicator->TakeMAX(a);
 		return a;
 	}
 	
-	OMD_INT TakeMIN(OMD_INT a) {
+	int TakeMIN(int a) {
 		if(Communicator) return Communicator->TakeMIN(a);
 		return a;
 	}
@@ -117,12 +117,12 @@ public:
 		return a;
 	}
 
-	void Broadcast(void* a, OMD_INT size){
+	void Broadcast(void* a, int size){
 		if(Communicator) Communicator->Broadcast(a,size);
 	}
 
 	void Broadcast(int& a){
-		if(Communicator) Communicator->Broadcast((void*)&a,sizeof(OMD_INT));
+		if(Communicator) Communicator->Broadcast((void*)&a,sizeof(int));
 	}
 
 	void Broadcast(OMD_FLOAT& a){

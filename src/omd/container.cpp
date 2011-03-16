@@ -96,21 +96,21 @@ AtomContainer* AtomContainer::ReadMaterial(string material_file) {
 	return this;
 }
 
-MDClass* AtomContainer::set_id(OMD_INT nid){
+MDClass* AtomContainer::set_id(int nid){
 	id=nid;
-	for (OMD_SIZET i=0; i<GetNAtom(); i++) Atoms(i).id=(OMD_CHAR)nid;
+	for (int i=0; i<GetNAtom(); i++) Atoms(i).id=(char)nid;
 	return this;
 }
 
-AtomContainer* AtomContainer::SetXID(OMD_INT nid){
-	for (OMD_SIZET i=0; i<GetNAtom(); i++) Atoms(i).xid=(OMD_CHAR)nid;
+AtomContainer* AtomContainer::SetXID(int nid){
+	for (int i=0; i<GetNAtom(); i++) Atoms(i).xid=(char)nid;
 	return this;
 }
 
 void AtomContainer::PrintInfo(ostream& ost) {
     ost  <<"id."<<id<<" "<<get_name()<<"\n"
          <<"number_of_atoms= "<<GetNAtom()<< "\n"
-         <<"number="<<(OMD_INT)Z<< "\n"
+         <<"number="<<(int)Z<< "\n"
          <<"mass="<<M<<" (sim) "<<M*NORMAL_AMU<<"(amu)\n";
     if(CanImport()) ost<<"imported_from_file "<<filename<<'\n';
 }
@@ -127,7 +127,7 @@ void AtomContainer::Release() {
 AtomContainer* AtomContainer::Shift(OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz)
 {
 	if(!created) Create();
-    for(OMD_SIZET i=0;i<GetNAtom();i++) {
+    for(int i=0;i<GetNAtom();i++) {
         Atoms(i).x+=dx;
         Atoms(i).y+=dy;
         Atoms(i).z+=dz;
@@ -141,12 +141,12 @@ AtomContainer* AtomContainer::Shift(OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz)
  * the same id with the container.
 */
 
-void AtomContainer::Allocate(OMD_INT na, bool clear, AtomKeeper::KeeperType type)
+void AtomContainer::Allocate(int na, bool clear, AtomKeeper::KeeperType type)
 {
 	if(na){
 		AtomStorage.Allocate(na,type);
 		if (clear) {
-    		for (OMD_INT i=0;i<na;i++) {
+    		for (int i=0;i<na;i++) {
         		Atoms(i).x=Atoms(i).vx=Atoms(i).fx=0.0;
         		Atoms(i).y=Atoms(i).vy=Atoms(i).fy=0.0;
         		Atoms(i).z=Atoms(i).vz=Atoms(i).fz=0.0;
@@ -166,13 +166,13 @@ void AtomContainer::Allocate(OMD_INT na, bool clear, AtomKeeper::KeeperType type
 
 SysBox& AtomContainer::CalcBox(){
 	OMD_FLOAT MinX, MaxX, MinY, MaxY, MinZ, MaxZ;        
-	OMD_INT natom=GetNAtom();
+	int natom=GetNAtom();
 	bool checkin=false;
 	
 	MinX=MinY=MinZ= DBL_MAX;
 	MaxX=MaxY=MaxZ=-DBL_MAX;
 
-	for(OMD_INT i=0; i<natom; i++) {
+	for(int i=0; i<natom; i++) {
 		if(!CheckInside(i)) continue;
 		checkin=true;
 		// Minimums
@@ -278,7 +278,7 @@ AtomContainer* AtomContainer::copy_data(AtomContainer* a) {
  * 
 **/
 
-AtomContainer* AtomContainer::Import(string fname, OMD_INT aid) {
+AtomContainer* AtomContainer::Import(string fname, int aid) {
 
 	string material_file;
 	
@@ -297,12 +297,12 @@ AtomContainer* AtomContainer::Import(string fname, OMD_INT aid) {
 		} else warn("material properties was set before import");
 	}
 
-	OMD_INT ix=0, iy=1, iz=2, ivx=-1, ivy=-1, ivz=-1, iid=-1, ixid=-1;
+	int ix=0, iy=1, iz=2, ivx=-1, ivy=-1, ivz=-1, iid=-1, ixid=-1;
 	if(p.exist("Fields")) {
 		// take x,y,z and vx,vy,vz,xid fields if exist
 		// fields line ends with "--"
-		OMD_INT idx=p.index_of("Fields")+1;
-		for(OMD_INT i=idx;i<p.size();i++){
+		int idx=p.index_of("Fields")+1;
+		for(int i=idx;i<p.size();i++){
 			string sfl=p.string_value(i);	
 			if(sfl=="x")ix=i-idx;
 			if(sfl=="y")iy=i-idx;
@@ -318,14 +318,14 @@ AtomContainer* AtomContainer::Import(string fname, OMD_INT aid) {
 	
 	if(aid>=0) assert(iid>=0, "id field not found");
 
-	OMD_INT it=0,lino=0;
+	int it=0,lino=0;
 	ifstream posf(filename.c_str());	
 	assert(posf.good(), "failed to open file "+filename);
 
 	vector<Atom> atom_register;
 
     while (posf.good()) {
-	    OMD_CHAR stbuff[512];
+	    char stbuff[512];
     	NOLEADINGSPACES(posf);
         posf.getline(stbuff, 511, '\n');
         if(posf.eof())break;
@@ -355,20 +355,20 @@ AtomContainer* AtomContainer::Import(string fname, OMD_INT aid) {
 				a.vz=vline.at(ivz);
 			}
 
-			if(ixid>=0) a.xid=(OMD_INT)vline.at(ixid);
+			if(ixid>=0) a.xid=(int)vline.at(ixid);
 			atom_register.push_back(a);
 
 		} catch(...) {
 			die("insufficient number of fields to import: "+filename+
 				" line="+as_string(lino)+
 				" particle_index="+as_string(it)+
-				" number_of_fields="+as_string((OMD_SIZET)(vline.size())));
+				" number_of_fields="+as_string((int)(vline.size())));
 		}
 
     }
 
     Allocate(atom_register.size());
-    for(OMD_SIZET i=0;i<atom_register.size();i++) Atoms(i)=atom_register[i];
+    for(int i=0;i<atom_register.size();i++) Atoms(i)=atom_register[i];
 
 	created=true;
     posf.close();
@@ -390,9 +390,9 @@ AtomContainer* AtomContainer::Import(string fname, OMD_INT aid) {
 
 AtomContainer* AtomContainer::DumpAtoms(AtomKeeper& ak,
                                         string fname,
-                                        OMD_INT mode,
+                                        int mode,
                                         bool*  AuxPrintable,
-                                        OMD_CHAR* AuxFormat[],
+                                        char* AuxFormat[],
                                         string AuxNames)
 {
 	
@@ -420,7 +420,7 @@ AtomContainer* AtomContainer::DumpAtoms(AtomKeeper& ak,
 			    << Box.x0<<" "<<Box.y0<<" "<<Box.z0<<" "
 		        << Box.x1<<" "<<Box.y1<<" "<<Box.z1<<"\n";
 
-			for (OMD_SIZET i=0;i<StringInfo.size();i++)f<<'#'<<StringInfo[i]<<'\n';
+			for (int i=0;i<StringInfo.size();i++)f<<'#'<<StringInfo[i]<<'\n';
 			
 			if(mat_file!="")f<<"#$ Material "<<mat_file<<"\n";
 		
@@ -429,7 +429,7 @@ AtomContainer* AtomContainer::DumpAtoms(AtomKeeper& ak,
 
 			if(AuxNames!="") f<<AuxNames;
 			else if(AuxPrintable){
-				for(OMD_INT i=0;i<MAXAUXVAR;i++) 
+				for(int i=0;i<MAXAUXVAR;i++) 
 					if(AuxPrintable[i])f << " aux"<<i;
 			}
 			
@@ -445,7 +445,7 @@ AtomContainer* AtomContainer::DumpAtoms(AtomKeeper& ak,
 	}
 	//---------------------------//
 	
-	for (OMD_SIZET i=0;i<ak.GetNAtom();i++) {
+	for (int i=0;i<ak.GetNAtom();i++) {
 		
 		if(!(mode&WM_GHOST)) if(ak.CheckGhost(i)) continue; // skip ghost atoms
 		if(!ak.CheckActive(i)) if(!(mode&WM_DEADATOM)) continue; // skip dead atoms
@@ -455,7 +455,7 @@ AtomContainer* AtomContainer::DumpAtoms(AtomKeeper& ak,
 		
 		// Print aux variables
 		if(AuxPrintable) {
-		  for(OMD_INT a=0;a<MAXAUXVAR;a++)
+		  for(int a=0;a<MAXAUXVAR;a++)
 			if(AuxPrintable[a]) {
 				if(AuxFormat) f<<as_string(ak[i].aux[a],AuxFormat[a])<<" ";
 				else f<<as_string(ak[i].aux[a],"%0.5e")<<" ";
@@ -467,9 +467,9 @@ AtomContainer* AtomContainer::DumpAtoms(AtomKeeper& ak,
 		if(mode&WM_FORCE)    f<<ak[i].fx<<" "<<ak[i].fy<<" "<<ak[i].fz<<" ";
 		if(mode&WM_POTENTIAL)f<<ak[i].potential<<" ";
 		if(mode&WM_VIRIAL)   f<<ak[i].virial<<" ";
-		if(mode&WM_ID)       f<<(OMD_INT)ak[i].id<<" ";
-		if(mode&WM_XID)      f<<(OMD_INT)ak[i].xid<<" ";
-		if(mode&WM_NID)      f<<(OMD_INT)ak[i].nid<<" ";
+		if(mode&WM_ID)       f<<(int)ak[i].id<<" ";
+		if(mode&WM_XID)      f<<(int)ak[i].xid<<" ";
+		if(mode&WM_NID)      f<<(int)ak[i].nid<<" ";
                              f << "\n";
 	}
 
@@ -492,9 +492,9 @@ AtomContainer* AtomContainer::DumpAtoms(AtomKeeper& ak,
 
 AtomContainer* AtomContainer::DumpAtoms(
 					string fname,
-					OMD_INT mode,
+					int mode,
 					bool* AuxPrintable,
-					OMD_CHAR* AuxFormat[],
+					char* AuxFormat[],
 					string AuxNames)
 {
 	string dumpname(get_name());
@@ -503,12 +503,12 @@ AtomContainer* AtomContainer::DumpAtoms(
 }
 
 #define WRITEST(STR, FL) { \
-	OMD_INT sz=(STR).size()+1; \
-	OMD_CHAR longst[sz]; \
+	int sz=(STR).size()+1; \
+	char longst[sz]; \
 	memset(longst,0,sz); \
 	(STR).copy(longst, sz-1); \
-	fwrite(&sz, sizeof(OMD_INT), 1, FL); \
-	fwrite(longst, sizeof(OMD_CHAR), sz, FL); \
+	fwrite(&sz, sizeof(int), 1, FL); \
+	fwrite(longst, sizeof(char), sz, FL); \
 }
 
 /**
@@ -527,32 +527,32 @@ AtomContainer* AtomContainer::Save(string binname, string mode) {
 
 	FILE* fl = fopen(binname.c_str(), mode.c_str());
 
-	OMD_CHAR cname[32];
+	char cname[32];
 	
 	assert(fl, "cannot open file for writing "+binname);
 	
 	memset(cname,0,32);
 	strcpy(cname,"$ATOMCONTAINER:");
-	fwrite(cname, sizeof(OMD_CHAR), 32, fl);
+	fwrite(cname, sizeof(char), 32, fl);
 
 	WRITEST(get_name(), fl);
 	WRITEST(mat_file, fl);
 	WRITEST(filename, fl);
 	WRITEST(param.raw_string(), fl);
 
-	fwrite(&id, sizeof(OMD_INT), 1, fl);
+	fwrite(&id, sizeof(int), 1, fl);
 	fwrite(&M, sizeof(OMD_FLOAT), 1, fl);
 	fwrite(&Z, sizeof(OMD_FLOAT), 1, fl);
 	fwrite(&Value, sizeof(OMD_FLOAT), 1, fl);
-	fwrite(&posprec, sizeof(OMD_INT), 1,fl);
-	fwrite(&valprec, sizeof(OMD_INT), 1, fl);
-	fwrite(&write_mode, sizeof(OMD_INT), 1, fl);
+	fwrite(&posprec, sizeof(int), 1,fl);
+	fwrite(&valprec, sizeof(int), 1, fl);
+	fwrite(&write_mode, sizeof(int), 1, fl);
 
-	OMD_INT na=GetNAtom();
-	fwrite(&na, sizeof(OMD_INT), 1, fl);
+	int na=GetNAtom();
+	fwrite(&na, sizeof(int), 1, fl);
 
-	for(OMD_INT i=0;i<na;i++) {
-		OMD_INT dr=fwrite(&(Atoms(i)), sizeof(Atom), 1, fl);
+	for(int i=0;i<na;i++) {
+		int dr=fwrite(&(Atoms(i)), sizeof(Atom), 1, fl);
 		assert(dr, "failure in writting file "+binname);
 	}
 	
@@ -565,10 +565,10 @@ AtomContainer* AtomContainer::Save(string binname, string mode) {
 // strings are previously saved ending with \0
 
 #define READST(STR, FL) { \
-	OMD_INT sz; \
-	fread(&sz, sizeof(OMD_INT), 1, FL); \
-	OMD_CHAR longst[sz]; \
-	fread(longst, sizeof(OMD_CHAR), sz, FL); \
+	int sz; \
+	fread(&sz, sizeof(int), 1, FL); \
+	char longst[sz]; \
+	fread(longst, sizeof(char), sz, FL); \
 	(STR).assign(longst); \
 }
 
@@ -580,7 +580,7 @@ AtomContainer* AtomContainer::Save(string binname, string mode) {
  */
 
 AtomContainer* AtomContainer::Load(string binname, string blockname) {
-	OMD_CHAR cname[32];
+	char cname[32];
 	
 	FILE* fl = fopen(binname.c_str(), "r");
 	assert(fl,"LOAD: can not open file '"+binname+"' for reading");
@@ -590,12 +590,12 @@ AtomContainer* AtomContainer::Load(string binname, string blockname) {
 	bool found=false;
 
 	while(!found) {
-		OMD_INT pos;
-		OMD_CHAR ch=0x00;
+		int pos;
+		char ch=0x00;
 		while((ch=getc(fl))!='$') if(feof(fl)) break;
 		pos=ftell(fl);
 		memset(cname, 0, 32);
-		fread(cname, sizeof(OMD_CHAR), 31, fl); // minus '$'
+		fread(cname, sizeof(char), 31, fl); // minus '$'
 		if(feof(fl)) break;
 
 		if(string("ATOMCONTAINER:")==cname){
@@ -616,24 +616,24 @@ AtomContainer* AtomContainer::Load(string binname, string blockname) {
 	READST(filename, fl);
 	READST(stake, fl); param.assign(stake);
 
-	fread(&id, sizeof(OMD_INT), 1, fl);
+	fread(&id, sizeof(int), 1, fl);
 	fread(&M, sizeof(OMD_FLOAT), 1, fl);
 	fread(&Z, sizeof(OMD_FLOAT), 1, fl);
 	fread(&Value, sizeof(OMD_FLOAT), 1, fl);
-	fread(&posprec, sizeof(OMD_INT), 1,fl);
-	fread(&valprec, sizeof(OMD_INT), 1, fl);
-	fread(&write_mode, sizeof(OMD_INT), 1, fl);
+	fread(&posprec, sizeof(int), 1,fl);
+	fread(&valprec, sizeof(int), 1, fl);
+	fread(&write_mode, sizeof(int), 1, fl);
 	
 	// read atom
-	OMD_INT na;
-	fread(&na, sizeof(OMD_INT), 1, fl);	
+	int na;
+	fread(&na, sizeof(int), 1, fl);	
 
 	blog("Loaded data length="+as_string(na)+" blocks "+
-	    as_string((OMD_SIZET)(na*sizeof(Atom)))+" bytes", LOGCREATE);
+	    as_string((int)(na*sizeof(Atom)))+" bytes", LOGCREATE);
 
 	Allocate(na, false);
-	OMD_INT dr=0;
-	for(OMD_INT i=0;i<na;i++) dr+=fread(&(Atoms(i)), sizeof(Atom), 1, fl);
+	int dr=0;
+	for(int i=0;i<na;i++) dr+=fread(&(Atoms(i)), sizeof(Atom), 1, fl);
 	assert(dr==na, "Fail in reading file '"+binname+"'");
 	assert(!ferror(fl), "error loading file '"+binname+"'");
 	fclose(fl);
@@ -652,10 +652,10 @@ AtomContainer* AtomContainer::Load(string binname, string blockname) {
 
 AtomContainer* AtomContainer::SetKineticEnergy(OMD_FLOAT ek_per_atom) {
 	if(!created) Create();
-	OMD_SIZET natom=GetNAtom();
+	int natom=GetNAtom();
 
 	if(ek_per_atom<=0.0) {
-		for(OMD_INT i=0;i<natom;i++) {
+		for(int i=0;i<natom;i++) {
 			Atoms(i).vx=0.0;
 			Atoms(i).vy=0.0;
 			Atoms(i).vz=0.0;
@@ -667,7 +667,7 @@ AtomContainer* AtomContainer::SetKineticEnergy(OMD_FLOAT ek_per_atom) {
 
 	// Give same energy, random direction
 	OMD_FLOAT svx=0.0,svy=0.0,svz=0.0;
-	for(OMD_INT i=0;i<natom;i++) {
+	for(int i=0;i<natom;i++) {
 		OMD_FLOAT v=sqrt(2.0*ek_per_atom/GetMass(i));
 		OMD_FLOAT sx=mdrand()*v;
 		OMD_FLOAT sy=mdrand()*(v-sx);
@@ -683,14 +683,14 @@ AtomContainer* AtomContainer::SetKineticEnergy(OMD_FLOAT ek_per_atom) {
 	svy/=(OMD_FLOAT)natom;
 	svz/=(OMD_FLOAT)natom;
 	
-	for(OMD_INT i=0;i<natom;i++) {
+	for(int i=0;i<natom;i++) {
 		Atoms(i).vx-=svx;
 		Atoms(i).vy-=svy;
 		Atoms(i).vz-=svz;
 	}
 
 	OMD_FLOAT checkek=0.0;
-	for(OMD_INT i=0;i<natom;i++) {
+	for(int i=0;i<natom;i++) {
 		checkek+=0.5*GetMass(i)*(
 			Atoms(i).vx*Atoms(i).vx+
 			Atoms(i).vy*Atoms(i).vy+
@@ -699,7 +699,7 @@ AtomContainer* AtomContainer::SetKineticEnergy(OMD_FLOAT ek_per_atom) {
 	
 	OMD_FLOAT fact=sqrt((ek_per_atom*(OMD_FLOAT)natom)/checkek);
 	
-	for(OMD_INT i=0;i<natom;i++) {
+	for(int i=0;i<natom;i++) {
 		Atoms(i).vx*=fact;
 		Atoms(i).vy*=fact;
 		Atoms(i).vz*=fact;

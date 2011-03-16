@@ -34,14 +34,14 @@ class ThermoDetector: public DataDumper, public ParallelGadget {
 	OMD_FLOAT system_temperature,system_pressure; // System's temperature and pressure
 	OMD_FLOAT avg_temp; // average of atom temperature
 	OMD_FLOAT avg_pres; // average of atom pressure
-	OMD_INT    *nneig;
-	OMD_INT    nalloc;
-	OMD_INT    tidx,pidx,nidx;
+	int    *nneig;
+	int    nalloc;
+	int    tidx,pidx,nidx;
 	bool   intensive_mode; // measure every timestep
 	enum {tempe,press} process;
 
 public:
-	ThermoDetector(OMD_FLOAT tm=-1.0, OMD_FLOAT rcut=-1.0, string fn="Data", OMD_INT extlen=3)
+	ThermoDetector(OMD_FLOAT tm=-1.0, OMD_FLOAT rcut=-1.0, string fn="Data", int extlen=3)
 	:DataDumper("", tm, fn, extlen){
 		set_name("THERMO DETECTOR");
 		register_class(get_name());
@@ -60,8 +60,8 @@ public:
 		else blog("intensive mode: false");
 	}
 	
-	void SetTemperature(OMD_INT idx, OMD_FLOAT t) {Atoms(idx).aux[tidx]=t;}
-	OMD_FLOAT GetTemperature(OMD_INT idx) {return Atoms(idx).aux[tidx];}
+	void SetTemperature(int idx, OMD_FLOAT t) {Atoms(idx).aux[tidx]=t;}
+	OMD_FLOAT GetTemperature(int idx) {return Atoms(idx).aux[tidx];}
 	OMD_FLOAT GetTemperature(){return system_temperature;}
 	
 	/**
@@ -74,16 +74,16 @@ public:
 		return avg_temp;
 	}
 	
-	OMD_FLOAT GetPressure(OMD_INT idx) {return Atoms(idx).aux[pidx];}
+	OMD_FLOAT GetPressure(int idx) {return Atoms(idx).aux[pidx];}
 	OMD_FLOAT GetPressure(){return system_pressure;}
 	OMD_FLOAT GetCutRadius(){return ercut;}
 	void GetCMVelocities(OMD_FLOAT* &cvx, OMD_FLOAT* &cvy, OMD_FLOAT* &cvz){
 		cvx=sumvx;cvy=sumvy;cvz=sumvz;
 	}
 	
-	OMD_INT GetAuxTempIndex(){return tidx;}
-	OMD_INT GetAuxPresIndex(){return pidx;}
-	OMD_INT GetAuxDensIndex(){return nidx;}
+	int GetAuxTempIndex(){return tidx;}
+	int GetAuxPresIndex(){return pidx;}
+	int GetAuxDensIndex(){return nidx;}
 	OMD_FLOAT GetDetectVolume(){return volcut;}
 
 	void Measure() {		
@@ -119,7 +119,7 @@ public:
 		MemAlloc(sumvy,sizeof(OMD_FLOAT)*nalloc);
 		MemAlloc(sumvz,sizeof(OMD_FLOAT)*nalloc);
 		MemAlloc(sumvir,sizeof(OMD_FLOAT)*nalloc);
-		MemAlloc(nneig,sizeof(OMD_INT)*nalloc);
+		MemAlloc(nneig,sizeof(int)*nalloc);
 		if(ercut<0.0) ercut=System->GetMaxCutRadius();
 		assert(ercut>0.0, "cut radius is zero... static mode?");
 		volcut=4.0*M_PI*ercut*ercut*ercut/3.0;
@@ -137,7 +137,7 @@ public:
 		MemFree(nneig);
 	}
 
-	virtual bool CheckLoopTemp(OMD_SIZET idx) {
+	virtual bool CheckLoopTemp(int idx) {
 		Atom* a=AtomPtr(idx);
 		nneig[idx]++;
 		masat=GetMass(a);
@@ -150,7 +150,7 @@ public:
 		return true;
 	}
 
-	virtual void IterationNodeTemp(OMD_SIZET at, OMD_SIZET to) {
+	virtual void IterationNodeTemp(int at, int to) {
 		OMD_FLOAT d=CalcDistance(at,to);
 		Atom* a=AtomPtr(at);
 		Atom* b=AtomPtr(to);
@@ -174,11 +174,11 @@ public:
 	virtual void ExtractTemperature() {
 		process=tempe;
 		Iterator->Iterate(this);
-		OMD_INT na=GetNAtom();
-		OMD_INT navg=0;
+		int na=GetNAtom();
+		int navg=0;
 		avg_temp=0.0;
 		
-		for (OMD_INT i=0;i<na;i++) {
+		for (int i=0;i<na;i++) {
 			Atom* a=AtomPtr(i);
 			sumvx[i]/=sumas[i]; 
 			sumvy[i]/=sumas[i];
@@ -205,12 +205,12 @@ public:
 		
 	}
 
-	virtual bool CheckLoopPressure(OMD_INT idx) {
+	virtual bool CheckLoopPressure(int idx) {
 		sumvir[idx]+=Atoms(idx).virial;  // my self
 		return true;
 	}
 
-	virtual void IterationNodePressure(OMD_SIZET at, OMD_SIZET to) {
+	virtual void IterationNodePressure(int at, int to) {
 		OMD_FLOAT d=CalcDistance(at,to);
 		if(d<=ercut){
 			sumvir[at]+=Atoms(to).virial;
@@ -221,10 +221,10 @@ public:
 	virtual void ExtractPressure() {
 		process=press;
 		Iterator->Iterate(this);
-		OMD_INT na=GetNAtom();
-		OMD_INT navg=0;
+		int na=GetNAtom();
+		int navg=0;
 		avg_pres=0.0;
-		for (OMD_INT i=0;i<na;i++) {
+		for (int i=0;i<na;i++) {
 			Atom* a=AtomPtr(i);
 			a->aux[pidx]=(nneig[i]==0)?0.0:
 			Unit->Pressure((sumvir[i]/(6.0*volcut))+(sumek[i]/(1.5*volcut)));
@@ -243,7 +243,7 @@ public:
 	}
 
 	virtual void ExtractQuantities() {
-		OMD_INT na=GetNAtom();
+		int na=GetNAtom();
 		
 		if(nalloc<na) {
 			nalloc=na;
@@ -253,10 +253,10 @@ public:
 			MemRealloc(sumvy,sizeof(OMD_FLOAT)*nalloc);
 			MemRealloc(sumvz,sizeof(OMD_FLOAT)*nalloc);
 			MemRealloc(sumvir,sizeof(OMD_FLOAT)*nalloc);
-			MemRealloc(nneig,sizeof(OMD_INT)*nalloc);
+			MemRealloc(nneig,sizeof(int)*nalloc);
 		}
 
-		OMD_INT nnn=sizeof(OMD_FLOAT)*na;
+		int nnn=sizeof(OMD_FLOAT)*na;
 		memset(sumas,0,nnn);
 		memset(sumas,0,nnn);
 		memset(sumvx,0,nnn);
@@ -264,7 +264,7 @@ public:
 		memset(sumvz,0,nnn);
 		memset(sumek,0,nnn);
 		memset(sumvir,0,nnn);
-		memset(nneig,0,sizeof(OMD_INT)*na);
+		memset(nneig,0,sizeof(int)*na);
 
 		ExtractTemperature();
 		ExtractPressure();
@@ -290,9 +290,9 @@ public:
 		
 		OMD_FLOAT summass=0.0;
 		
-		OMD_INT na=GetNAtom();
+		int na=GetNAtom();
 
-		for(OMD_INT i=0;i<na;i++){
+		for(int i=0;i<na;i++){
 			Atom *a=AtomPtr(i);
 			if(a->flag&FLAG_GHOST) continue;
 			if(a->flag&FLAG_ACTIVE) {
@@ -325,10 +325,10 @@ public:
 		cmvy/=summass;
 		cmvz/=summass;
 		
-		OMD_INT totatom=0;
+		int totatom=0;
 		OMD_FLOAT temp=0.0;
 
-		for(OMD_INT i=0;i<na;i++){
+		for(int i=0;i<na;i++){
 			Atom* a=AtomPtr(i);
 			if(a->flag&FLAG_GHOST) continue;
 			if(a->flag&FLAG_ACTIVE) {
@@ -356,12 +356,12 @@ public:
 		
 	}
 
-	bool PreIterationNode(OMD_SIZET idx) {
+	bool PreIterationNode(int idx) {
 		if(process==tempe) return CheckLoopTemp(idx);
 		else return CheckLoopPressure(idx);
 	}
 	
-	void IterationNode(OMD_SIZET at, OMD_SIZET to) {
+	void IterationNode(int at, int to) {
 		if(process==tempe) IterationNodeTemp(at,to);
 		else IterationNodePressure(at,to);		
 	}

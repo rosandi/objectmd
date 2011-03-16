@@ -42,7 +42,7 @@ class TForcePair: public ForceKernel {
 	public:	
 		
 		TForcePair(string TableFile) {
-			OMD_CHAR sname[128];
+			char sname[128];
 			set_name("TABLE PAIR FORCE");
 			register_class(get_name());
 			tablefile=TableFile;

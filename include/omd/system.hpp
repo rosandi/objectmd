@@ -139,16 +139,16 @@ class MDSystem:public AtomContainer {
 protected:
 	friend class MDGadget;
 
-	OMD_SIZET FlagBitUsed;     /**<the mask of used flag bit**/
-	OMD_SIZET AuxVariableUsed; /**<the bit mask of used variables**/
-    OMD_INT  InterruptFlag;   /**<system interrupt flag**/
+	int FlagBitUsed;     /**<the mask of used flag bit**/
+	int AuxVariableUsed; /**<the bit mask of used variables**/
+    int  InterruptFlag;   /**<system interrupt flag**/
 
-	OMD_SIZET Mode; /**<the running mode: NORMAL_MODE|RESTART_MODE|TEST_MODE**/
+	int Mode; /**<the running mode: NORMAL_MODE|RESTART_MODE|TEST_MODE**/
 
-	OMD_INT AtomID;
-	OMD_INT GroupID;
-	OMD_INT ConditionerID;
-	OMD_INT DetectorID;
+	int AtomID;
+	int GroupID;
+	int ConditionerID;
+	int DetectorID;
 	bool BoxImport;
 	bool Unificated;
 	bool Enumerated;
@@ -163,9 +163,9 @@ protected:
 
 public:
 
-    OMD_INT* Argc;
-    OMD_CHAR*** Argv;
-    OMD_INT  ExitCode;
+    int* Argc;
+    char*** Argv;
+    int  ExitCode;
     
 	vector<string>  AuxUser;
 	vector<string> SAuxFormat;
@@ -173,7 +173,7 @@ public:
 	vector<string>  FlagUser;
 	
 	bool PrintableAux[MAXAUXVAR];
-	OMD_CHAR** AuxFormat;
+	char** AuxFormat;
 
 	MDUnit* Unit;
 
@@ -188,8 +188,8 @@ public:
 	time_t    SimBeginTime, SimEndTime;
 	OMD_FLOAT    SimWallTime; 
 
-    OMD_INT      PBoundary;
-	OMD_SIZET    TotalAtom;
+    int      PBoundary;
+	int    TotalAtom;
 	
     OMD_FLOAT Energy;
     OMD_FLOAT Kinetic;
@@ -197,7 +197,7 @@ public:
     OMD_FLOAT Potential;
     OMD_FLOAT BasePotential;
     
-    OMD_SIZET Step;
+    int Step;
     OMD_FLOAT ElapsedTime;
     OMD_FLOAT MaxTime;
 	OMD_FLOAT SqrMaxVelocity;
@@ -248,14 +248,14 @@ protected:
 
 public:      
 
-	MDSystem(OMD_INT &argc, OMD_CHAR** &argv);
+	MDSystem(int &argc, char** &argv);
 	MDSystem();
 	
     virtual ~MDSystem();
     void SystemInit();
 
     virtual void ReadParameters();
-	virtual OMD_INT Run(OMD_INT mode=NORMAL_MODE);
+	virtual int Run(int mode=NORMAL_MODE);
 
 	MDIntegrator* SetIntegrator(MDIntegrator* itg);
 	Detector* AddDetector(Detector* Detc);
@@ -264,15 +264,15 @@ public:
 	AtomGroup* AddAtomGroup(string group_name);
 	
 	class ForceKernel* AddForce(class ForceKernel* Force);
-	class ForceKernel* AddForce(class ForceKernel* Force, const OMD_CHAR* from, const OMD_CHAR* to);
+	class ForceKernel* AddForce(class ForceKernel* Force, const char* from, const char* to);
 
-	class ForceKernel* AddForce(class ForceKernel* Force, const OMD_CHAR* target){
+	class ForceKernel* AddForce(class ForceKernel* Force, const char* target){
 		return AddForce(Force, target, target);
 	}
 	
 	void InsertDataHeader(ofstream& fl) {} // Maybe needed later
-	void ChangeAtomID(OMD_SIZET idx, OMD_INT NewID);
-	void ChangeAtomID(OMD_SIZET start, OMD_SIZET end, OMD_INT NewID);
+	void ChangeAtomID(int idx, int NewID);
+	void ChangeAtomID(int start, int end, int NewID);
 	
 	virtual void PrintContainerInfo(ostream& ost);
 	virtual void PrintGadgetInfo(ostream& ost);
@@ -283,7 +283,7 @@ public:
 	bool OnTime(OMD_FLOAT tm);	
 	virtual void PrintTime(ostream& ost);
 	virtual void PrintHeader(ostream& ost);
-	virtual void ExecuteConditioners(OMD_INT contype);
+	virtual void ExecuteConditioners(int contype);
 	virtual void ExecuteDetectors();
 
 	virtual AtomContainer* Save(string binname, string mode="a"); // mode is not applicable...
@@ -302,14 +302,14 @@ public:
 	virtual MDIntegrator* GetIntegrator(){return Integrator;}
 
 	/** synchronizing data **/
-	virtual void SyncData(OMD_INT syncmode){}
+	virtual void SyncData(int syncmode){}
 		
 	virtual OMD_FLOAT GetMaxCutRadius();
 	virtual OMD_FLOAT GetMaxVelocity();
-	virtual OMD_FLOAT GetMass(OMD_SIZET idx);
+	virtual OMD_FLOAT GetMass(int idx);
 	virtual OMD_FLOAT GetMass(Atom& a);
 	virtual OMD_FLOAT GetMass(Atom* a);
-	virtual OMD_FLOAT GetZ(OMD_SIZET idx);
+	virtual OMD_FLOAT GetZ(int idx);
 	
 	virtual void MeasurePotential();
 	virtual void MeasureKinetic();
@@ -319,17 +319,17 @@ public:
 	/** Corrects distances according to the boundary condition. **/
 	virtual void BoundaryCorrectDistances(OMD_FLOAT& dx, OMD_FLOAT& dy, OMD_FLOAT& dz);
 	
-	virtual void ErrorHandler(const OMD_CHAR* errst);
-	virtual OMD_SIZET  ClaimFlagBit(MDClass* user, string sinfo="");
-	virtual OMD_SIZET  ClaimAuxVariable(MDClass* user, bool printable=false, const OMD_CHAR* tag=NULL, const OMD_CHAR* sformat=NULL);
+	virtual void ErrorHandler(const char* errst);
+	virtual int  ClaimFlagBit(MDClass* user, string sinfo="");
+	virtual int  ClaimAuxVariable(MDClass* user, bool printable=false, const char* tag=NULL, const char* sformat=NULL);
 	                             
-	virtual OMD_SIZET GetFlagBitMask(const OMD_CHAR* usagecode);
-	virtual OMD_SIZET GetTotalAtom(){return GetNAtom();}
+	virtual int GetFlagBitMask(const char* usagecode);
+	virtual int GetTotalAtom(){return GetNAtom();}
 
 	void SetUnit(
-		const OMD_CHAR* stime, const OMD_CHAR* slength, const OMD_CHAR* smass, 
-        const OMD_CHAR* sforce, const OMD_CHAR* senergy, 
-        const OMD_CHAR* stemp, const OMD_CHAR* spress)
+		const char* stime, const char* slength, const char* smass, 
+        const char* sforce, const char* senergy, 
+        const char* stemp, const char* spress)
 	{
 		if(!Unit) Unit=new MDUnit;
 		Unit->SetUnit(stime,slength,smass,sforce,senergy,stemp,spress);
@@ -338,10 +338,10 @@ public:
 	void SetUnit(MDUnit* unit){if(Unit)delete Unit; Unit=unit;}
 	
 	// compatibility reason...
-	void SetArgument(OMD_INT &argc, OMD_CHAR** &argv);
+	void SetArgument(int &argc, char** &argv);
 		
 	// react to this signal
-	void AcceptSignal(OMD_INT signo);	
+	void AcceptSignal(int signo);	
 		
 	// output directory
 	virtual void SetOutputDirectory(const string outdir) {
@@ -355,7 +355,7 @@ public:
 	DataSlot* GetMessageSlot(string slotlabel);
 	
 	virtual void ArrangeMessageSlots();
-	OMD_INT GetContainerID(string name);	
+	int GetContainerID(string name);	
 
 	/** search gadget class by its name (Conditioner/Detector) **/
 	virtual MDGadget* SearchGadget(string name);
@@ -363,7 +363,7 @@ public:
 	
 	virtual AtomContainer* Import(string fname);
 
-	OMD_INT GetMode(){return Mode;}
+	int GetMode(){return Mode;}
 	
 	stage_type stage;
 	
@@ -373,9 +373,9 @@ public:
 	void SetMaxTime(OMD_FLOAT maxtime) {if(MaxTime<0)MaxTime=maxtime;}
 
 	/** sets boundary condition only when is not already done previously **/
-	void SetBoundaryCondition(OMD_INT pbc) {if(PBoundary<0)PBoundary=pbc;}
+	void SetBoundaryCondition(int pbc) {if(PBoundary<0)PBoundary=pbc;}
 
-	virtual OMD_SIZET GetLocalAtomNumber(){return GetNAtom();}
+	virtual int GetLocalAtomNumber(){return GetNAtom();}
 
 };
 

@@ -16,11 +16,11 @@
 **/
 
 class LocalOrderParameter: public DataDumper {
-	OMD_INT ilop;
+	int ilop;
 	OMD_FLOAT Q0;
 	OMD_FLOAT lc;
 	OMD_FLOAT cutsqr;
-	OMD_INT *ncord;
+	int *ncord;
 	OMD_FLOAT *sinsum, *cossum;
 	enum {do_calc, do_average} turn;
 	bool enumerate;
@@ -54,7 +54,7 @@ public:
 		return (FilenamePrefix+Filename);
 	}
 
-	void calculate_lop(OMD_SIZET at, OMD_SIZET to) {
+	void calculate_lop(int at, int to) {
 		OMD_FLOAT dx, dy, dz;
 		OMD_FLOAT d=CalcSqrDistance(at, to, dx, dy, dz);
 		if(d<=cutsqr) {
@@ -70,7 +70,7 @@ public:
 		}
 	}
 
-	void average_lop(OMD_SIZET at, OMD_SIZET to) {
+	void average_lop(int at, int to) {
 		OMD_FLOAT d=CalcSqrDistance(at, to);
 		if(d<=cutsqr) {
 			ncord[at]++;
@@ -80,7 +80,7 @@ public:
 		}
 	}
 
-	void IterationNode(OMD_SIZET at, OMD_SIZET to) {
+	void IterationNode(int at, int to) {
 		if(turn==do_calc)
 			calculate_lop(at,to);
 		else
@@ -88,12 +88,12 @@ public:
 	}
 
 	void find_local_order() {
-		OMD_SIZET na=GetNAtom();
-		MemRealloc(ncord, na*sizeof(OMD_INT));
+		int na=GetNAtom();
+		MemRealloc(ncord, na*sizeof(int));
 		MemRealloc(sinsum, na*sizeof(OMD_FLOAT));
 		MemRealloc(cossum, na*sizeof(OMD_FLOAT));
 		
-		for(OMD_INT i=0;i<na;i++) {
+		for(int i=0;i<na;i++) {
 			Atoms(i).aux[ilop]=0.0;
 			ncord[i]=0;
 			cossum[i]=0.0;
@@ -104,17 +104,17 @@ public:
 		Iterator->Iterate(this);
 		
 		// use sinsum&cossum as buffer
-		for(OMD_INT i=0;i<na;i++) {
+		for(int i=0;i<na;i++) {
 			OMD_FLOAT a=(cossum[i]*cossum[i]-sinsum[i]*sinsum[i]);
 			OMD_FLOAT nn=(OMD_FLOAT)(36*ncord[i]*ncord[i]);
 			sinsum[i]=cossum[i]=(nn>0.0)?a/nn:0.0;
 		}
 		
 		turn=do_average;
-		for(OMD_INT i=0;i<na;i++) ncord[i]=1;
+		for(int i=0;i<na;i++) ncord[i]=1;
 		Iterator->Iterate(this,false);
 		
-		for(OMD_INT i=0;i<na;i++) {
+		for(int i=0;i<na;i++) {
 			Atoms(i).aux[ilop]=cossum[i]/(OMD_FLOAT)(ncord[i]);
 		}
 

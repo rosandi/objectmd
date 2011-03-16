@@ -21,11 +21,11 @@
 
 class Quencher:public Post_Conditioner {
 protected:
-	OMD_INT Period, Step;
+	int Period, Step;
 	OMD_FLOAT Factor;
 	
 public:
-	Quencher(OMD_FLOAT QFactor, OMD_INT per=0) 
+	Quencher(OMD_FLOAT QFactor, int per=0) 
 	{
 		Factor=QFactor; Period=per; Step=0;
 		set_name("Quencher");
@@ -40,8 +40,8 @@ public:
 	{
 		if (Step>=Period) {
 			Step=0;
-			OMD_INT na=Target->GetNAtom();
-			for (OMD_INT i=0; i<na; i++) {
+			int na=Target->GetNAtom();
+			for (int i=0; i<na; i++) {
 				Target->Atoms(i).vx*=Factor;
 				Target->Atoms(i).vy*=Factor;
 				Target->Atoms(i).vz*=Factor;

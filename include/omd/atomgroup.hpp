@@ -24,7 +24,7 @@
 
 class AtomGroup: public AtomContainer {
 	class MDSystem* System;
-	OMD_SIZET group_flagmask;
+	int group_flagmask;
 	AtomContainer* source;
 	AtomKeeper scratch_ak;
 public:
@@ -42,8 +42,8 @@ public:
 	AtomGroup* SelectLE(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z); // less or equal
 	AtomGroup* Commit(){return dynamic_cast<AtomGroup*>(Create());}
 
-	OMD_SIZET GetGroupFlagMask() {return group_flagmask;}
-	OMD_FLOAT GetMass(OMD_SIZET idx);
+	int GetGroupFlagMask() {return group_flagmask;}
+	OMD_FLOAT GetMass(int idx);
 };
 
 #endif

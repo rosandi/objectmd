@@ -38,12 +38,12 @@
 */
 
 class MDIntegrator: public MDGadget {
-	OMD_INT ForcID;
+	int ForcID;
 	bool CurrentGhostFlag;
 
 public:
 	vector<ForceKernel*> ActForces;
-	OMD_SIZET   NType;
+	int   NType;
 	OMD_FLOAT TimeStep;
 
     //Put force pointers in matrix form
@@ -60,11 +60,11 @@ public:
 	
 	void PrintInfo(ostream& ost);
 
-    virtual void IterationNode(OMD_SIZET at, OMD_SIZET to);
+    virtual void IterationNode(int at, int to);
     virtual void Integrate();
     virtual void Iterate();
-	ForceKernel* GetForce(OMD_SIZET idx){return ActForces.at(idx);}	
-	ForceKernel* GetForce(OMD_SIZET a, OMD_SIZET b) {return Forces[a][b];}
+	ForceKernel* GetForce(int idx){return ActForces.at(idx);}	
+	ForceKernel* GetForce(int a, int b) {return Forces[a][b];}
 };
 
 #endif

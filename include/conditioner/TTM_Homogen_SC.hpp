@@ -59,9 +59,9 @@ class TTM_Homogen: public Pre_Conditioner, public ParallelGadget {
 	bool stopped;
 	bool stop_equ;
 	
-	OMD_INT    allocated_length;
-	OMD_INT    atemp;
-	OMD_INT    adens;
+	int    allocated_length;
+	int    atemp;
+	int    adens;
 	
 	enum {none, function, pulsetemp, pulse} source_type;
 	
@@ -192,7 +192,7 @@ private:
 	}
 
 	void fd_main_loop(){
-		OMD_INT na=GetNAtom();
+		int na=GetNAtom();
 		OMD_FLOAT atomtemp=temp_detector->GetTemperatureAvg();
 
 		// use constant volume!
@@ -222,7 +222,7 @@ private:
 	}
 
 	void velocity_scalling() {
-		OMD_INT na=GetNAtom();
+		int na=GetNAtom();
 		OMD_FLOAT *cmx, *cmy, *cmz;
 		temp_detector->GetCMVelocities(cmx, cmy, cmz);
 
@@ -231,11 +231,11 @@ private:
 
 		// \Delta t_FD = \Delta t_MD
 		OMD_FLOAT sum_eng=0.0;
-		OMD_INT neng=0;
+		int neng=0;
 		OMD_FLOAT small_vel=System->GetMaxVelocity()*1e-6;
 		small_vel*=small_vel;
 		
-		for(OMD_INT i=0;i<na;i++){
+		for(int i=0;i<na;i++){
 			Atom* a=AtomPtr(i);
 			if (a->flag&FLAG_GHOST) continue;
 			if (!(a->flag&FLAG_ACTIVE)) continue;

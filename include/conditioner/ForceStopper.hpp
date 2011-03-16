@@ -13,7 +13,7 @@
 
 class ForceStopper: public Force_Conditioner {
 	OMD_FLOAT dWest, dEast, dNorth, dSouth, dTop, dBottom;
-	OMD_INT fixflag;
+	int fixflag;
 
 public:
 
@@ -41,7 +41,7 @@ public:
 		
 		fixflag=ClaimFlagBit();
 		
-		for(OMD_INT i=0; i<GetNAtom(); i++) {
+		for(int i=0; i<GetNAtom(); i++) {
  			if(Atoms(i).x<dWest){SetFlag(i,fixflag);continue;}
 			if(Atoms(i).x>dEast){SetFlag(i,fixflag);continue;}
 			if(Atoms(i).y<dSouth){SetFlag(i,fixflag);continue;}
@@ -53,7 +53,7 @@ public:
 
 	void ForceModifier(){
 		OMD_FLOAT na=GetNAtom();
-		for(OMD_INT i=0;i<na;i++) {
+		for(int i=0;i<na;i++) {
 			if(CheckFlag(i,fixflag)) {
 				Atoms(i).fx = Atoms(i).vx = 0.0;
 				Atoms(i).fy = Atoms(i).vy = 0.0;

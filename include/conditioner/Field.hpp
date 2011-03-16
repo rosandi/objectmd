@@ -22,7 +22,7 @@ class TField: public Force_Conditioner {
 	OMD_FLOAT ox,oy,oz;
 	OMD_FLOAT ax,ay,az;
 	OMD_FLOAT bx,by,bz;
-	OMD_INT    ivar;
+	int    ivar;
 	
 	TableReader Phi;
 	ForceFieldType Type;
@@ -30,21 +30,21 @@ class TField: public Force_Conditioner {
 	
 	public:		
 		
-		void CreateMe(const OMD_CHAR* TargetAtoms, const OMD_CHAR*tablefile) {
+		void CreateMe(const char* TargetAtoms, const char*tablefile) {
 			TargetName=TargetAtoms;
 			set_name("Force field");
 			Phi.Open(tablefile);
 			CutRadius=Phi.MaxRange();
 		}
 
-		TField(const OMD_CHAR* TargetAtoms, const OMD_CHAR* tablefile,
+		TField(const char* TargetAtoms, const char* tablefile,
 		           OMD_FLOAT originx, OMD_FLOAT originy, OMD_FLOAT originz) {
 			ox=originx;oy=originy;oz=originz;
 			Type=PointSource;
 			CreateMe(TargetAtoms, tablefile);
 		}			
 
-		TField(const OMD_CHAR* TargetAtoms, const OMD_CHAR* tablefile, 
+		TField(const char* TargetAtoms, const char* tablefile, 
 		           OMD_FLOAT originx, OMD_FLOAT originy, OMD_FLOAT originz,
 		           OMD_FLOAT ariginx, OMD_FLOAT ariginy, OMD_FLOAT ariginz
 		           ) {
@@ -54,7 +54,7 @@ class TField: public Force_Conditioner {
 			CreateMe(TargetAtoms, tablefile);
 		}
 		
-		TField(const OMD_CHAR* iTargetAtoms, const OMD_CHAR* tablefile, 
+		TField(const char* iTargetAtoms, const char* tablefile, 
 		           OMD_FLOAT originx, OMD_FLOAT originy, OMD_FLOAT originz,
 		           OMD_FLOAT ariginx, OMD_FLOAT ariginy, OMD_FLOAT ariginz,
 		           OMD_FLOAT briginx, OMD_FLOAT briginy, OMD_FLOAT briginz
@@ -96,7 +96,7 @@ class TField: public Force_Conditioner {
 				
 		void ForceModifier(){
 			OMD_FLOAT r, potential,drpot,ff,dx,dy,dz;
-			for(OMD_INT i=0;i<Target->NAtom;i++) {
+			for(int i=0;i<Target->NAtom;i++) {
 				dx=Atoms[i].x;dy=Atoms[i].y;dz=Atoms[i].z;
 				r=Distance(dx,dy,dz);
 				if (r<CutRadius) {

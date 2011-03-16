@@ -32,9 +32,6 @@
 #ifndef OMD_TYPES
 #define OMD_TYPES
 #define OMD_FLOAT double
-#define OMD_INT   int
-#define OMD_SIZET uint
-#define OMD_CHAR  char
 #endif
 
 using std::string;
@@ -94,32 +91,32 @@ public:
 		pseu_code.assign("#$");
 		read(fpar);
 	}
-	ParamHandler(OMD_INT argc, OMD_CHAR* argv[]) {
+	ParamHandler(int argc, char* argv[]) {
 		prefix.assign("");
 		pseu_code.assign("#$");
-		for(OMD_INT i=0;i<argc;i++) {
+		for(int i=0;i<argc;i++) {
 			spar.push_back(argv[i]);
 		}
 	}
 	
-	OMD_INT  size(){return spar.size();}
+	int  size(){return spar.size();}
 	void push_val(string p){spar.push_back(p);}
 	void push_par(string p){spar.push_back(prefix+p);}
 	void push_pair(string p, string v){push_par(p);push_val(v);}
 	
 	void clear(){spar.clear();}
-	void set_prefix(const OMD_CHAR* pp){prefix.assign(pp);}
+	void set_prefix(const char* pp){prefix.assign(pp);}
 
 	void copy(ParamHandler &p){
 		prefix.assign(p.prefix);
 		spar.clear();
-		for(OMD_SIZET i=0;i<p.spar.size();i++){
+		for(int i=0;i<p.spar.size();i++){
 			spar.push_back(p.spar[i]);
 		}
 	}
 
-	void append(OMD_INT argc, OMD_CHAR* argv[]){
-		for(OMD_INT i=0;i<argc;i++) {
+	void append(int argc, char* argv[]){
+		for(int i=0;i<argc;i++) {
 			spar.push_back(argv[i]);
 		}
 	}
@@ -134,7 +131,7 @@ public:
 		}
 	}
 	
-	void assign(OMD_INT argc, OMD_CHAR* argv[]){clear(); append(argc, argv);}
+	void assign(int argc, char* argv[]){clear(); append(argc, argv);}
 	void assign(string parstr) {clear(); append(parstr);}
 
 	// appending a file
@@ -147,7 +144,7 @@ public:
 		}
 
 		while(fl.good()) {
-			OMD_CHAR sln[1024];
+			char sln[1024];
 			fl.getline(sln,1024);
 			if(string(sln)=="--") break;
 			std::istringstream s(sln);
@@ -180,7 +177,7 @@ public:
 		psmark=pseu_code+psmark;
 
 		while(fl.good()) {
-			OMD_CHAR sln[1024];
+			char sln[1024];
 			string pseu,ts;
 			
 			fl.getline(sln,1024);
@@ -199,7 +196,7 @@ public:
 	}
 
 	
-	string& operator[](OMD_SIZET idx){
+	string& operator[](int idx){
 		if(idx<spar.size()) return spar[idx];
 		throw "index out of range";	return spar[0]; // avoids warning
 	}
@@ -209,21 +206,21 @@ public:
 		spar.erase(spar.begin());
 	}
 	
-	void shift(OMD_SIZET n){
+	void shift(int n){
 		if(n>spar.size())n=spar.size();
-		for(OMD_SIZET i=0;i<n;i++)shift();
+		for(int i=0;i<n;i++)shift();
 	}
 	
 	bool exist(string p){
-		for(OMD_SIZET i=0;i<spar.size();i++) {
+		for(int i=0;i<spar.size();i++) {
 			if(spar[i]==(prefix+p)) return true;
 		}
 		return false;
 	}
 	
 	// returns the index of first occurrence
-	OMD_INT index_of(string p){
-		for(OMD_SIZET i=0;i<spar.size();i++) {
+	int index_of(string p){
+		for(int i=0;i<spar.size();i++) {
 			if(spar[i]==(prefix+p))return i;
 		}
 		throw (string("parameter ")+p+" does not exist").c_str();
@@ -249,10 +246,10 @@ public:
 		if(idx!=spar.end())spar.erase(idx);
 	}
 
-	double double_value(OMD_SIZET idx) {
+	double double_value(int idx) {
 		double retd=0.0;
 		if(idx<spar.size()){
-			OMD_CHAR st[256],*pt;
+			char st[256],*pt;
 			memset(st,0,256);
 			spar[idx].copy(st,256);
 			retd=strtod(st,&pt);
@@ -261,10 +258,10 @@ public:
 		return retd;
 	}
 	
-	OMD_INT int_value(OMD_SIZET idx){
-		OMD_INT reti=0;
+	int int_value(int idx){
+		int reti=0;
 		if(idx<spar.size()){
-			OMD_CHAR st[256],*pt;
+			char st[256],*pt;
 			memset(st,0,256);
 			spar[idx+1].copy(st,256);
 			reti=strtol(st,&pt,10);
@@ -273,16 +270,16 @@ public:
 		return reti;
 	}
 	
-	string string_value(OMD_SIZET idx){
+	string string_value(int idx){
 		if(idx>=spar.size()) throw "conversion: out of range";
 		return spar[idx];
 	}
 
     //--------------------------------------------------------------
 
-	string string_value(string p, OMD_INT index=0){
+	string string_value(string p, int index=0){
 		if(!exist(p)) throw (string("parameter ")+p+" doesn't exist").c_str();
-		OMD_SIZET idx=index_of(p)+index;
+		int idx=index_of(p)+index;
 		
 		string rets("");
 		if((idx+1)<spar.size()) rets=spar[idx+1];
@@ -292,18 +289,18 @@ public:
 	// lower case
 	string lower_string_value(string p){
 		string rets=string_value(p);
-		for(OMD_SIZET i=0;i<rets.size();i++) {
+		for(int i=0;i<rets.size();i++) {
 			rets[i]=tolower(rets[i]);
 		}
 		return rets;
 	}
 	    
-	double double_value(string p, OMD_INT index=0) {
+	double double_value(string p, int index=0) {
 		if(!exist(p)) throw (string("parameter ")+p+" doesn't exist").c_str();
-		OMD_SIZET idx=index_of(p)+index;
+		int idx=index_of(p)+index;
 		
 		if(idx<spar.size()-1){
-			OMD_CHAR st[256],*pt;
+			char st[256],*pt;
 			memset(st,0,256);
 			spar[idx+1].copy(st,256);
 			double retd=strtod(st,&pt);
@@ -321,15 +318,15 @@ public:
 
 	}
 	
-	OMD_INT int_value(string p, OMD_INT index=0){
+	int int_value(string p, int index=0){
 		if(!exist(p)) throw (string("parameter ")+p+" doesn't exist").c_str();
-		OMD_SIZET idx=index_of(p)+index;
+		int idx=index_of(p)+index;
 		
 		if(idx<spar.size()-1){
-			OMD_CHAR st[256],*pt;
+			char st[256],*pt;
 			memset(st,0,256);
 			spar[idx+1].copy(st,256);
-			OMD_INT reti=strtol(st,&pt,10);
+			int reti=strtol(st,&pt,10);
 			if(pt==st)
 				throw (string("invalid integer value for parameter ")+
 				       spar[idx]+": "+st).c_str();
@@ -354,7 +351,7 @@ public:
 		return false;
 	}
 	
-	bool peek(string p, OMD_INT &var){
+	bool peek(string p, int &var){
 		if(exist(p)){var=int_value(p);return true;}
 		return false;
 	}
@@ -381,7 +378,7 @@ public:
 		var=def;return false;
 	}
 	
-	bool peek(string p, OMD_INT &var, OMD_INT def){
+	bool peek(string p, int &var, int def){
 		if(exist(p)){var=int_value(p);return true;}
 		var=def;return false;
 	}
@@ -400,21 +397,21 @@ public:
 	
 	void dump(std::ostream& out){
 		out << "number of parameters = " << spar.size() << "\n";
-		for(OMD_SIZET i=0;i<spar.size();i++)
+		for(int i=0;i<spar.size();i++)
 			out <<"["<<i<<"] "<<spar[i] << " ";
 		out << "\n#total "<<spar.size()<<" parameters\n";
 	}
 	
 	string raw_string() {
 		string ss="";
-		for(OMD_SIZET i=0;i<spar.size();i++) ss.append(spar[i]+" ");
+		for(int i=0;i<spar.size();i++) ss.append(spar[i]+" ");
 		return ss;
 	}
 	
 	// the parameter name and the end string is excluded 
 	string raw_string(string p, string ends="--") {
 		string ss="";
-		for(OMD_SIZET i=index_of(p)+1;i<spar.size();i++) {
+		for(int i=index_of(p)+1;i<spar.size();i++) {
 			if(spar[i]==ends) break;
 			ss.append(spar[i]+" ");
 		}
@@ -423,7 +420,7 @@ public:
 	
 	void set_pair(string p, string val) {
 		if(exist(p)) {
-			OMD_SIZET idx=index_of(p);
+			int idx=index_of(p);
 			if(idx==spar.size()-1) push_val(val);
 			else spar[idx]=val;
 		} else push_pair(p, val);			

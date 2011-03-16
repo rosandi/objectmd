@@ -23,14 +23,14 @@
 class StructureFactor: public DataDumper {
 	OMD_FLOAT wbin;
 	OMD_FLOAT rho;
-	OMD_INT nbin;
+	int nbin;
 	OMD_FLOAT qstep;
 	OMD_FLOAT delta, rmax;
 	OMD_FLOAT *gr, *sq;
 	OMD_FLOAT z_up_limit;
 	OMD_FLOAT z_down_limit;
 	bool enumerate;
-	OMD_INT  contrib_na;
+	int  contrib_na;
 	SysBox box;
 
 public:
@@ -38,7 +38,7 @@ public:
 	StructureFactor(
 		string outf,
 		bool enumerate_outf,
-		OMD_INT ibin=1024,
+		int ibin=1024,
 		OMD_FLOAT iq=10.0,
 		OMD_FLOAT r_max=-1.0,
 		OMD_FLOAT detect_time=0.0):
@@ -53,12 +53,12 @@ public:
 
 	void calc_box() {
 		OMD_FLOAT MinX, MaxX, MinY, MaxY, MinZ, MaxZ;        
-		OMD_INT natom=GetNAtom();
+		int natom=GetNAtom();
 		
 		MinX=MinY=MinZ= DBL_MAX;
 		MaxX=MaxY=MaxZ=-DBL_MAX;
 
-		for(OMD_INT i=0; i<natom; i++) {
+		for(int i=0; i<natom; i++) {
 			// Minimums
 			if (MinX>Atoms(i).x)MinX=Atoms(i).x;
 			if (MinY>Atoms(i).y)MinY=Atoms(i).y;
@@ -108,7 +108,7 @@ public:
 		}
 		
 		contrib_na=0;
-		for(OMD_INT i=0;i<GetNAtom();i++) {
+		for(int i=0;i<GetNAtom();i++) {
 			if((Atoms(i).z<=z_up_limit)&&
 			   (Atoms(i).z>=z_down_limit))contrib_na++;
 		}
@@ -125,23 +125,23 @@ public:
 	// FIXME! parallelize this...
 	
 	void calc_distribution() {
-		OMD_SIZET na=GetNAtom();
-		for (OMD_SIZET i=0; i<nbin; i++) gr[i]=0.0;
-		OMD_CHAR prog[]="...........oooooooOOOOOOOOOOooooooo...........:::::::* **";
-		OMD_INT progc=0;
+		int na=GetNAtom();
+		for (int i=0; i<nbin; i++) gr[i]=0.0;
+		char prog[]="...........oooooooOOOOOOOOOOooooooo...........:::::::* **";
+		int progc=0;
 
-		for (OMD_SIZET i=0; i<na-1; i++) {
+		for (int i=0; i<na-1; i++) {
 			
-			OMD_INT contrib=0;
+			int contrib=0;
 			OMD_FLOAT z=Atoms(i).z;
 			contrib=((z<=z_up_limit)&&(z>=z_down_limit))?1:0;
 
-			for (OMD_SIZET j=i+1; j<na; j++) {
+			for (int j=i+1; j<na; j++) {
 				OMD_FLOAT r=CalcDistance(i, j);
 				if (r<rmax) {
 					
 					z=Atoms(j).z;
-					OMD_INT ig = (OMD_INT)floor(r/wbin);
+					int ig = (int)floor(r/wbin);
 
 					gr[ig]+=(((z<=z_up_limit)&&(z>=z_down_limit))?contrib+1:contrib);
 					
@@ -155,12 +155,12 @@ public:
 	}
 
 	void calc_struc_factor() {
-		OMD_INT na=GetNAtom();
+		int na=GetNAtom();
 		OMD_FLOAT pi_rmax=M_PI/rmax;
-		for(OMD_INT q=0;q<nbin;q++) {
+		for(int q=0;q<nbin;q++) {
 			OMD_FLOAT qq=(OMD_FLOAT)q*qstep;
 			sq[q]=0.0;
-			for(OMD_INT i=0;i<nbin;i++) {
+			for(int i=0;i<nbin;i++) {
 				OMD_FLOAT r=(OMD_FLOAT)i*wbin;
 				if((r==0.0)||(qq==0.0))	sq[q]=0.0; else
 				sq[q]+=gr[i]*(sin(qq*r)/(qq*r))*(sin(pi_rmax*r)/(pi_rmax*r));
@@ -174,10 +174,10 @@ public:
 		calc_box();
 		calc_distribution();
 		calc_struc_factor();
-		OMD_INT na=GetNAtom();
+		int na=GetNAtom();
 		ofstream fout(GetFilename().c_str());
-		for(OMD_INT i=0; i<nbin; i++) {
-			OMD_INT j=i+1;
+		for(int i=0; i<nbin; i++) {
+			int j=i+1;
 			OMD_FLOAT nv=(4./3.)*M_PI*(OMD_FLOAT)((j*j*j)-(i*i*i))*wbin*wbin*wbin;
 			gr[i]/=(nv*contrib_na*rho);
 			fout << wbin*(OMD_FLOAT)i<<" "<<gr[i]<<" "<<qstep*(OMD_FLOAT)i<<" "<<sq[i]<<"\n";

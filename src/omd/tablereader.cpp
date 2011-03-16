@@ -35,23 +35,23 @@ using std::istringstream;
 // Calculate spline coeficients
 void TableReader::calculate_coef() {
 	OMD_FLOAT m;
-	OMD_INT    n=n_data-2;
+	int    n=n_data-2;
 	
 	OMD_FLOAT *b=new OMD_FLOAT[n];
 	OMD_FLOAT *d=new OMD_FLOAT[n];
 	OMD_FLOAT *S=new OMD_FLOAT[n_data];
 	
-	for (OMD_INT i=1;i<n+1;i++) d[i-1]=coef[i+1].d-2.0*coef[i].d + coef[i-1].d; 
-	for (OMD_INT i=1;i<n-1;i++) b[i]=4.0;
+	for (int i=1;i<n+1;i++) d[i-1]=coef[i+1].d-2.0*coef[i].d + coef[i-1].d; 
+	for (int i=1;i<n-1;i++) b[i]=4.0;
 	b[0]=b[n-1]=5.0;	
 	
 	// Calculate matrix with Thomas algorithm
-	for (OMD_INT k=1;k<n;k++) {m=1.0/b[k-1]; b[k]-=m; d[k]-=m*d[k-1];}
+	for (int k=1;k<n;k++) {m=1.0/b[k-1]; b[k]-=m; d[k]-=m*d[k-1];}
 	S[n+1]=S[n]=d[n-1]/b[n-1];
-	for (OMD_INT k=n-2; k>=0; k--) S[k+1]=(d[k]-1.0*S[k+2])/b[k];
+	for (int k=n-2; k>=0; k--) S[k+1]=(d[k]-1.0*S[k+2])/b[k];
 	S[0]=S[1];
 	
-	for (OMD_INT i=0; i<n_data-1;i++) {
+	for (int i=0; i<n_data-1;i++) {
 		coef[i].a=(S[i+1]-S[i])/dr/dr/dr;
 		coef[i].b= 3.0*S[i]/dr/dr;
 		coef[i].c=(coef[i+1].d-coef[i].d-2.0*S[i]-S[i+1])/dr;
@@ -76,7 +76,7 @@ TableReader::TableReader(string table_filename, string table_name) {
 
 void TableReader::allocate() {
 	coef = new CoefStruct[n_data];
-	for (OMD_INT i=0; i<n_data; i++) coef[i].a=coef[i].b=coef[i].c=coef[i].d=0.0;
+	for (int i=0; i<n_data; i++) coef[i].a=coef[i].b=coef[i].c=coef[i].d=0.0;
 }
 
 // open file and read table data
@@ -112,8 +112,8 @@ void TableReader::open_omd(string table_filename, string table_name) {
 	ifstream fl(filename.c_str());
 	assert(fl.good(), "error in reading data file", tablename);
 	
-	OMD_INT lnum=0;
-	OMD_CHAR line[1024];
+	int lnum=0;
+	char line[1024];
 	bool partfound=false;
 	string stag="#$"+tablename;
 	
@@ -125,7 +125,7 @@ void TableReader::open_omd(string table_filename, string table_name) {
 	assert(partfound, "can not find table "+tablename+"@"+filename);
 	blog("table '"+tablename+"' found at line "+as_string(lnum), LOGCREATE);
 
-	for(OMD_INT i=0;i<n_data;i++){
+	for(int i=0;i<n_data;i++){
 		fl>>coef[i].d;
 	}
 
@@ -147,7 +147,7 @@ TableReader::~TableReader() {delete[] coef;}
 void TableReader::read(OMD_FLOAT r, OMD_FLOAT& val, OMD_FLOAT& dval) {
 	
 	OMD_FLOAT rval=r-roffset;
-	OMD_INT    x = (OMD_INT)(rval/dr);
+	int    x = (int)(rval/dr);
 	OMD_FLOAT dx = rval-(OMD_FLOAT)x*dr;
 	
 	if (x>n_data-1) {
@@ -185,7 +185,7 @@ void TableReader::read(OMD_FLOAT r, OMD_FLOAT& val, OMD_FLOAT& dval) {
 OMD_FLOAT TableReader::read(OMD_FLOAT r) {
 	
 	OMD_FLOAT rval=r-roffset;
-	OMD_INT x = (OMD_INT)(rval/dr);
+	int x = (int)(rval/dr);
 	OMD_FLOAT dx = rval-(OMD_FLOAT)x*dr;
 /*
 	if(debug_flag) {
@@ -243,7 +243,7 @@ OMD_FLOAT TableReader::dread(OMD_FLOAT r) {
 
 OMD_FLOAT TableReader::dread2(OMD_FLOAT r) {
 	OMD_FLOAT rval=r-roffset;
-	OMD_INT x = (OMD_INT)(rval/dr);
+	int x = (int)(rval/dr);
 	OMD_FLOAT dx = rval-(OMD_FLOAT)x*dr;
 	
 
@@ -281,7 +281,7 @@ OMD_FLOAT TableReader::dread2(OMD_FLOAT r) {
 	return ddval;
 }
 
-void TableReader::dump(string filename, OMD_INT resolution) { 
+void TableReader::dump(string filename, int resolution) { 
 	OMD_FLOAT rmax=roffset+(OMD_FLOAT)(n_data-1)*dr;
 	OMD_FLOAT dx=rmax/(OMD_FLOAT)resolution;
 	ofstream ofl(filename.c_str());

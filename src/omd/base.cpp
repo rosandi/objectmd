@@ -28,7 +28,7 @@ MDClass::MDClass() {
 	mem_alloc_cnt[0]=mem_alloc_cnt[1]=mem_alloc_cnt[2]=0;
 	
 	// load OMD environment variables	
-	OMD_CHAR *p;
+	char *p;
 	if((p=getenv("OMD_LIB"))) param.push_pair("$OMD_LIB", p);
 	else param.push_pair("$OMD_LIB", ".");
 	if((p=getenv("OMD_CLASS"))) param.push_pair("$OMD_CLASS", p);
@@ -94,17 +94,17 @@ void MDClass::PrintInfo(ostream& ost){
 
 //---- Atom checking & management ---//
 
-void MDClass::SetActive(OMD_INT idx, bool a){
+void MDClass::SetActive(int idx, bool a){
 	if(a)Atoms(idx).flag|=FLAG_ACTIVE;
 	else Atoms(idx).flag&=(~FLAG_ACTIVE);
 }
 
-void MDClass::SetOutside(OMD_INT idx, bool a){
+void MDClass::SetOutside(int idx, bool a){
 	if(a)Atoms(idx).flag|=FLAG_OUTSIDE;
 	else Atoms(idx).flag&=(~FLAG_OUTSIDE);
 }
 
-void MDClass::SetGhost(OMD_INT idx, bool a){
+void MDClass::SetGhost(int idx, bool a){
 	if(a)Atoms(idx).flag|=FLAG_GHOST;
 	else Atoms(idx).flag&=(~FLAG_GHOST);
 }
@@ -169,7 +169,7 @@ void AtomKeeper::Release(){
  * This operator give array like access to the elements.
  */
 
-Atom& AtomKeeper::operator[](OMD_INT idx) {
+Atom& AtomKeeper::operator[](int idx) {
 	if(idx>=NAtom)
 		die("index out of range. index="+as_string(idx)+
 			", n_atom="+as_string(GetNAtom()));
@@ -182,7 +182,7 @@ Atom& AtomKeeper::operator[](OMD_INT idx) {
  * program, this function is called via the AtomContainer::Atoms() function.
  */
 
-Atom& AtomKeeper::Atoms(OMD_INT idx, MDClass *caller) {
+Atom& AtomKeeper::Atoms(int idx, MDClass *caller) {
 	if(idx>=NAtom){
 		die("index out of range. index="+as_string(idx)+
 			", n_atom="+as_string(GetNAtom())+
@@ -195,7 +195,7 @@ Atom& AtomKeeper::Atoms(OMD_INT idx, MDClass *caller) {
  * Returns the pointer of an atom.
  */
 
-Atom* AtomKeeper::AtomPtr(OMD_INT idx) {
+Atom* AtomKeeper::AtomPtr(int idx) {
 	if(idx>=NAtom)
 		die("index out of range. index="+as_string(idx)+
 			", n_atom="+as_string(GetNAtom()));
@@ -216,7 +216,7 @@ Atom* AtomKeeper::AtomPtr(OMD_INT idx) {
  * 
  */
 
-void AtomKeeper::Allocate(OMD_INT sz, KeeperType t){
+void AtomKeeper::Allocate(int sz, KeeperType t){
 
 	Type=t; Release();
 	if(sz==0)return;
@@ -229,7 +229,7 @@ void AtomKeeper::Allocate(OMD_INT sz, KeeperType t){
 			MemAlloc(AtomIndex,sizeof(Ptr)*sz);
 			
 			// Initialize as active ~outside ~ghost ~mirror
-			for(OMD_INT i=0;i<sz;i++) {
+			for(int i=0;i<sz;i++) {
 				a->id=a->xid=-1;a->flag=1;AtomIndex[i].p=a++;
 			}
 
@@ -250,7 +250,7 @@ void AtomKeeper::Allocate(OMD_INT sz, KeeperType t){
 void AtomKeeper::ChangeType(KeeperType tp) {
 	if(Type==tp) return;
 	Type=tp;
-	OMD_INT n=NAtom;
+	int n=NAtom;
 	Release();
 	if(tp!=Clone)Allocate(n,tp);
 }
@@ -276,9 +276,9 @@ void AtomKeeper::ChangeType(KeeperType tp) {
  * 
  */
 
-void AtomKeeper::Expand(OMD_INT sz){
+void AtomKeeper::Expand(int sz){
 	assert(Type!=Clone, "attempt to expand a clone atom keeper");
-	OMD_INT nold=NAtom;
+	int nold=NAtom;
 	
 	if(sz>NAlloc){ // reallocate storage
 		MemRealloc(AtomIndex, sizeof(Ptr)*sz);
@@ -290,8 +290,8 @@ void AtomKeeper::Expand(OMD_INT sz){
 			MemRealloc(AtomArray,sizeof(Atom)*sz);
 			Atom* a=AtomArray;
 			assert(AtomArray, "unable to reallocate atoms");
-			for(OMD_INT i=0;i<sz;i++)AtomIndex[i].p=a++;
-			for(OMD_INT i=nold;i<NAtom;i++)
+			for(int i=0;i<sz;i++)AtomIndex[i].p=a++;
+			for(int i=nold;i<NAtom;i++)
 				{AtomArray[i].id=-1;AtomArray[i].flag=0;}
 		}
 		NAlloc=NAtom=sz;
@@ -314,8 +314,8 @@ void AtomKeeper::Expand(OMD_INT sz){
 
 void AtomKeeper::Append(AtomKeeper& ak) {
 	if(ak.GetNAtom()<=0) return;
-	OMD_INT lastn=NAtom;
-	OMD_INT na=ak.GetNAtom();
+	int lastn=NAtom;
+	int na=ak.GetNAtom();
 	Expand(NAtom+na);
 	Atom* a;
 	switch(Type) {
@@ -325,7 +325,7 @@ void AtomKeeper::Append(AtomKeeper& ak) {
 			break;
 		case Referral:
 			a=ak.GetArrayPtr();
-			for(OMD_INT i=lastn;i<NAtom;i++)AtomIndex[i].p=a++;
+			for(int i=lastn;i<NAtom;i++)AtomIndex[i].p=a++;
 			break;
 		case Clone:
 			die("attempt to append to a clone");
@@ -343,7 +343,7 @@ void AtomKeeper::Append(AtomKeeper& ak) {
 
 void AtomKeeper::Attach(Atom* pa){
 	if(Type==Clone) return;
-	OMD_INT ip=NAtom;
+	int ip=NAtom;
 	Expand(NAtom+1);
 	if(Type==Storage)Atoms(ip)=*pa;
 	else AtomIndex[ip].p=pa; // referral
@@ -351,17 +351,17 @@ void AtomKeeper::Attach(Atom* pa){
 
 void AtomKeeper::Copy(AtomKeeper& ak) {
 	assert(Type==Storage, "attempt to copy to a non storage keeper");
-	OMD_INT na=ak.GetNAtom();
+	int na=ak.GetNAtom();
 	Expand(na);
 	if(ak.GetType()==Storage) {
 		memcpy(AtomArray, ak.GetArrayPtr(), na*(sizeof(Atom)));
 	} else {
-		for(OMD_INT i=0;i<na;i++) AtomArray[i]=ak[i];
+		for(int i=0;i<na;i++) AtomArray[i]=ak[i];
 	}
 }
 
 void AtomKeeper::AssignByIndex(AtomKeeper& ak) {
-	OMD_INT a;
+	int a;
 	Expand(IndexBook.length);
 	Clear();
 	IndexBook.reset();
@@ -379,7 +379,7 @@ void AtomKeeper::AssignByIndex(AtomKeeper& ak) {
  * 
  */
 
-void AtomKeeper::Dispose(OMD_INT idx){
+void AtomKeeper::Dispose(int idx){
 	if(NAtom==0||idx>=NAtom) return;
 	NAtom--;
 	AtomIndex[idx]=AtomIndex[NAtom];
@@ -398,7 +398,7 @@ void AtomKeeper::CloneArray(AtomKeeper& ak) {
 void AtomKeeper::ReferArray(AtomKeeper& ak) {
 	Release();
 	Type=Referral;
-	OMD_SIZET sz=ak.GetNAtom();
+	int sz=ak.GetNAtom();
 	Expand(sz);Clear();
 	for(int i=0;i<sz;i++) Attach(ak[i]);
 }

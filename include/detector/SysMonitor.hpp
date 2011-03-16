@@ -108,15 +108,15 @@ public:
 			MechanicEnergy=System->Kinetic+System->Potential-System->BasePotential;
 			
 			if (usefile) {
-				OMD_INT nslot=System->MessageSlots.size();
+				int nslot=System->MessageSlots.size();
 				if(firsttime) {
 					fout << "#";
-					for (OMD_INT i=0;i<nslot;i++)
+					for (int i=0;i<nslot;i++)
 						fout << System->MessageSlots[i]->GetLabel() << " ";
 					fout << '\n';
 					firsttime=false;
 				}
-	    		for(OMD_INT i=0;i<nslot;i++)
+	    		for(int i=0;i<nslot;i++)
 	    			fout << System->MessageSlots[i]->AsString() << " ";
 	    			
     			fout << '\n';

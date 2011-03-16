@@ -34,27 +34,27 @@
  
 
 class NeighborCell: public MDIterator {
-	OMD_INT GridNX, GridNY, GridNZ, TotalGrid;
+	int GridNX, GridNY, GridNZ, TotalGrid;
 	OMD_FLOAT RCell;
 	
 	struct CellStruct {
-		OMD_INT  NbCell[13];
-		OMD_INT  Size;
+		int  NbCell[13];
+		int  Size;
 	} *CellGrid;
 
 	struct IndexList {
-		OMD_INT I;
+		int I;
 		IndexList* Next;
 	} **Cell, **CellTail;
 	
-	OMD_INT *NMember;
+	int *NMember;
 	
 	SysBox Box;
 
 public:
 	
 	// refresh=0 means: never refresh
-	NeighborCell(OMD_INT rebuild=0, OMD_FLOAT rtol=0.0){
+	NeighborCell(int rebuild=0, OMD_FLOAT rtol=0.0){
 	 	set_name("NEIGHBORCELL");
 		register_class(get_name());
 		RebuildPeriod=rebuild;
@@ -67,7 +67,7 @@ public:
 	}
 
 	void Release(){
-		for(OMD_INT i=0;i<TotalGrid;i++){
+		for(int i=0;i<TotalGrid;i++){
 			DeleteTail(Cell[i]);
 			delete Cell[i];
 		}
@@ -86,10 +86,10 @@ public:
 
 	void CalculateSystemBox(){
 		OMD_FLOAT MinX, MaxX, MinY, MaxY, MinZ, MaxZ;        
-		OMD_INT natom=GetNAtom();
+		int natom=GetNAtom();
 		MinX=MinY=MinZ= DBL_MAX;
 		MaxX=MaxY=MaxZ=-DBL_MAX;
-		for(OMD_INT i=0; i<natom; i++) {
+		for(int i=0; i<natom; i++) {
 			if (MinX>Atoms(i).x)MinX=Atoms(i).x;
 			if (MinY>Atoms(i).y)MinY=Atoms(i).y;
 			if (MinZ>Atoms(i).z)MinZ=Atoms(i).z;
@@ -113,41 +113,41 @@ public:
 	void CreateGrid() {
 		RCell=System->GetMaxCutRadius()+RadiusTolerance;
 		CalculateSystemBox();
-		GridNX=OMD_INT(Box.lx/RCell)+1;
-		GridNY=OMD_INT(Box.ly/RCell)+1;
-		GridNZ=OMD_INT(Box.lz/RCell)+1;
+		GridNX=int(Box.lx/RCell)+1;
+		GridNY=int(Box.ly/RCell)+1;
+		GridNZ=int(Box.lz/RCell)+1;
 		TotalGrid=GridNX*GridNY*GridNZ;
 		
-		OMD_SIZET s_cellgrid=TotalGrid*sizeof(CellStruct);
-		OMD_SIZET s_cell=TotalGrid*sizeof(IndexList*);
-		OMD_SIZET s_celltail=TotalGrid*sizeof(IndexList*);
-		OMD_SIZET s_nmember=TotalGrid*sizeof(OMD_INT);
+		int s_cellgrid=TotalGrid*sizeof(CellStruct);
+		int s_cell=TotalGrid*sizeof(IndexList*);
+		int s_celltail=TotalGrid*sizeof(IndexList*);
+		int s_nmember=TotalGrid*sizeof(int);
 
 		MemAlloc(CellGrid,s_cellgrid);
 		MemAlloc(Cell,s_cell);
 		MemAlloc(CellTail,s_celltail);
 		MemAlloc(NMember,s_nmember);
 		
-		for(OMD_INT i=0;i<TotalGrid;i++){Cell[i]=NULL;CellTail[i]=NULL;NMember[i]=0;}
+		for(int i=0;i<TotalGrid;i++){Cell[i]=NULL;CellTail[i]=NULL;NMember[i]=0;}
 		
-		for(OMD_INT i=0;i<TotalGrid;i++)
-			for(OMD_INT j=0;j<13;j++) {
+		for(int i=0;i<TotalGrid;i++)
+			for(int j=0;j<13;j++) {
 				CellGrid[i].NbCell[j]=-1;
 				CellGrid[i].Size=0;
 			}
 		
 		// -1 means no neighboring cell	
-		for(OMD_INT p=0;p<TotalGrid;p++) {
-			OMD_INT n=0;			
-			OMD_INT px=p%GridNX;
-			OMD_INT py=(p/GridNX)%GridNY;
-			OMD_INT pz=(p/(GridNX*GridNY))%GridNZ;
-			for(OMD_INT k=-1;k<=1;k++) 
-				for(OMD_INT j=-1;j<=1;j++)
-					for(OMD_INT i=-1;i<=1;i++) {
-						OMD_INT nx=px+i;
-						OMD_INT ny=py+j;
-						OMD_INT nz=pz+k;
+		for(int p=0;p<TotalGrid;p++) {
+			int n=0;			
+			int px=p%GridNX;
+			int py=(p/GridNX)%GridNY;
+			int pz=(p/(GridNX*GridNY))%GridNZ;
+			for(int k=-1;k<=1;k++) 
+				for(int j=-1;j<=1;j++)
+					for(int i=-1;i<=1;i++) {
+						int nx=px+i;
+						int ny=py+j;
+						int nz=pz+k;
 						if((nx<0)||(nx>=GridNX))continue;
 						if((ny<0)||(ny>=GridNY))continue;
 						if((nz<0)||(nz>=GridNZ))continue;
@@ -171,30 +171,30 @@ public:
 		ost << "dimension " << GridNX << "," << GridNY << "," << GridNZ << "\n"
 		    << "total_grid " << TotalGrid << "\n";
 
-		for(OMD_INT p=0;p<TotalGrid;p++){
+		for(int p=0;p<TotalGrid;p++){
 			ost << "Cell " <<p << ":\n";
-			for(OMD_INT n=0;n<CellGrid[p].Size;n++) {
+			for(int n=0;n<CellGrid[p].Size;n++) {
 				ost << "  " << CellGrid[p].NbCell[n] << "\n";
 			}
 		}
 	}
 	
-	OMD_INT GetCellNumber(OMD_INT at)
+	int GetCellNumber(int at)
 	{
 		Atom* a=AtomPtr(at);
-		OMD_INT xid=(OMD_INT)((a->x-Box.x0)/RCell);
-		OMD_INT yid=(OMD_INT)((a->y-Box.y0)/RCell);
-		OMD_INT zid=(OMD_INT)((a->z-Box.z0)/RCell);
+		int xid=(int)((a->x-Box.x0)/RCell);
+		int yid=(int)((a->y-Box.y0)/RCell);
+		int zid=(int)((a->z-Box.z0)/RCell);
 		if(xid>=GridNX)xid=GridNX-1;if(xid<0)xid=0;
 		if(yid>=GridNY)yid=GridNY-1;if(yid<0)yid=0;
 		if(zid>=GridNZ)zid=GridNZ-1;if(zid<0)zid=0;
-		OMD_INT cn=zid*(GridNX*GridNY)+yid*GridNX+xid;
+		int cn=zid*(GridNX*GridNY)+yid*GridNX+xid;
 		assert(cn<TotalGrid, "total number of grid exceeded: "+as_string(cn)+
 			   " of "+as_string(TotalGrid));
 		return cn;
 	}
 
-	void Attach(OMD_INT cn, OMD_INT idx) {		
+	void Attach(int cn, int idx) {		
 		if(NMember[cn]==0) {
 			if(!CellTail[cn]) {
 				Cell[cn]=new IndexList;
@@ -212,7 +212,7 @@ public:
 		NMember[cn]++;
 	}
 
-	void ListReset(OMD_INT cn) {
+	void ListReset(int cn) {
 		CellTail[cn]=Cell[cn];
 		NMember[cn]=0;
 	}
@@ -229,12 +229,12 @@ public:
 	}
 
 	void Update() { // update cell membership...
-		OMD_INT na=GetNAtom();
-		for(OMD_INT i=0;i<TotalGrid;i++) ListReset(i);
-		for(OMD_INT i=0;i<na;i++) {
+		int na=GetNAtom();
+		for(int i=0;i<TotalGrid;i++) ListReset(i);
+		for(int i=0;i<na;i++) {
 			Attach(GetCellNumber(i),i);
 		}
-		for(OMD_INT i=0;i<TotalGrid;i++){
+		for(int i=0;i<TotalGrid;i++){
 			DeleteTail(CellTail[i]);
 			if((NMember[i]==0)&&(CellTail[i]!=NULL)) {
 				delete CellTail[i];
@@ -270,7 +270,7 @@ public:
 		if(dirty||force_update) Update();
 		
 		IndexList *atptr,*toptr;
-		for(OMD_INT c=0;c<TotalGrid;c++) {
+		for(int c=0;c<TotalGrid;c++) {
 			if(!Cell[c])continue;
 
 			// This cell
@@ -299,8 +299,8 @@ public:
 			while(atptr) {
 				if(CheckActive(atptr->I)){
 					if(IteratedClass->PreIterationNode(atptr->I)) {
-						for(OMD_INT nc=0;nc<CellGrid[c].Size;nc++) {
-							OMD_INT neigcell=CellGrid[c].NbCell[nc];
+						for(int nc=0;nc<CellGrid[c].Size;nc++) {
+							int neigcell=CellGrid[c].NbCell[nc];
 							toptr=Cell[neigcell];
 							while(toptr) {
 								
