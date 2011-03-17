@@ -20,9 +20,29 @@
 
 #include <omd/iterator.hpp>
 
+/**
+ @ingroup iterator
+ @brief Verlet neighbor list (Iterator)
+ 
+ This class is the verlet neighbor list iterator algorithm.
+ The calculation is about twice as fast compares to the NeighborCell iterator.
+ No periodic boundary condition is considered. Use this class with MDSystemGrid
+ for periodic boundary simulation.
+ 
+ Parameters:
+ - @e verlet.update : the update period of the neighbor list. This parameter is ignored
+                      in parallel OMD, and the update period is controlled by MDSystemGrid.
+ - @e verlet.rebuild : the period to rebuild the neighbor grid. This is zero by default, which
+					means no rebuilding.
+ - @e verlet.radtole : the radius tolerance of the neighbor grid. In parallel MD this is ignored
+                       and the radius is defined by MDSystemGrid.
+ - @e verlet.nmean : the estimate value of number of neighbors of an atom. The default is 120. 
+
+**/
+
 class VerletList: public MDIterator {
 	int U, V, W;
-	int nmean;
+	int nmean; 
 	int NeighSize;
 	int AllocSize;
 	OMD_FLOAT VerletRadius;

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 WEBSRV=merapi
 USER=rosandi
 WEBPATH=public_html/objectmd

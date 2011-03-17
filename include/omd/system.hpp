@@ -376,6 +376,7 @@ public:
 	void SetBoundaryCondition(int pbc) {if(PBoundary<0)PBoundary=pbc;}
 
 	virtual int GetLocalAtomNumber(){return GetNAtom();}
+	virtual int GetTotalAtomNumber(){return GetNAtom();}
 
 };
 

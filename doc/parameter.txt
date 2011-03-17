@@ -29,7 +29,7 @@ A parameter file may contain single line comments begins with hash character
 line:
 
 @code
-./example silent maxtime 10.0
+./example silent time.max 10.0
 @endcode
 
 To let the example program read command line parameters, the application
@@ -49,7 +49,7 @@ upon execution. Here brackets is used only to state the values.
 - @b dir.output (directory name) : specify the name of output directory.
 - @b dir.binary (directory name) : specify the directory name to stor binary and
   log files in parallel OMD application.
-- @b maxtime (time unit) : specify the maximum simulation time 
+- @b time.max (time unit) : specify the maximum simulation time 
   (usually pico seconds).
 - @b restart (file name) : sets the restart file name. If the file exists in the
   current directory, the simulation will run in RESTART_MODE and load the

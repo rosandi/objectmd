@@ -135,4 +135,6 @@ public:
 
 };
 
+#define _PARALLEL_COMPLIANT_ public ParallelGadget
+
 #endif

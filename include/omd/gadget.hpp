@@ -173,7 +173,8 @@ public:
 	OMD_FLOAT CalcDistance(int at, int to, bool check=true) {
 		return sqrt(CalcSqrDistance(Atoms(at), Atoms(to), check));
 	}
-
+	
+	virtual OMD_FLOAT GetTimeStep() {return System->GetIntegrator()->GetTimeStep();}
 	void SetUnit(MDUnit* unit){Unit=unit;}
 	
 	DataSlot* RegisterMessageSlot(DataSlot* slot);

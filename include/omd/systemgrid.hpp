@@ -139,7 +139,6 @@ public:
 	
 	// cancels boundary's minimum distance convention: image atoms copy is used
 	virtual void BoundaryCorrectDistances(OMD_FLOAT& dx, OMD_FLOAT& dy, OMD_FLOAT& dz){}
-	virtual int GetTotalAtom(){return ProcInfo.TotalAtom;}
 	
 	//----Master(Root) routines----//
 	virtual void Root_ArrangeNeighbor();	
@@ -197,7 +196,8 @@ public:
 	virtual void SetCommRefreshPeriod(int peri) {CommRefreshPeriod=peri;}
 	string  GetGridConfiguration();
 	virtual void ReadParameters();
-	int GetLocalAtomNumber(){return LocalAtomNumber;}
+	virtual int GetLocalAtomNumber(){return LocalAtomNumber;}
+	virtual int GetTotalAtomNumber(){return ProcInfo.TotalAtom;}
 	virtual void DistributeContainers();
 	virtual void UpdateRadiusTolerance();
 };

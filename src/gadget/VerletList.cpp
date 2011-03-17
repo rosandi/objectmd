@@ -39,7 +39,7 @@ VerletList::~VerletList() {
 
 void VerletList::ReadParameter() {
 	SysParam->peek("verlet.update", UpdatePeriod, 5);
-	SysParam->peek("verlet.refresh", RebuildPeriod, 0);
+	SysParam->peek("verlet.rebuild", RebuildPeriod, 0);
 	SysParam->peek("verlet.radtole", RadiusTolerance, -1.0);
 	SysParam->peek("verlet.n_mean", nmean, 120);
 }
@@ -84,6 +84,7 @@ void VerletList::CalculateBox() {
 	VerletRadius=System->GetMaxCutRadius()+RadiusTolerance;
 
 	for(int i=0; i<na; i++) {
+		if (!CheckActive(i)) continue; // consider only active atoms...
 		if (MinX>Atoms(i).x)MinX=Atoms(i).x;
 		if (MinY>Atoms(i).y)MinY=Atoms(i).y;
 		if (MinZ>Atoms(i).z)MinZ=Atoms(i).z;
@@ -91,6 +92,7 @@ void VerletList::CalculateBox() {
 		if (MaxY<Atoms(i).y)MaxY=Atoms(i).y;
 		if (MaxZ<Atoms(i).z)MaxZ=Atoms(i).z;
 	}
+
 	Box.x0=MinX;Box.x1=MaxX;
 	Box.y0=MinY;Box.y1=MaxY;
 	Box.z0=MinZ;Box.z1=MaxZ;	

@@ -35,14 +35,16 @@ public:
 		upd=update_period;
 	}
 	
-	void Init(MDSystem *WorkSys) {
-		Pre_Conditioner::Init(WorkSys);
-		ParallelGadget::Init(WorkSys);
-
+	void ReadParameter() {
 		SysParam->peek("timestep.maxpath", maxp);
 		SysParam->peek("timestep.max", maxdt);
 		SysParam->peek("timestep.update", upd);
-		assert(maxp>0, "maxpath is undefined! (parameter timestep.maxpath)");
+	}
+	
+	void Init(MDSystem *WorkSys) {
+		Pre_Conditioner::Init(WorkSys);
+		ParallelGadget::Init(WorkSys);
+		assert(maxp>0.0, "maxpath is undefined! (parameter timestep.maxpath)");
 	}
 
 	void PreIntegration(){
