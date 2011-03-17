@@ -9,4 +9,4 @@ $(hostname)
 endt
 
 make &&
-$OMD_MPI/bin/mpirun -machinefile machine -np 4 expand $@
+$OMD_MPI/bin/mpirun -machinefile machine -np 4 ./slab_expand $@

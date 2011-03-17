@@ -24,12 +24,14 @@
 class MySim:public MDSystemGrid {	
 	
 	void CreateSystem() {
-	    AddAtom(new CrystalFCC100(16,16,64,"platinum"))->SetName("Target");
+	    AddAtom(new CrystalFCC100(16,16,64,"aluminum"))
+	    	->Create()
+	    	->SetName("Target");
 	}
 	
 	void CreateGadget() {
 		SetIntegrator(new MDIntegrator);
-		AddForce(new TForceEAM("platinum"));
+		AddForce(new TForceEAM("aluminum"));
 		AddConditioner(new VerletList);
 		AddConditioner(new EnergySource);		
 		AddDetector(new SysMonitor("md.out"));

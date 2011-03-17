@@ -28,7 +28,6 @@
 
 class EnergySource: public Pre_Conditioner, public ParallelGadget {
 	int input_mode;
-	int n_input;
 	OMD_FLOAT e_tally; // total energy/atom...
 	OMD_FLOAT delta;
 	OMD_FLOAT energy;
@@ -45,7 +44,6 @@ public:
 		register_class(get_name());
 		firstcall=true;
 		e_tally=0.0;
-		n_input=0;
 	}
 	
 	void ReadParameter() {
@@ -63,7 +61,6 @@ public:
 		
 		if(smode=="pulse") {
 			input_mode=INPUT_PULSE;
-			n_input=(int)(width/dt)+1;
 			delta=energy*dt/width;
 			stop_time=start_time+width;
 		}
