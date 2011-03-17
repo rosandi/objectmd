@@ -49,11 +49,11 @@ AtomContainer* MDGadget::SearchTarget(string name, bool strict){
 	if(name==System->get_name()) return System;
 
 	// Atom group has priority...
-	for(int i=0;i<System->SystemAtomGroups.size();i++)
+	for(int i=0;i<(int)System->SystemAtomGroups.size();i++)
 		if(name==System->SystemAtomGroups[i]->get_name())
 			return System->SystemAtomGroups[i];
 
-	for(int i=0;i<System->SystemAtoms.size();i++)
+	for(int i=0;i<(int)System->SystemAtoms.size();i++)
 		if(name==System->SystemAtoms[i]->get_name())
 			return System->SystemAtoms[i];
 
@@ -62,12 +62,12 @@ AtomContainer* MDGadget::SearchTarget(string name, bool strict){
 }
 
 MDGadget* MDGadget::SearchGadget(string name, bool strict) {
-	for(int i=0;i<System->Detectors.size();i++) {
+	for(int i=0;i<(int)System->Detectors.size();i++) {
 		if(System->Detectors[i]->get_name()==name)
 			return System->Detectors[i];
 	}
 	
-	for(int i=0;i<System->Conditioners.size();i++) {
+	for(int i=0;i<(int)System->Conditioners.size();i++) {
 		if(System->Conditioners[i]->get_name()==name)
 			return System->Conditioners[i];
 	}
@@ -79,11 +79,11 @@ MDGadget* MDGadget::SearchGadget(string name, bool strict) {
 // case insensitive
 MDGadget* MDGadget::SearchGadgetType(string type, bool strict) {
 	type=(replace_char(lower_case(type), ' ', '_'));
-	for(int i=0;i<System->Detectors.size();i++)
+	for(int i=0;i<(int)System->Detectors.size();i++)
 		if(System->Detectors[i]->type_of(type))
 			return System->Detectors[i];
 
-	for(int i=0;i<System->Conditioners.size();i++)
+	for(int i=0;i<(int)System->Conditioners.size();i++)
 		if(System->Conditioners[i]->type_of(type))
 			return System->Conditioners[i];
 
@@ -170,7 +170,7 @@ void MDGadget::RestartVariable(string tag, OMD_FLOAT &val){
 	assert(System, "attempt to read restart variable before initialization");
 	DataSlot *m=NULL;
 
-	for(int i=0;i<System->RestartVars.size();i++) {
+	for(int i=0;i<(int)System->RestartVars.size();i++) {
 		if(System->RestartVars[i]->GetLabel()==tag) m=System->RestartVars[i];
 	}
 	
@@ -189,7 +189,7 @@ void MDGadget::RestartVariable(string tag, int &val){
 	assert(System, "attempt to read restart variable befor initialization");
 	DataSlot *m=NULL;
 
-	for(int i=0;i<System->RestartVars.size();i++) {
+	for(int i=0;i<(int)System->RestartVars.size();i++) {
 		if(System->RestartVars[i]->GetLabel()==tag) m=System->RestartVars[i];
 	}
 	

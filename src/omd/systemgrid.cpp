@@ -237,7 +237,7 @@ void MDSystemGrid::Root_DistributeAtoms() {
 
 	AtomContainer* ProcAtm[GetGridSize()][SystemAtoms.size()];
 
-	for(int i=0;i<SystemAtoms.size();i++){
+	for(int i=0;i<(int)SystemAtoms.size();i++){
 		AtomKeeper Atm(SystemAtoms[i]->GetAtomStorage());
 		int nproc=GetGridSize();
 		int npp=Atm.GetNAtom()/nproc+NTOLE;
@@ -260,20 +260,20 @@ void MDSystemGrid::Root_DistributeAtoms() {
 	for(int pn=0;pn<GetGridSize();pn++) {
 		string fname(BinDirectory+"/p"+as_string(pn)+"-crystal");
 		int cnt=0;
-		for(int a=0;a<SystemAtoms.size();a++){
+		for(int a=0;a<(int)SystemAtoms.size();a++){
 			ProcAtm[pn][a]->Save(fname, "a");
 			cnt+=ProcAtm[pn][a]->GetNAtom();
 		}
 		cntot+=cnt;
 	}
 	
-	for(int i=0;i<SystemAtoms.size();i++) {
+	for(int i=0;i<(int)SystemAtoms.size();i++) {
 		strncpy(ProcInfo.AtomNames[i],SystemAtoms[i]->get_name().c_str(),32);
 		ProcInfo.AtomNames[i][31]=0x0;
 	}
 	
 	for(int a=0;a<GetGridSize();a++){
-		for(int i=0;i<SystemAtoms.size();i++) {
+		for(int i=0;i<(int)SystemAtoms.size();i++) {
 			ProcAtm[a][i]->Release();
 			delete ProcAtm[a][i];
 		}
@@ -297,7 +297,7 @@ void MDSystemGrid::Root_Prepare() {
 	ProcInfo.NumberOfContainers=SystemAtoms.size();
 	Root_ArrangeNeighbor();
 	Root_DistributeAtoms();
-	for(int a=0;a<SystemAtoms.size();a++) {
+	for(int a=0;a<(int)SystemAtoms.size();a++) {
 		SystemAtoms[a]->Release();
 		delete SystemAtoms[a];
 	}
@@ -602,7 +602,6 @@ void MDSystemGrid::UpdateRadiusTolerance() {
 
 void MDSystemGrid::InitGadgets() {
 	MDSystem::InitGadgets();
-	OMD_FLOAT L;
 
 	UpdateRadiusTolerance();
 	Iterator->SetDirty();

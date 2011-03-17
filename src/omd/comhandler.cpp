@@ -330,7 +330,6 @@ bool CommunicationHandler::CheckCellShift(int b, OMD_FLOAT& xshift,OMD_FLOAT& ys
 }
 
 void CommunicationHandler::UnpackSpace() {
-	int rank=GetRank();
 	int newna=System->LocalAtomNumber;
 	OMD_FLOAT xshift, yshift, zshift;
 	System->AtomStorage.Cut(System->LocalAtomNumber);
@@ -371,7 +370,6 @@ void CommunicationHandler::UnpackSpace() {
 }
 
 void CommunicationHandler::UnpackPosition() {
-	int rank=GetRank();
 	int oldna=System->LocalAtomNumber;
 	int newna=System->LocalAtomNumber;
 	OMD_FLOAT xshift, yshift, zshift;
@@ -409,8 +407,6 @@ void CommunicationHandler::UnpackPosition() {
 }
 
 void CommunicationHandler::UnpackVelocity() {
-	
-	int rank=GetRank();
 	int oldna=System->LocalAtomNumber;
 	int newna=System->LocalAtomNumber;
 	
@@ -442,8 +438,7 @@ void CommunicationHandler::UnpackVelocity() {
 }
 
 void CommunicationHandler::UnpackForce() {
-	
-	int rank=GetRank();
+
 	int oldna=System->LocalAtomNumber;
 	int newna=System->LocalAtomNumber;
 	
@@ -476,7 +471,6 @@ void CommunicationHandler::UnpackForce() {
 
 void CommunicationHandler::UnpackAux(int aidx) {
 
-	int rank=GetRank();
 	int oldna=System->LocalAtomNumber;
 	int newna=System->LocalAtomNumber;
 

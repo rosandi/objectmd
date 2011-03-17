@@ -198,12 +198,12 @@ public:
 	}
 
 	string lower_case(string str){
-		for(int i=0;i<str.size();i++)str[i]=tolower(str[i]);
+		for(int i=0;i<(int)str.size();i++)str[i]=tolower(str[i]);
 		return str;
 	}
 	
 	string replace_char(string str, char cold, char cnew) {
-		for(int i=0;i<str.size();i++){
+		for(int i=0;i<(int)str.size();i++){
 			if(str[i]==cold) str[i]=cnew;
 		}
 		return str;		
@@ -213,7 +213,7 @@ public:
 	bool type_of(string type) {
     	type=lower_case(type);
     	type=replace_char(type, ' ', '_');		
-		for(int i=0;i<class_type.size();i++) {
+		for(int i=0;i<(int)class_type.size();i++) {
 			if(class_type[i]==type) return true;
 		}
 		return false;
@@ -225,7 +225,7 @@ public:
 
 	string descent_type() {
 		string ty;
-		for(int i=0;i<class_type.size();i++){
+		for(int i=0;i<(int)class_type.size();i++){
 			ty.append(class_type[i]+" ");
 		}
 		return ty;

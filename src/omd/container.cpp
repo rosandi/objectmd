@@ -368,7 +368,7 @@ AtomContainer* AtomContainer::Import(string fname, int aid) {
     }
 
     Allocate(atom_register.size());
-    for(int i=0;i<atom_register.size();i++) Atoms(i)=atom_register[i];
+    for(int i=0;i<(int)atom_register.size();i++) Atoms(i)=atom_register[i];
 
 	created=true;
     posf.close();
@@ -420,7 +420,7 @@ AtomContainer* AtomContainer::DumpAtoms(AtomKeeper& ak,
 			    << Box.x0<<" "<<Box.y0<<" "<<Box.z0<<" "
 		        << Box.x1<<" "<<Box.y1<<" "<<Box.z1<<"\n";
 
-			for (int i=0;i<StringInfo.size();i++)f<<'#'<<StringInfo[i]<<'\n';
+			for (int i=0;i<(int)StringInfo.size();i++)f<<'#'<<StringInfo[i]<<'\n';
 			
 			if(mat_file!="")f<<"#$ Material "<<mat_file<<"\n";
 		

@@ -41,6 +41,7 @@ AtomContainer* AtomGroup::Create() { // commit.. called by MDSystem...
 AtomGroup* AtomGroup::Source(AtomContainer* ac) {
 	source=ac;
 	scratch_ak.ReferArray(ac->GetAtomStorage());
+	return this;
 }
 
 AtomGroup* AtomGroup::Union(AtomContainer& a) { // warning! combining may take time!

@@ -182,7 +182,7 @@ bool TForceEAM::SearchAttachEmbeddingClass() {
 	}
 
 	// find first the Embedding energy handler in conditioner list
-	for (int i=0; i<(System->Conditioners.size()); i++) {
+	for (int i=0; i<(int)System->Conditioners.size(); i++) {
 			
 		if(System->Conditioners[i]->type_of("EMBEDDING_FUNCTION")){
 			emb=dynamic_cast<TEmbedding*>(System->Conditioners[i]);

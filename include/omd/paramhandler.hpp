@@ -29,8 +29,7 @@
 #include <cmath>
 #include <ctype.h>
 
-#ifndef OMD_TYPES
-#define OMD_TYPES
+#ifndef OMD_FLOAT
 #define OMD_FLOAT double
 #endif
 
@@ -110,7 +109,7 @@ public:
 	void copy(ParamHandler &p){
 		prefix.assign(p.prefix);
 		spar.clear();
-		for(int i=0;i<p.spar.size();i++){
+		for(int i=0;i<(int)p.spar.size();i++){
 			spar.push_back(p.spar[i]);
 		}
 	}
@@ -197,7 +196,7 @@ public:
 
 	
 	string& operator[](int idx){
-		if(idx<spar.size()) return spar[idx];
+		if(idx<(int)spar.size()) return spar[idx];
 		throw "index out of range";	return spar[0]; // avoids warning
 	}
 	
@@ -207,12 +206,12 @@ public:
 	}
 	
 	void shift(int n){
-		if(n>spar.size())n=spar.size();
+		if(n>(int)spar.size())n=spar.size();
 		for(int i=0;i<n;i++)shift();
 	}
 	
 	bool exist(string p){
-		for(int i=0;i<spar.size();i++) {
+		for(int i=0;i<(int)spar.size();i++) {
 			if(spar[i]==(prefix+p)) return true;
 		}
 		return false;
@@ -220,7 +219,7 @@ public:
 	
 	// returns the index of first occurrence
 	int index_of(string p){
-		for(int i=0;i<spar.size();i++) {
+		for(int i=0;i<(int)spar.size();i++) {
 			if(spar[i]==(prefix+p))return i;
 		}
 		throw (string("parameter ")+p+" does not exist").c_str();
@@ -248,7 +247,7 @@ public:
 
 	double double_value(int idx) {
 		double retd=0.0;
-		if(idx<spar.size()){
+		if(idx<(int)spar.size()){
 			char st[256],*pt;
 			memset(st,0,256);
 			spar[idx].copy(st,256);
@@ -260,7 +259,7 @@ public:
 	
 	int int_value(int idx){
 		int reti=0;
-		if(idx<spar.size()){
+		if(idx<(int)spar.size()){
 			char st[256],*pt;
 			memset(st,0,256);
 			spar[idx+1].copy(st,256);
@@ -271,7 +270,7 @@ public:
 	}
 	
 	string string_value(int idx){
-		if(idx>=spar.size()) throw "conversion: out of range";
+		if(idx>=(int)spar.size()) throw "conversion: out of range";
 		return spar[idx];
 	}
 
@@ -282,14 +281,14 @@ public:
 		int idx=index_of(p)+index;
 		
 		string rets("");
-		if((idx+1)<spar.size()) rets=spar[idx+1];
+		if((idx+1)<(int)spar.size()) rets=spar[idx+1];
 		return rets;
 	}
 	
 	// lower case
 	string lower_string_value(string p){
 		string rets=string_value(p);
-		for(int i=0;i<rets.size();i++) {
+		for(int i=0;i<(int)rets.size();i++) {
 			rets[i]=tolower(rets[i]);
 		}
 		return rets;
@@ -299,7 +298,7 @@ public:
 		if(!exist(p)) throw (string("parameter ")+p+" doesn't exist").c_str();
 		int idx=index_of(p)+index;
 		
-		if(idx<spar.size()-1){
+		if(idx<(int)spar.size()-1){
 			char st[256],*pt;
 			memset(st,0,256);
 			spar[idx+1].copy(st,256);
@@ -322,7 +321,7 @@ public:
 		if(!exist(p)) throw (string("parameter ")+p+" doesn't exist").c_str();
 		int idx=index_of(p)+index;
 		
-		if(idx<spar.size()-1){
+		if(idx<(int)spar.size()-1){
 			char st[256],*pt;
 			memset(st,0,256);
 			spar[idx+1].copy(st,256);
@@ -397,21 +396,21 @@ public:
 	
 	void dump(std::ostream& out){
 		out << "number of parameters = " << spar.size() << "\n";
-		for(int i=0;i<spar.size();i++)
+		for(int i=0;i<(int)spar.size();i++)
 			out <<"["<<i<<"] "<<spar[i] << " ";
 		out << "\n#total "<<spar.size()<<" parameters\n";
 	}
 	
 	string raw_string() {
 		string ss="";
-		for(int i=0;i<spar.size();i++) ss.append(spar[i]+" ");
+		for(int i=0;i<(int)spar.size();i++) ss.append(spar[i]+" ");
 		return ss;
 	}
 	
 	// the parameter name and the end string is excluded 
 	string raw_string(string p, string ends="--") {
 		string ss="";
-		for(int i=index_of(p)+1;i<spar.size();i++) {
+		for(int i=index_of(p)+1;i<(int)spar.size();i++) {
 			if(spar[i]==ends) break;
 			ss.append(spar[i]+" ");
 		}
@@ -421,7 +420,7 @@ public:
 	void set_pair(string p, string val) {
 		if(exist(p)) {
 			int idx=index_of(p);
-			if(idx==spar.size()-1) push_val(val);
+			if(idx==(int)spar.size()-1) push_val(val);
 			else spar[idx]=val;
 		} else push_pair(p, val);			
 	}

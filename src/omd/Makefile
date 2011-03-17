@@ -6,7 +6,7 @@
 include ../../config.make
 
 CXX = g++ -g -Wall
-CXXFLAGS = -I../../include -I$(MPI_HOME)/include
+CXXFLAGS = -I../../include $(MPI_FLAGS)
 AR = ar
 RANLIB = ranlib
 RM = rm

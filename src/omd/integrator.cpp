@@ -42,14 +42,14 @@ MDIntegrator::MDIntegrator(OMD_FLOAT time_step)
 }
 
 MDIntegrator::~MDIntegrator() {
-	for (int i=0; i<ActForces.size(); i++) delete ActForces[i];
+	for (int i=0; i<(int)ActForces.size(); i++) delete ActForces[i];
 }
 
 void MDIntegrator::PrintInfo(ostream& ost) {
     ost<<get_name()<< " - interaction forces:\n\n";
     
-	for (int i=0; i<(System->SystemAtoms.size()); i++)
-		for (int j=i; j<(System->SystemAtoms.size()); j++) {
+	for (int i=0; i<(int)System->SystemAtoms.size(); i++)
+		for (int j=i; j<(int)System->SystemAtoms.size(); j++) {
 			if (GetForce(i, j)!=NULL) {
 				ost << System->SystemAtoms[i]->get_name() << "*" 
 					<< System->SystemAtoms[j]->get_name() << " = ";
@@ -78,7 +78,7 @@ void MDIntegrator::Init(MDSystem* WorkSys) {
     NType = WorkSys->SystemAtoms.size();
     
 	// put forces into the kernel matrix
-	for(int i=0;i<ActForces.size();i++){
+	for(int i=0;i<(int)ActForces.size();i++){
 		int from=ActForces[i]->A;
 		int to  =ActForces[i]->B;
 
@@ -100,7 +100,7 @@ void MDIntegrator::Init(MDSystem* WorkSys) {
 	}
 	
 	MaxCutRadius=-1.0;
-	for(int i=0;i<ActForces.size();i++) {
+	for(int i=0;i<(int)ActForces.size();i++) {
 		ActForces[i]->Init(WorkSys);
 		if (ActForces[i]->CutRadius>MaxCutRadius)
 			MaxCutRadius=ActForces[i]->CutRadius;
@@ -204,9 +204,9 @@ void MDIntegrator::Iterate() {
 		Atom* a=AtomPtr(i);
 		a->fx=a->fy=a->fz=a->virial=a->potential=0.0;		
 	}
-	for(int i=0;i<ActForces.size();i++) ActForces[i]->ClearAccumulators();
+	for(int i=0;i<(int)ActForces.size();i++) ActForces[i]->ClearAccumulators();
 	Iterator->Iterate(this);
-	for (int i=0; i<ActForces.size(); i++) ActForces[i]->Correction();
+	for (int i=0; i<(int)ActForces.size(); i++) ActForces[i]->Correction();
 	SyncData(SYNC_FORCE);
     System->ExecuteConditioners(COND_FORCE_MODIFIER);
 }

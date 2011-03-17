@@ -113,19 +113,19 @@ MDSystem::MDSystem(){
 // The atoms are not freed from each atom container
 
 MDSystem::~MDSystem() {
-	for (int i=0; i<Detectors.size(); i++) {
+	for (int i=0; i<(int)Detectors.size(); i++) {
 		delete Detectors[i];
 	}
-	for (int i=0; i<Conditioners.size(); i++) {
+	for (int i=0; i<(int)Conditioners.size(); i++) {
 		delete Conditioners[i];
 	}
-	for (int i=0; i<SystemAtoms.size(); i++) {
+	for (int i=0; i<(int)SystemAtoms.size(); i++) {
 		delete SystemAtoms[i];
 	}
 	delete Integrator;
 
 	if(AuxFormat){
-		for(int i=0;i<SAuxFormat.size();i++) MemFree(AuxFormat[i]);
+		for(int i=0;i<(int)SAuxFormat.size();i++) MemFree(AuxFormat[i]);
 		MemFree(AuxFormat);
 	}	
 }
@@ -235,7 +235,7 @@ void MDSystem::ErrorHandler(const char* errst) {
 
 void MDSystem::PrintContainerInfo(ostream& ost) {
 	ost << "\n*** Atom containers ***\n";
-	for (int i=0; i<SystemAtoms.size(); i++) {
+	for (int i=0; i<(int)SystemAtoms.size(); i++) {
 		ost << "=>"; SystemAtoms[i]->PrintInfo(ost);
 	}
 }
@@ -246,11 +246,11 @@ void MDSystem::PrintGadgetInfo(ostream& ost) {
 	Integrator->PrintInfo(ost);
 	
 	ost << "\n*** Conditioners ***\n";
-	for (int i=0; i<Conditioners.size(); i++) {
+	for (int i=0; i<(int)Conditioners.size(); i++) {
 		ost << "=>"; Conditioners[i]->PrintInfo(ost);
 	}
 	ost << "\n*** Detectors ***\n";
-	for (int i=0; i<Detectors.size(); i++) {
+	for (int i=0; i<(int)Detectors.size(); i++) {
 		ost << "=>"; Detectors[i]->PrintInfo(ost);
 	}
 	
@@ -341,13 +341,13 @@ void MDSystem::EnumerateAtoms(bool force) {
 void MDSystem::UnificateAtoms() {
     int na=0;
     
-    for (int i=0;i<SystemAtoms.size();i++) na+=SystemAtoms[i]->GetNAtom();
+    for (int i=0;i<(int)SystemAtoms.size();i++) na+=SystemAtoms[i]->GetNAtom();
     assert(na>0, "no atom to simulate (NAtom=0)");
    
     AtomStorage.Allocate(na);
     AtomStorage.Clear();
 
-    for (int i=0;i<SystemAtoms.size();i++) {
+    for (int i=0;i<(int)SystemAtoms.size();i++) {
     	assert(SystemAtoms[i]->M>0.0&&SystemAtoms[i]->Z>0.0,
     	       "uninitialized atom properties (mass and number)",
     	       SystemAtoms[i]->get_name());
@@ -387,7 +387,7 @@ void MDSystem::CreationFunction() {
     else
     	CreateSystem();
     	
-    for(int i=0;i<SystemAtoms.size();i++)SystemAtoms[i]->set_id(i);
+    for(int i=0;i<(int)SystemAtoms.size();i++)SystemAtoms[i]->set_id(i);
     CreateGadget();
 }
 
@@ -403,7 +403,7 @@ SysBox& MDSystem::CalcBox() {
 	bb.x1=bb.y1=bb.z1=-DBL_MAX;
 
 	// find bounding box...
-	for (int i=0; i<SystemAtoms.size(); i++) {
+	for (int i=0; i<(int)SystemAtoms.size(); i++) {
 		ba=SystemAtoms[i]->GetBox();
 		if(bb.x0>ba.x0)bb.x0=ba.x0;
 		if(bb.y0>ba.y0)bb.y0=ba.y0;
@@ -452,7 +452,7 @@ void MDSystem::AdjustSystem() {
 void MDSystem::InitGadgets() {
 
 	// Search for the Iterator. Add if not found.
-   	for (int i=0; i<(Conditioners.size()); i++) {
+   	for (int i=0; i<(int)Conditioners.size(); i++) {
 		if(Conditioners[i]->type_of("iterator"))
 			Iterator=dynamic_cast<MDIterator*>(Conditioners[i]);
 	}
@@ -476,16 +476,16 @@ void MDSystem::InitGadgets() {
 	}
 
 	// insert forces and initiate integrator
-	for(int i=0;i<force_reg.size();i++) Integrator->AddForce(force_reg[i]);
+	for(int i=0;i<(int)force_reg.size();i++) Integrator->AddForce(force_reg[i]);
 	Integrator->Init(this);	
 
 	// Initiate all gadgets
-	for (int i=0;i<Conditioners.size();i++) Conditioners[i]->Init(this);
-	for (int i=0;i<Detectors.size();i++) Detectors[i]->Init(this);
+	for (int i=0;i<(int)Conditioners.size();i++) Conditioners[i]->Init(this);
+	for (int i=0;i<(int)Detectors.size();i++) Detectors[i]->Init(this);
 
 	// Convert aux format string to array of string
 	MemAlloc(AuxFormat,SAuxFormat.size()*sizeof(char*));
-	for(int i=0;i<SAuxFormat.size();i++){
+	for(int i=0;i<(int)SAuxFormat.size();i++){
 		int sz=(SAuxFormat[i].size()+1);
 		MemAlloc(AuxFormat[i],sz*sizeof(char));
 		memset(AuxFormat[i],'\0',sz);
@@ -499,18 +499,18 @@ void MDSystem::ArrangeMessageSlots() {
 	int pri=1000;
 	
 	// search minimum priority number
-	for(int i=0; i<MessageSlots.size(); i++) {
+	for(int i=0; i<(int)MessageSlots.size(); i++) {
 		if(pri>MessageSlots[i]->GetPriority())
 			pri=MessageSlots[i]->GetPriority();
 			tslot.push_back(MessageSlots[i]);
 	}
 	
 	int adi=0;
-	while(adi<MessageSlots.size()) {	
-		for(int i=0; i<tslot.size(); i++) {
+	while(adi<(int)MessageSlots.size()) {
+		for(int i=0; i<(int)tslot.size(); i++) {
 			if(tslot[i]->GetPriority()==pri) {
 				MessageSlots[adi++]=tslot[i];
-				if(adi>MessageSlots.size()) break;
+				if(adi>(int)MessageSlots.size()) break;
 			}
 		}
 		pri++;
@@ -545,7 +545,7 @@ void MDSystem::Initiate() {
 	
 	if(write_mode&WM_ID) {
 		// ID? name material_file
-		for(int i=0;i<SystemAtoms.size();i++){
+		for(int i=0;i<(int)SystemAtoms.size();i++){
 			PushInfo("$ ID"+as_string(i)+" "+
    			   SystemAtoms[i]->get_name()+" "+
 			   SystemAtoms[i]->GetMaterialFile());
@@ -601,7 +601,7 @@ void MDSystem::LoadVariables(FILE* fl){
 }
 
 AtomContainer* MDSystem::Save(string fname, string mode) {
-	for (int cr=0; cr<SystemAtoms.size(); cr++)
+	for (int cr=0; cr<(int)SystemAtoms.size(); cr++)
 		SystemAtoms[cr]->Save(fname.c_str(), "a");	
 	return this;
 }
@@ -808,7 +808,7 @@ void MDSystem::ExecuteDetectors() {
 
 void MDSystem::PrintMessages(ostream& ost) {
 	int printed=0;
-	for(int i=0;i<MessageSlots.size();i++){
+	for(int i=0;i<(int)MessageSlots.size();i++){
 		if(MessageSlots[i]->IsPrintable()) {
 			ost << MessageSlots[i]->GetFormattedText() << " ";
 			printed++;
@@ -829,15 +829,15 @@ void MDSystem::CheckBeforeRun() {
 	// Check all gadgets
 	assert(Integrator->Check(), "force integrator is not ready");
 
-	for (int i=0;i<Conditioners.size();i++) 
+	for (int i=0;i<(int)Conditioners.size();i++)
 		assert(Conditioners[i]->Check(), "conditioner not ready", Conditioners[i]->get_name());
 
-	for (int i=0;i<Detectors.size();i++)
+	for (int i=0;i<(int)Detectors.size();i++)
 		assert(Detectors[i]->Check(), "detector not ready",Detectors[i]->get_name());
 
 	assert(GetNAtom()>1, "insufficient number of atom", as_string(GetNAtom()));
 
-	for(int i=0;i<Detectors.size();i++){
+	for(int i=0;i<(int)Detectors.size();i++){
 		if(OutputDirectory!="") {
 			Detectors[i]->SetFilenamePrefix(OutputDirectory+"/");
 		}
@@ -1245,7 +1245,7 @@ int MDSystem::ClaimAuxVariable(
 
 		if(AuxVariableUsed>MAXAUXVAR) {
 			string serr("Maximum aux variable exceeded. Users:");
-			for(int i=0;i<AuxUser.size();i++){
+			for(int i=0;i<(int)AuxUser.size();i++){
 				serr.append(" ");
 				serr.append(AuxUser[i]);
 			}
@@ -1255,7 +1255,7 @@ int MDSystem::ClaimAuxVariable(
 }
 
 DataSlot* MDSystem::GetMessageSlot(string slotlabel){
-	for(int i=0;i<MessageSlots.size();i++){
+	for(int i=0;i<(int)MessageSlots.size();i++){
 		if(slotlabel.compare(MessageSlots[i]->GetLabel())==0)
 			return MessageSlots[i];
 	}
@@ -1266,7 +1266,7 @@ DataSlot* MDSystem::GetMessageSlot(string slotlabel){
 int MDSystem::GetFlagBitMask(const char* usagecode) {
 	int i;
 	bool found=false;
-	for(i=0;i<FlagUser.size();i++) {
+	for(i=0;i<(int)FlagUser.size();i++) {
 		string sss("<");sss.append(usagecode);sss.append(">");
 		if(FlagUser[i].find(sss)!=string::npos){found=true;break;}
 	}
@@ -1282,11 +1282,11 @@ void MDSystem::AcceptSignal(int signo) {
 }
 
 MDGadget* MDSystem::SearchGadget(string name) {
-	for(int i=0;i<Detectors.size();i++) {
+	for(int i=0;i<(int)Detectors.size();i++) {
 		if(Detectors[i]->get_name()==name) return Detectors[i];
 	}
 	
-	for(int i=0;i<Conditioners.size();i++) {
+	for(int i=0;i<(int)Conditioners.size();i++) {
 		if(Conditioners[i]->get_name()==name) return Conditioners[i];
 	}
 	
@@ -1310,10 +1310,10 @@ bool MDSystem::OnTime(OMD_FLOAT tm) {
 }
 
 bool MDSystem::GadgetExist(MDGadget* gad){
-	for(int i=0;i<Detectors.size();i++){
+	for(int i=0;i<(int)Detectors.size();i++){
 		if(Detectors[i]==gad) return true;
 	}
-	for(int i=0;i<Conditioners.size();i++){
+	for(int i=0;i<(int)Conditioners.size();i++){
 		if(Conditioners[i]==gad) return true;
 	}
 	return false;

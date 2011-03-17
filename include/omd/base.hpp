@@ -246,8 +246,6 @@ public:
 
 class MDClass:public MDToolkit {
 	
-private:
-	
 protected:
 	int mem_alloc_cnt[3]; // free, alloc, realloc counter
 
@@ -268,22 +266,10 @@ public:
 	string           search_path(string path, string fl);
 	virtual MDClass* set_id(int nid) {id=nid;return this;}
 
-	virtual Atom& Atoms(int idx) {
-		die("unimplemented function Atoms()"); 
-		/* no warning fake */ Atom* a; return *a /*---*/;
-	}
-	
-	virtual Atom* AtomPtr(int idx) {
-		die("unimplemented function AtomPtr()"); 
-		return NULL;
-	}
-	
-	virtual int GetNAtom() {
-		die("unimplemented function GetNAtom()"); 
-		return 0;
-	}
-
-	virtual bool     Check(){return true;}
+	virtual Atom& Atoms(int idx)=0;
+	virtual Atom* AtomPtr(int idx)=0;
+	virtual int GetNAtom()=0;
+	virtual bool Check(){return true;}
 	
 	//---- Atom checking & management ---//
 	bool CheckActive(int idx){return(Atoms(idx).flag&FLAG_ACTIVE);}
@@ -302,25 +288,19 @@ public:
 
 
 //-------------MEMORY-ALOCATION-MACROS-----------------------//
-
 #define MemFree(PTR) mem_free((void*&)PTR)
 #define MemAlloc(PTR,SIZE) mem_alloc((void*&)PTR,SIZE)
 #define MemRealloc(PTR,SIZE) mem_realloc((void*&)PTR,SIZE)
-
 #define MemNew(PTR, OBJTYPE) \
 {PTR=new OBJTYPE;mem_alloc_cnt[1]++;logmem(PTR, sizeof(OBJTYPE)*SIZE);}
-  
 #define MemDelete(PTR) \
 if(PTR){delete PTR;mem_alloc_cnt[0]++;logmem(PTR);} \
 else{warn("trying to delete unallocated object");}
-  
 #define MemNewArray(PTR, OBJTYPE, SIZE) \
 {PTR=new OBJTYPE[SIZE];mem_alloc_cnt[1]++;logmem(PTR, sizeof(OBJTYPE)*SIZE);}
-
 #define MemDeleteArray(PTR) \
 if(PTR){ delete[] PTR;mem_alloc_cnt[0]++;logmem(PTR);} \
 else{warn("trying to delete unallocated array");}
-
 //-------------------------------------------------------------//
 
 /** 

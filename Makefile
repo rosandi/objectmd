@@ -13,8 +13,8 @@ debug:
 
 optimize:
 	rm -f lib/*
-	$(MAKE) CXX="$(M_OMD_CXX) -O3" -C src/omd
-	$(MAKE) CXX="$(M_OMD_CXX) -O3" -C src/gadget
+	$(MAKE) CXX="$(M_OMD_CXX) -O3 -Wall -Wno-strict-aliasing" -C src/omd
+	$(MAKE) CXX="$(M_OMD_CXX) -O3 -Wall -Wno-strict-aliasing" -C src/gadget
 
 omd: src/omd/*.cpp
 	rm -f lib/libomd.a

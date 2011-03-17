@@ -24,7 +24,7 @@
 
 #include <omd/base.hpp>
 
-class TableReader:public MDClass {
+class TableReader:public MDToolkit {
 	// Coefficient a is the value it self
 	struct CoefStruct {OMD_FLOAT a, b, c, d;} *coef;
 	enum tabel_format {plain, rmult} format;
@@ -38,6 +38,7 @@ class TableReader:public MDClass {
 	void allocate();
 	void open_omd(string, string);
 	bool ready;
+	ParamHandler param;
 
 	public:
 		string  filename;
