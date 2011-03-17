@@ -33,21 +33,24 @@ class EnergySource: public Pre_Conditioner, public ParallelGadget {
 	OMD_FLOAT delta;
 	OMD_FLOAT energy;
 	OMD_FLOAT start_time;
+	OMD_FLOAT stop_time;
 	OMD_FLOAT width;
 	OMD_FLOAT grad;
 	string smode;
+	bool firstcall;
 	
 public:
 	EnergySource() {
 		set_name("ENERGY SOURCE");
 		register_class(get_name());
+		firstcall=true;
 		e_tally=0.0;
 		n_input=0;
 	}
 	
 	void ReadParameter() {
-		energy=SysParam->double_value("source.energy");
-		SysParam->peek("source.start", start_time, 0.0); // fixme! not used yet...
+		energy=SysParam->double_value("source.energy"); // energy per atom...
+		SysParam->peek("source.start", start_time, 0.0);
 		SysParam->peek("source.mode", smode, "pulse");
 		SysParam->peek("source.width", width, -1.0);
 	}
@@ -61,7 +64,8 @@ public:
 		if(smode=="pulse") {
 			input_mode=INPUT_PULSE;
 			n_input=(int)(width/dt)+1;
-			delta=energy*width/dt/System->GetTotalAtomNumber();
+			delta=energy*dt/width;
+			stop_time=start_time+width;
 		}
 		
 		if(smode=="ramp") {
@@ -85,12 +89,15 @@ public:
 	
 	void PreIntegration() {
 
-		if(NCalls==0) {
+		if(System->ElapsedTime<start_time) return;
+		
+		if(firstcall) {
 			System->SetKineticEnergy(delta);
+			firstcall=false;
 			return;
 		}
 		
-		if(NCalls<n_input) {
+		if(System->ElapsedTime<stop_time) {
 			int na=GetNAtom();
 			OMD_FLOAT small_vel=System->GetMaxVelocity()*1e-6;
 			small_vel*=small_vel;
