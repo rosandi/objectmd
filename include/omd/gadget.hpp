@@ -174,7 +174,6 @@ public:
 		return sqrt(CalcSqrDistance(Atoms(at), Atoms(to), check));
 	}
 	
-	virtual OMD_FLOAT GetTimeStep() {return System->GetIntegrator()->GetTimeStep();}
 	void SetUnit(MDUnit* unit){Unit=unit;}
 	
 	DataSlot* RegisterMessageSlot(DataSlot* slot);

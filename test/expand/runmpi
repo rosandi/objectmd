@@ -1,0 +1,12 @@
+#!/bin/bash
+
+make clean
+cat << endt > machine
+$(hostname)
+$(hostname)
+$(hostname)
+$(hostname)
+endt
+
+make &&
+$OMD_MPI/bin/mpirun -machinefile machine -np 4 expand $@

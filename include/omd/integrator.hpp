@@ -56,7 +56,6 @@ public:
 	virtual void Init(MDSystem* WorkSys);
 	        bool Check();
 	MDIntegrator* SetTimeStep(OMD_FLOAT time_step){TimeStep=time_step; return this;}
-	OMD_FLOAT     GetTimeStep(){return TimeStep;}
 	MDIntegrator* AddForce(ForceKernel* Forc);
 	
 	void PrintInfo(ostream& ost);

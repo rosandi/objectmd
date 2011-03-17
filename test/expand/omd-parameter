@@ -1,0 +1,7 @@
+comm.refresh 5
+comm.arch 2 2 1
+time.max 5.0
+boundary.periodic xy
+source.mode pulse
+source.energy 0.5
+source.width  0.5
