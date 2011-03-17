@@ -1,6 +1,6 @@
 CXX=$(OMD_CXX)
-LIB_PATH=-L ../../lib
-INCLUDE_PATH=-I ../../include
+LIB_PATH=-L../../lib
+INCLUDE_PATH=-I../../include
 LIBS=-lm -lomd_object-$(shell uname -m) -lomd-$(shell uname -m)
 
 EXE=expand

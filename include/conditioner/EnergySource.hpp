@@ -42,7 +42,6 @@ public:
 		set_name("ENERGY SOURCE");
 		register_class(get_name());
 		e_tally=0.0;
-		n_tally=0;
 		n_input=0;
 	}
 	
@@ -65,11 +64,11 @@ public:
 			delta=energy*width/dt/System->GetTotalAtomNumber();
 		}
 		
-		if(smode="ramp") {
+		if(smode=="ramp") {
 			die("mode=ramp not implemeted yet");
 		}
 		
-		if(smode="function") {
+		if(smode=="function") {
 			die("mode=function not implemented yet");
 		}
 		
