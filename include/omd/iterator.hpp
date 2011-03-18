@@ -74,7 +74,6 @@ public:
 	
 	virtual void SetRadiusTolerance(OMD_FLOAT tole){
 		RadiusTolerance=tole;
-		blog("setting radius tolerance to "+as_string(RadiusTolerance));
 	}
 	
 	void SetDirty(){dirty=true;}
