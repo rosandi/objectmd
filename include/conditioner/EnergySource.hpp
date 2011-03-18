@@ -24,7 +24,26 @@
 #define INPUT_PULSE    1
 #define INPUT_RAMP     2
 #define INPUT_FUNCTION 3
-#define INPUT_SUDDEN   4
+
+/**
+ @brief Energy source
+ 
+ This object input energy to the system as  pulse, ramp, or using
+ any shape defined by a normallized function table.
+ 
+ Parameters:
+ - @e source.energy (energy in eV): total energy given to the system
+ - @e source.mode (pulse|ramp|function)  : input mode. 
+ - @e source.start (time in ps) : time to start the energy input. If this
+   parameter is zero, the atoms' velocity will be initiated by a corresponding
+   amount of energy (\f \Delta E \f) at the first step. The target crystal
+   is assumed to have initially zero temperature.
+ - @e source.width (width in ps) : the width of the pulse. Not applicable for
+   @e mode=function.
+ - @e source.function (filename) : the omd-table filename of a normallized
+   function.
+ 
+**/
 
 class EnergySource: public Pre_Conditioner, public ParallelGadget {
 	int input_mode;
@@ -36,6 +55,7 @@ class EnergySource: public Pre_Conditioner, public ParallelGadget {
 	OMD_FLOAT width;
 	OMD_FLOAT grad;
 	string smode;
+	string sfunc; // function must be normallized...
 	bool firstcall;
 	
 public:
@@ -51,15 +71,15 @@ public:
 		SysParam->peek("source.start", start_time, 0.0);
 		SysParam->peek("source.mode", smode, "pulse");
 		SysParam->peek("source.width", width, -1.0);
+		SysParam->peek("source.function", sfunc, "-");
 	}
 	
 	bool CheckParameter() {
 		
 		double dt=GetTimeStep();
 		
-		if(width<=dt) smode="sudden";
-		
 		if(smode=="pulse") {
+			if(width<dt) width=dt;
 			input_mode=INPUT_PULSE;
 			delta=energy*dt/width;
 			stop_time=start_time+width;
@@ -89,8 +109,8 @@ public:
 		if(System->ElapsedTime<start_time) return;
 		
 		if(firstcall) {
-			System->SetKineticEnergy(delta);
 			firstcall=false;
+			if(start_time==0.0) System->SetKineticEnergy(delta);
 			return;
 		}
 		
