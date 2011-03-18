@@ -213,7 +213,7 @@ protected:
 	virtual void PreCreation(){}
     virtual void PostCreation(){}
     virtual bool ConfirmResume(){return true;}
-	virtual void Scheduller(){}
+	virtual void Scheduler(){}
 	virtual void InlineFunction(){}
 	
 	// interrupt signal handlers
