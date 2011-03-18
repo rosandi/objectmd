@@ -138,7 +138,9 @@ public:
 	int ClaimAuxVariable(){return ClaimAuxVariable(false,NULL,NULL);}
 	OMD_FLOAT& AuxVariable(int i);
 
-	bool OnTime(OMD_FLOAT tm);	
+	bool OnTime(OMD_FLOAT tm);
+	bool OnStep(int step);
+	
 	int IsActive(int Code=0);
 
 	/**

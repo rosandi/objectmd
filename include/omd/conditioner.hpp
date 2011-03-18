@@ -77,6 +77,7 @@ public:
     		(Atom &a, Atom &b, OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz, OMD_FLOAT fr, OMD_FLOAT pot) {}
 
     virtual void Execute(int condtype) {
+		if(!Active) return; // Active stors the type of conditioner...
     	if(condtype&COND_PRE_INTEGRATION&Active)  PreIntegration();
     	if(condtype&COND_PRE_CALCULATION&Active)  PreCalculation();
     	if(condtype&COND_FORCE_MODIFIER&Active)   ForceModifier();

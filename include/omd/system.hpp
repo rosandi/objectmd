@@ -280,7 +280,9 @@ public:
 	virtual void PrintInfo(ostream& ost);
 	virtual void PrintInfo(string fname);
 	
-	bool OnTime(OMD_FLOAT tm);	
+	bool OnTime(OMD_FLOAT tm);
+	bool OnStep(int step);
+	
 	virtual void PrintTime(ostream& ost);
 	virtual void PrintHeader(ostream& ost);
 	virtual void ExecuteConditioners(int contype);
@@ -377,6 +379,9 @@ public:
 
 	virtual int GetLocalAtomNumber(){return GetNAtom();}
 	virtual int GetTotalAtomNumber(){return GetNAtom();}
+	
+	void ActivateGadget(string gname);
+	void DeactivateGadget(string gname);
 
 };
 

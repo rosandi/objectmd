@@ -121,7 +121,8 @@ OMD_FLOAT MDGadget::GetZ(Atom &a) {return System->SystemAtoms[a.id]->Z;}
 OMD_FLOAT MDGadget::GetZ(int idx) {return System->GetZ(idx);}
 
 int   MDGadget::ClaimFlagBit() {return System->ClaimFlagBit(this);}
-bool   MDGadget::OnTime(OMD_FLOAT tm){return System->OnTime(tm);}
+bool  MDGadget::OnTime(OMD_FLOAT tm){return System->OnTime(tm);}
+bool  MDGadget::OnStep(int step){return System->OnStep(step);}
 OMD_FLOAT&MDGadget::AuxVariable(int i){return Atoms(i).aux[AuxIdx];}
 int   MDGadget::ClaimAuxVariable(bool printable, const char* tag, const char* sformat) {
 	AuxIdx=System->ClaimAuxVariable(this,printable,tag,sformat);

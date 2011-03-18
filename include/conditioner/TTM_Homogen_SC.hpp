@@ -22,9 +22,9 @@
  * the coupling function. Used in laser ablation simulation. The energy is given to the
  * lattice using corrected velocity-scalling method. The scalling factor is calculated
  * using:
- *  @f C_m \cdot c + \sqrt{(C_m\cdot c)^2 + c^2(\epsilon + V^2 - C_m^2)}/c^2 @f
+ *  @f[ C_m \cdot c + \sqrt{(C_m\cdot c)^2 + c^2(\epsilon + V^2 - C_m^2)}/c^2 @f]
  * 
- * where @f\epsilon=2\Delta E/m @f and @f \Delta E=G(T_e-T_a)\Omega\Delta t @f is the 
+ * where @f$ \epsilon=2\Delta E/m @f$ and @f$ \Delta E=G(T_e-T_a)\Omega\Delta t @f$ is the 
  * input energy.
 */
 
@@ -216,9 +216,10 @@ private:
 		electron_temperature+=de/(C0*Ce.read(electron_temperature));
 		
 		// stop ttm if the electron temperature is lower than atom temperature
-		if (stop_equ)
-		if (electron_temperature<atomtemp) stopped=true;
-		
+		if (stop_equ) {
+			if (electron_temperature<atomtemp) stopped=true;
+		}
+
 	}
 
 	void velocity_scalling() {

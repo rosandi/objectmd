@@ -1282,14 +1282,14 @@ void MDSystem::AcceptSignal(int signo) {
 }
 
 MDGadget* MDSystem::SearchGadget(string name) {
-	for(int i=0;i<(int)Detectors.size();i++) {
-		if(Detectors[i]->get_name()==name) return Detectors[i];
-	}
-	
 	for(int i=0;i<(int)Conditioners.size();i++) {
 		if(Conditioners[i]->get_name()==name) return Conditioners[i];
 	}
-	
+
+	for(int i=0;i<(int)Detectors.size();i++) {
+		if(Detectors[i]->get_name()==name) return Detectors[i];
+	}
+		
 	return NULL;
 }
 
@@ -1306,6 +1306,11 @@ bool MDSystem::OnTime(OMD_FLOAT tm) {
 	if((tm>(ElapsedTime-0.5*Integrator->TimeStep))
 		&&(tm<(ElapsedTime+0.5*Integrator->TimeStep))) 
 		return true;
+	return false;
+}
+
+bool MDSystem::OnStep(int step) {
+	if(Step==step) return true;
 	return false;
 }
 
@@ -1423,4 +1428,14 @@ void MDSystem::OnInterruptUSR1(){
 void MDSystem::OnInterruptUSR2(){
 	blog("handling SIGUSR1 --- non-terminating interrupt", LOGINFO);
 	SaveSimulation();
+}
+
+void MDSystem::ActivateGadget(string gname) {
+	MDGadget* g=SearchGadget(gname);
+	if(g)g->Activate();
+}
+
+void MDSystem::DeactivateGadget(string gname) {
+	MDGadget* g=SearchGadget(gname);
+	if(g)g->Deactivate();
 }
