@@ -203,9 +203,8 @@ public:
 	OMD_FLOAT SqrMaxVelocity;
 
 protected:
-	
-	// Abstract functions
-    virtual void CreateSystem()=0;
+
+    virtual void CreateSystem();
     virtual void CreateGadget()=0;
     virtual void SystemSetting(){} // settings may be done via parameters
 
@@ -295,7 +294,7 @@ public:
 	virtual void   LoadVariables(FILE* fl);
 	virtual void   SaveSimulationConfig(string binfile);
 	virtual void   SaveSimulation(string binfile="");
-	virtual void   LoadSimulation();
+	virtual void   LoadSimulation(string binfile="");
 
 	virtual void BorderOffset(OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz);
 	virtual void BorderOffset(OMD_FLOAT dr){BorderOffset(dr,dr,dr);}

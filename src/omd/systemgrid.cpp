@@ -446,8 +446,8 @@ void MDSystemGrid::SyncVariable() {
 void MDSystemGrid::CreationFunction() {
 // Here: conditional: restarting or normal.....
 	if(GetRank()==0) {
-		if(Mode==NORMAL_MODE)CreateSystem();
-		if(Mode==RESTART_MODE)LoadSimulation();
+		if(Mode==NORMAL_MODE) CreateSystem();
+		if(Mode==RESTART_MODE) LoadSimulation();
 		Root_Prepare();
 	}
 

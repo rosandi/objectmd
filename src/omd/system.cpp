@@ -228,6 +228,24 @@ void MDSystem::ReadParameters() {
 
 }
 
+// FIXME! Untested....
+void MDSystem::CreateSystem() {
+
+	if(param.exist("import")) { // import crystal
+		string fname=param.string_value("import");
+		assert(file_exist(fname), "can not find file to import ("+fname+")");
+		blog("importing file "+fname);
+		Import(fname);
+	} else if(param.exist("load")) { // load from binary file
+		string fname=param.string_value("load");
+		assert(file_exist(fname), "can not find binary file to load ("+fname+")");
+		blog("loading file "+fname);
+		LoadSimulation(fname);
+		ResetSimulationTime();
+	}
+
+}
+
 void MDSystem::ErrorHandler(const char* errst) {
 	blog(string(errst), LOGINFO);
 	ExitCode=EXIT_FAILURE;
@@ -698,14 +716,15 @@ void MDSystem::SaveSimulation(string binfile) {
  * 
  */
 
-void MDSystem::LoadSimulation() {
+void MDSystem::LoadSimulation(string binfile) {
 
 	#define TOLE 100
 	int NumCont;
 	int nresvar;
 	char cname[32];
 	
-	string LoadFromFile(GetRestartFilename());
+	string LoadFromFile(binfile);
+	if(LoadFromFile=="") LoadFromFile=GetRestartFilename();
 
 	FILE* fl = fopen(LoadFromFile.c_str(), "r");
 	assert(fl, "unable to read restart file", LoadFromFile);
@@ -1329,6 +1348,7 @@ bool MDSystem::GadgetExist(MDGadget* gad){
  * 
  * 
  */
+
 AtomContainer* MDSystem::Import(string fname){
 	ParamHandler p;
 	p.read_pseudo(fname);
@@ -1340,7 +1360,8 @@ AtomContainer* MDSystem::Import(string fname){
 		AddAtom(new AtomContainer(p[idx+2]))
 			->Import(fname,ia)
 			->SetName(p[idx+1]);
-		ia++; ids.assign("ID"+as_string(ia));
+		ia++;
+		ids.assign("ID"+as_string(ia));
 	}
 	
 	if(p.exist("Box")) {
