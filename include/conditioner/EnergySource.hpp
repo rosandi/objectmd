@@ -22,21 +22,27 @@
 #include <omd/conditioner.hpp>
 
 #define INPUT_PULSE    1
-#define INPUT_RAMP     2
-#define INPUT_FUNCTION 3
+#define INPUT_FUNCTION 2
 
 /**
  @brief Energy source
  
- This object input energy to the system as  pulse, ramp, or using
- any shape defined by a normallized function table.
+ This class inputs energy to the system as a pulse or any shape 
+ defined by a normallized function table. The energy is pushed
+ into the system using @e velocity @e scaling method, 
+ \f$ v' \leftarrow \gamma v \f$. The scaling factor
+ \f$\gamma \f$ is calculated by the following expression:
+ 
+ \f[
+ \gamma = \sqrt{1 + \frac{2\Delta E}{m v^2}}
+ \f]
  
  Parameters:
  - @e source.energy (energy in eV): total energy given to the system
- - @e source.mode (pulse|ramp|function)  : input mode. 
+ - @e source.mode (pulse|function)  : input mode. 
  - @e source.start (time in ps) : time to start the energy input. If this
    parameter is zero, the atoms' velocity will be initiated by a corresponding
-   amount of energy (\f \Delta E \f) at the first step. The target crystal
+   amount of energy (\f$ \Delta E \f$) in the first step. The target crystal
    is assumed to have initially zero temperature.
  - @e source.width (width in ps) : the width of the pulse. Not applicable for
    @e mode=function.
@@ -79,17 +85,14 @@ public:
 		double dt=GetTimeStep();
 		
 		if(smode=="pulse") {
-			if(width<dt) width=dt;
 			input_mode=INPUT_PULSE;
+			if(width<dt) width=dt;
 			delta=energy*dt/width;
 			stop_time=start_time+width;
 		}
 		
-		if(smode=="ramp") {
-			die("mode=ramp not implemeted yet");
-		}
-		
 		if(smode=="function") {
+			input_mode=INPUT_FUNCTION;
 			die("mode=function not implemented yet");
 		}
 		
