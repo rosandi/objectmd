@@ -20,6 +20,9 @@
 using std::cerr;
 using std::ofstream;
 
+// FIXME! make a note on VerletRadius and Radius tolerance. CommHandler alter these
+// variable. What is the effect? ...
+
 VerletList::VerletList() {
 	set_name("VERLET LIST");
 	register_class(get_name());
