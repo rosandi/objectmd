@@ -874,7 +874,7 @@ void MDSystem::SetArgument(int &argc, char** &argv) {
  * guaranty that these properties are available for them.
  * 
  * The sequence of processes done in this function is the following:
- *    # Execution of scheduller function, Scheduller(). If implemented in the 
+ *    # Execution of scheduller function, Scheduler(). If implemented in the 
  *      descendant, this is a general purpose function reserved for schedulled processes.
  *    # The pre integration conditioners are executed.
  *    # The integration loop is invoked.
@@ -890,7 +890,7 @@ void MDSystem::SetArgument(int &argc, char** &argv) {
 void MDSystem::RunKernel() {
 	stage=stage_run;
 	while(CheckRun()) {
-		Scheduller();
+		Scheduler();
 		ExecuteConditioners(COND_PRE_INTEGRATION);
 		Integrator->Integrate();
 		InlineFunction();
@@ -1433,9 +1433,15 @@ void MDSystem::OnInterruptUSR2(){
 void MDSystem::ActivateGadget(string gname) {
 	MDGadget* g=SearchGadget(gname);
 	if(g)g->Activate();
+	blog("gadget ("+gname+","+g->get_type()+
+	     ") Activated step="+as_string(Step));
 }
 
 void MDSystem::DeactivateGadget(string gname) {
 	MDGadget* g=SearchGadget(gname);
-	if(g)g->Deactivate();
+	if(g) {
+		g->Deactivate();
+		blog("gadget ("+gname+","+g->get_type()+
+		     ") Deactivated step="+as_string(Step));
+	}
 }

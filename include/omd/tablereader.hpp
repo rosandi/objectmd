@@ -38,9 +38,9 @@ class TableReader:public MDToolkit {
 	void allocate();
 	void open_omd(string, string);
 	bool ready;
-	ParamHandler param;
 
 	public:
+		ParamHandler param;
 		string  filename;
 		string  tablename;
 		TableReader(string table_filename="", string table_name="");

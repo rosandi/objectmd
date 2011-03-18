@@ -132,7 +132,9 @@ public:
 
 	MDGadget* Activate() {Active|=ActiveCode; return this;}
 	MDGadget* Deactivate() {Active=0; return this;}
+	MDGadget* SetName(string name){set_name(name);return this;}
 	MDGadget* SetSystem(MDSystem* WorkSys){System=WorkSys; return this;}
+	
 	int ClaimFlagBit();
 	int ClaimAuxVariable(bool printable, const char* tag, const char* sformat=NULL);
 	int ClaimAuxVariable(){return ClaimAuxVariable(false,NULL,NULL);}
