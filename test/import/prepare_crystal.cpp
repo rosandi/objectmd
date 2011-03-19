@@ -1,8 +1,8 @@
 #include <omd/system.hpp>
 #include <omd/integrator.hpp>
-#include <class/FCC100.hpp>
-#include <class/DummyForce.hpp>
-#include <class/NeighborCell.hpp>
+#include <crystal/FCC100.hpp>
+#include <potential/DummyForce.hpp>
+#include <conditioner/NeighborCell.hpp>
 
 class creator:public MDSystem {
 	void CreateSystem() {

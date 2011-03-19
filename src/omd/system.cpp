@@ -154,7 +154,7 @@ int MDSystem::Run(int mode) {
 	Mode=mode;
 
 	try {
-		ReadParameters();
+		ReadParameter();
 		switch(Mode) {
 			case NORMAL_MODE: RunNormal(); break;
 			case RESTART_MODE: RunRestart(); break;
@@ -174,7 +174,7 @@ int MDSystem::Run(int mode) {
 }
 
 
-void MDSystem::ReadParameters() {
+void MDSystem::ReadParameter() {
 	
 	if(param.exist("paramfile")) {
 		string paramfilename=param.string_value("paramfile");
@@ -895,10 +895,6 @@ void MDSystem::PrintHeader(ostream& ost) {
 void MDSystem::SetArgument(int &argc, char** &argv) {
 	Argc=&argc;Argv=&argv;
 	param.append(argc, argv);
-	if(param.exist("load")) {
-		SetRestartFilename(param.string_value("load"));
-		if(file_exist(GetRestartFilename())) Mode=RESTART_MODE;
-	}
 }
 
 /**
@@ -1368,9 +1364,9 @@ AtomContainer* MDSystem::Import(string fname){
 	ParamHandler p;
 	p.read_pseudo(fname);
 	string ids("ID0");
-
 	int ia=0;
 	while(p.exist(ids)) { // ID* name material, can be overriden by parameter
+		std::cerr << "got\n";
 		int idx=p.index_of(ids);
 		AddAtom(new AtomContainer(p[idx+2]))
 			->Import(fname,ia)
@@ -1388,6 +1384,12 @@ AtomContainer* MDSystem::Import(string fname){
 		Box.x1=p.double_value(idx++);
 		Box.y1=p.double_value(idx++);
 		Box.z1=p.double_value(idx);
+		Box.lx=fabs(Box.x1-Box.x0);
+		Box.ly=fabs(Box.y1-Box.y0);
+		Box.lz=fabs(Box.z1-Box.z0);		
+		Box.hlx=Box.lx/2.0;
+		Box.hly=Box.ly/2.0;
+		Box.hlz=Box.lz/2.0;
 		BoxImport=true;
 	}
 	
@@ -1397,7 +1399,8 @@ AtomContainer* MDSystem::Import(string fname){
 	
 	if(!ia) {
 		assert(p.exist("Material"), 
-		"can not find Material tag import file nor material definition in the parameter list");
+		"can not find Material tag in import file ("+fname+
+		") nor material definition in the parameter list");
 		AddAtom(new AtomContainer(p.string_value("Material")))->Import(fname);
 	}
 

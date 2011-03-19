@@ -26,16 +26,18 @@ MDClass::MDClass() {
 	id=-1;
 	set_name("MDCLASS");
 	mem_alloc_cnt[0]=mem_alloc_cnt[1]=mem_alloc_cnt[2]=0;
-	
-	// load OMD environment variables	
+	LoadEnv();
+}
+
+void MDClass::LoadEnv() {
+	// load OMD environment variables
 	char *p;
 	if((p=getenv("OMD_LIB"))) param.push_pair("$OMD_LIB", p);
 	else param.push_pair("$OMD_LIB", ".");
 	if((p=getenv("OMD_CLASS"))) param.push_pair("$OMD_CLASS", p);
 	else param.push_pair("$OMD_CLASS", ".");
 	if((p=getenv("OMD_TABLE"))) param.push_pair("$OMD_TABLE", p);
-	else param.push_pair("$OMD_TABLE", ".");
-	
+	else param.push_pair("$OMD_TABLE", ".");	
 }
 
 /**

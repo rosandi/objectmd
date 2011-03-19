@@ -253,7 +253,7 @@ public:
     virtual ~MDSystem();
     void SystemInit();
 
-    virtual void ReadParameters();
+    virtual void ReadParameter();
 	virtual int Run(int mode=NORMAL_MODE);
 
 	MDIntegrator* SetIntegrator(MDIntegrator* itg);

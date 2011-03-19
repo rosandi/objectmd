@@ -5,7 +5,7 @@
 #define _TEMP_CONTROLLER_HPP_
 
 #include <omd/conditioner.hpp>
-#include <detector/TempPressDetector.hpp>
+#include <detector/ThermoDetector.hpp>
 
 /**
  * @ingroup conditioner
@@ -34,7 +34,7 @@
 
 class TempController: public Post_Conditioner {
 	OMD_FLOAT TempSet, Tau;
-	TempPressDetector* temp_detector;
+	ThermoDetector* temp_detector;
 
 public:
 	
@@ -51,7 +51,7 @@ public:
 		
 	void Init(MDSystem *WorkSys) {
 		Post_Conditioner::Init(WorkSys);		
-		temp_detector=dynamic_cast<TempPressDetector*>(SearchGadgetType("tpdetector",false));
+		temp_detector=dynamic_cast<ThermoDetector*>(SearchGadgetType("thermo detector",false));
 		if(!temp_detector) warn("using systems Kinetic variable for temperature measurement");
 	}
 

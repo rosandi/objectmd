@@ -22,20 +22,21 @@
 
 int main(int argc, char* argv[]) {
 		
-		ParamHandler p(argc, argv);
+    ParamHandler p(argc, argv);
 		
-		if(p[1]==""){
-			std::cerr<<"file name needed\n";
-			return 1;
-		}
+    if(argc==1){
+	std::cerr<<"file name needed\n";
+	return 1;
+    }
 		
-		AtomContainer A,B;
-		A.Import(p[1], 0)->DumpAtoms("type0");
-		B.Import(p[1], 1)->DumpAtoms("type1");
+    AtomContainer A,B;
+    A.Import(p[1], 0)->DumpAtoms("type0");
+    B.Import(p[1], 1)->DumpAtoms("type1");
 	
-	    AtomContainer C("aluminum");
-	    C.Import(p[1])
-	    	->SetName("imported")
-	    	->SetWriteMode(WM_XID)
-	    	->DumpAtoms();	    	
+    AtomContainer C("aluminum");
+    C.Import(p[1])
+    	->SetName("imported")
+    	->SetWriteMode(WM_XID)
+    	->DumpAtoms();	    	
+
 }

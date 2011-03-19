@@ -248,6 +248,7 @@ class MDClass:public MDToolkit {
 	
 protected:
 	int mem_alloc_cnt[3]; // free, alloc, realloc counter
+	void LoadEnv();
 
 public:
 

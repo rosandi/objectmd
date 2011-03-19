@@ -645,7 +645,7 @@ void CommunicationHandler::DistributeAtomIndexSlab(int slab) {
 	OMD_FLOAT rcut=System->GetMaxCutRadius()+CellRadiusTolerance;
 
 	if(rcut>System->ProcInfo.LCellX || rcut>System->ProcInfo.LCellY || rcut>System->ProcInfo.LCellZ)
-		die("processor cell size is to small cell=("+
+		die("processor cell size is too small cell=("+
 				as_string(System->ProcInfo.LCellX)+","+
 				as_string(System->ProcInfo.LCellY)+","+
 				as_string(System->ProcInfo.LCellZ)+") border radius="+as_string(rcut));

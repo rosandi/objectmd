@@ -81,6 +81,7 @@ AtomContainer* AtomContainer::ReadMaterial(string material_file) {
 	assert(material_file!="", "empty material file");
 	mat_file=material_file;
 	param.clear();
+	LoadEnv();
 	param.read(search_path("$OMD_TABLE", "def."+material_file));
 	SetName(param.string_value("element"));
 	blog("reading material: "+mat_file, LOGCREATE);

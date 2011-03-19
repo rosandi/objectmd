@@ -279,9 +279,9 @@ public:
 	string string_value(string p, int index=0){
 		if(!exist(p)) throw (string("parameter ")+p+" doesn't exist").c_str();
 		int idx=index_of(p)+index;
-		
 		string rets("");
 		if((idx+1)<(int)spar.size()) rets=spar[idx+1];
+		if(rets=="") throw "no string value found";
 		return rets;
 	}
 	

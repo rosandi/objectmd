@@ -195,7 +195,7 @@ public:
 	virtual void PrintMessages(ostream& ost);
 	virtual void SetCommRefreshPeriod(int peri) {CommRefreshPeriod=peri;}
 	string  GetGridConfiguration();
-	virtual void ReadParameters();
+	virtual void ReadParameter();
 	virtual int GetLocalAtomNumber(){return LocalAtomNumber;}
 	virtual int GetTotalAtomNumber(){return ProcInfo.TotalAtom;}
 	virtual void DistributeContainers();

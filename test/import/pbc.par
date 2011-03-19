@@ -1,0 +1,4 @@
+boundary.periodic xy
+dump.field id+xid
+time.max 0.1
+temperature 300

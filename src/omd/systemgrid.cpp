@@ -834,8 +834,8 @@ void MDSystemGrid::PrintMessages(ostream& ost) {
 	if(GetRank()==ROOT) MDSystem::PrintMessages(ost);
 }
 
-void MDSystemGrid::ReadParameters() {
-	MDSystem::ReadParameters();
+void MDSystemGrid::ReadParameter() {
+	MDSystem::ReadParameter();
 	param.peek("comm.refresh", CommRefreshPeriod);
 	if(param.exist("comm.arch")) {
 		int nx, ny, nz;

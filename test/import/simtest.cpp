@@ -1,13 +1,10 @@
 #include <omd/system.hpp>
 #include <omd/integrator.hpp>
-#include <class/FCC100.hpp>
-#include <class/DummyForce.hpp>
-#include <class/NeighborCell.hpp>
+#include <crystal/FCC100.hpp>
+#include <potential/DummyForce.hpp>
+#include <conditioner/NeighborCell.hpp>
 
 class creator:public MDSystem {
-	void CreateSystem() {
-		Import("system.cry");
-	}
 	
 	void CreateGadget() {
 		SetIntegrator(new MDIntegrator);
@@ -17,11 +14,8 @@ class creator:public MDSystem {
 		AddConditioner(new NeighborCell);
 	}
 	
-	void SystemSetting() {
-		SetWriteMode(WM_ID|WM_XID);
-	}
-
 	void BeforeRun() {
+		PrintInfo("simtest.info");
 		DumpAtoms("output.cry");
 		die("normal termination");
 	}
@@ -29,6 +23,11 @@ class creator:public MDSystem {
 };
 
 int main(int argc, char* argv[]) {
+	if(argc<3) {
+		std::cerr<<"syntax:\n./simtest paramfile simtest.par\n";
+		exit(1);
+	}
 	creator c;
+	c.SetArgument(argc,argv);
 	return c.Run();
 }
