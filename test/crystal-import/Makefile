@@ -20,16 +20,12 @@ saveload:
 	$(CXX) -g -o save save.cpp $(LIB_PATH) $(INCLUDE_PATH) $(LIBS)
 	$(CXX) -g -o load load.cpp $(LIB_PATH) $(INCLUDE_PATH) $(LIBS)
 
-pbc:
-	$(CXX) -g -o pbc_export pbc_export.cpp $(LIB_PATH) $(INCLUDE_PATH) $(LIBS)
-	$(CXX) -g -o pbc_import pbc_import.cpp $(LIB_PATH) $(INCLUDE_PATH) $(LIBS)
-
 clean:
-	rm -rf import export prepare_crystal simtest err me-* system-? true_cry hot cool nohup.* \
+	rm -rf import export prepare_crystal simtest err me-* system-? \
+	true_cry hot cool nohup.* save \
 	machine  mach-* md.out  pomd Data.??? init_data info.out \
-	import.dat imported type0 type1  ID0  ID1 system.cry output.cry mem.log \
-	run.log pbc_info.out pbc_init.dat info.out init.dat output \
-	hot.load cool.load load save.bin simulation_system.bin \
-	pbc_import_restart save pbc_import pbc_export_55.00.bin pbc_export.dat \
+	import.dat imported type0 type1  ID0  ID1 system.cry output.cry \
+	mem.log run.log pbc_info.out pbc_init.dat info.out init.dat output \
+	hot.load cool.load load pbc_import pbc_export_55.00.bin pbc_export.dat \
 	pbc_export pbc_import_p *.dSYM *.info *.bin *.cry *.init *.out
 

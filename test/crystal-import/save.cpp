@@ -1,4 +1,4 @@
-#include <class/FCC100.hpp>
+#include <crystal/FCC100.hpp>
 
 int main(int argc, char* argv[]) {
 	CrystalFCC100 CC(32,32,32, "platinum");

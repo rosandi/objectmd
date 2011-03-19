@@ -20,18 +20,10 @@
 #include <omd/container.hpp>
 #include <omd/paramhandler.hpp>
 
-int main(int argc, char* argv[]) {
-		
-		ParamHandler p(argc, argv);
-		
-		if(p[1]==""){
-			std::cerr<<"file name needed\n";
-			return 1;
-		}
-		
-		AtomContainer A,B;
-		A.Load(p[1], "hot")->DumpAtoms("hot.load");
-		B.Load(p[1], "cool")->DumpAtoms("cool.load");
+int main() {
+    AtomContainer A,B;
+    A.Load("save.bin", "hot")->DumpAtoms("hot.load");
+    B.Load("save.bin", "cool")->DumpAtoms("cool.load");
 
 /*	
 	    AtomContainer C("aluminum");
