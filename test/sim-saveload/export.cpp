@@ -27,21 +27,17 @@ class creator:public MDSystemGrid {
 	
 	void BeforeRun() {
 		PrintInfo("pbc_export.info");
-		DumpAtoms("pbc.init");
+		DumpAtoms("export-init.cry");
 	}
 	
 	void AfterRun() {
 		SaveSimulation("export.bin");
-		DumpAtoms("pbc_export.cry");
+		DumpAtoms("export.cry");
 	}
 
 };
 
 int main(int argc, char* argv[]) {
-	if(argc==1) {
-		std::cerr<<"syntax:\n ./pbc_export --param pbc.par\n";
-		exit(1);
-	}
 	creator c;
 	c.SetArgument(argc,argv);
 	return c.Run();

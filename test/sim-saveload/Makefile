@@ -5,9 +5,11 @@ LIBS=-lm -lomd_object-$(shell uname -m) -lomd-$(shell uname -m)
 
 
 all:
-	$(CXX) -g -o pbc_export pbc_export.cpp $(LIB_PATH) $(INCLUDE_PATH) $(LIBS)
-	$(CXX) -g -o pbc_import pbc_import.cpp $(LIB_PATH) $(INCLUDE_PATH) $(LIBS)
+	$(CXX) -g -o export export.cpp $(LIB_PATH) $(INCLUDE_PATH) $(LIBS)
+	$(CXX) -g -o import import.cpp $(LIB_PATH) $(INCLUDE_PATH) $(LIBS)
 
 clean:
-	rm -rf *.dSYM pbc_export pbc_import *.bin *.out *.info
+	rm -rf *.dSYM export import *.bin *.out *.cry *.info \
+	pomd *.log
+	
 

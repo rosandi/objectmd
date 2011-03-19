@@ -18,21 +18,17 @@ class creator:public MDSystemGrid {
 	}
 	
 	void BeforeRun() {
-		PrintInfo("pbc.info");
-		DumpAtoms("pbc.init");
+		PrintInfo("import.info");
+		DumpAtoms("import-init.cry");
 	}
 	
 	void AfterRun() {
-		SaveSimulation("pbc_import.bin");
+		SaveSimulation("import.bin");
 	}
 
 };
 
 int main(int argc, char* argv[]) {
-    if(argc==1){
-        std::cerr << "syntax:\n ./pbc_import --param pbc.par import filename\n";
-        exit(1);
-    } 
     creator c;
     c.SetArgument(argc,argv);
     return c.Run();

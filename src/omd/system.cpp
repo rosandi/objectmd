@@ -618,6 +618,8 @@ void MDSystem::SaveVariables(FILE* fl){
 	fwrite(&write_mode, sizeof(int), 1, fl);	
 }
 
+// FIXME! BoxImport should be replaced by Box.undefined()...
+
 void MDSystem::LoadVariables(FILE* fl){
 	fread(&SimBeginTime, sizeof(time_t), 1, fl);
 	fread(&Step, sizeof(int), 1, fl);
@@ -630,6 +632,7 @@ void MDSystem::LoadVariables(FILE* fl){
 	fread(&ElapsedTime, sizeof(OMD_FLOAT), 1, fl);
 	fread(&Box, sizeof(SysBox), 1, fl);
 	fread(&write_mode, sizeof(int), 1, fl);
+	BoxImport=true;
 }
 
 AtomContainer* MDSystem::Save(string fname, string mode) {
@@ -775,8 +778,9 @@ void MDSystem::LoadSimulation(string binfile) {
 	fclose(fl);
 
 	// Loads all atoms for each atom containers
-	for (int cr=0; cr<NumCont; cr++)
+	for (int cr=0; cr<NumCont; cr++) {
 		SystemAtoms[cr]->Load(LoadFromFile);
+	}
 
 }
 

@@ -416,10 +416,12 @@ AtomContainer* AtomContainer::DumpAtoms(AtomKeeper& ak,
 		if (!(mode&WM_APPEND)) { 
 			f 	<< "#####################################\n"
 				<< "#  Object-MD data file\n"
-				<< "#  (c) 2005 Rosandi\n#\n"
-			    << "#$ Box "
-			    << Box.x0<<" "<<Box.y0<<" "<<Box.z0<<" "
-		        << Box.x1<<" "<<Box.y1<<" "<<Box.z1<<"\n";
+				<< "#  (c) 2005 Rosandi\n#\n";
+
+			if(!Box.undefined())
+				f << "#$ Box "
+			      << Box.x0<<" "<<Box.y0<<" "<<Box.z0<<" "
+		          << Box.x1<<" "<<Box.y1<<" "<<Box.z1<<"\n";
 
 			for (int i=0;i<(int)StringInfo.size();i++)f<<'#'<<StringInfo[i]<<'\n';
 			
