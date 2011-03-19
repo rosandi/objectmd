@@ -1,4 +1,4 @@
 boundary.periodic xy
-dump.field id+xid
+dump.field id+xid+velocity
 time.max 0.1
 temperature 300

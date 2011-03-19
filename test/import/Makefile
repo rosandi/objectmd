@@ -29,6 +29,7 @@ clean:
 	machine  mach-* md.out  pomd Data.??? init_data info.out \
 	import.dat imported type0 type1  ID0  ID1 system.cry output.cry mem.log \
 	run.log pbc_info.out pbc_init.dat info.out init.dat output \
-	hot.load cool.load load save.bin simulation_system.bin pbc_import_restart save pbc_import pbc_export_55.00.bin pbc_export.dat \
-	pbc_export pbc_import_p *.dSYM *.info
+	hot.load cool.load load save.bin simulation_system.bin \
+	pbc_import_restart save pbc_import pbc_export_55.00.bin pbc_export.dat \
+	pbc_export pbc_import_p *.dSYM *.info *.bin *.cry *.init *.out
 

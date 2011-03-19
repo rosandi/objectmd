@@ -21,29 +21,28 @@ class creator:public MDSystemGrid {
 		AddForce(new TForceEAM("aluminum"));
 		AddConditioner(new VerletList);
 		AddConditioner(new TempController(param.double_value("temperature"), 0.5));
-		AddDetector(new SysMonitor("md-export-s.out"));
+		AddDetector(new SysMonitor("export.out"));
 		AddDetector(new ThermoDetector(0.1));
 	}
 	
 	void BeforeRun() {
-		PrintInfo("pbc_info.out");
-		DumpAtoms("pbc_init.dat");
+		PrintInfo("pbc_export.info");
+		DumpAtoms("pbc.init");
 	}
 	
 	void AfterRun() {
-		SaveSimulation();
-		DumpAtoms("pbc_export.dat");
+		SaveSimulation("export.bin");
+		DumpAtoms("pbc_export.cry");
 	}
 
 };
 
 int main(int argc, char* argv[]) {
 	if(argc==1) {
-		std::cerr<<"syntax:\n ./pbc_export paramfile pbc.par\n";
+		std::cerr<<"syntax:\n ./pbc_export --param pbc.par\n";
 		exit(1);
 	}
 	creator c;
 	c.SetArgument(argc,argv);
-	c.SetName("pbc-export");
 	return c.Run();
 }

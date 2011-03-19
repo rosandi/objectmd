@@ -176,10 +176,10 @@ int MDSystem::Run(int mode) {
 
 void MDSystem::ReadParameter() {
 	
-	if(param.exist("paramfile")) {
-		string paramfilename=param.string_value("paramfile");
+	if(param.exist("--param")) {
+		string paramfilename=param.string_value("--param");
 		assert(file_exist(paramfilename),
-		       "can not find parameter file "+param.string_value("paramfile"));
+		       "can not find parameter file "+param.string_value("--param"));
 		param.read(paramfilename);
 	} else {
 		if(file_exist(DEFAULT_CONFIG_FILENAME)) param.read(DEFAULT_CONFIG_FILENAME);
@@ -253,6 +253,7 @@ void MDSystem::CreateSystem() {
 		assert(file_exist(fname), "can not find binary file to load ("+fname+")");
 		blog("loading file "+fname);
 		LoadSimulation(fname);
+		EnumerateAtoms();
 		ResetSimulationTime();
 
 	}
@@ -1366,7 +1367,6 @@ AtomContainer* MDSystem::Import(string fname){
 	string ids("ID0");
 	int ia=0;
 	while(p.exist(ids)) { // ID* name material, can be overriden by parameter
-		std::cerr << "got\n";
 		int idx=p.index_of(ids);
 		AddAtom(new AtomContainer(p[idx+2]))
 			->Import(fname,ia)

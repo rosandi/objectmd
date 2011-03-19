@@ -13,24 +13,24 @@ class creator:public MDSystemGrid {
 		SetIntegrator(new MDIntegrator);
 		AddForce(new TForceEAM("aluminum"));
 		AddConditioner(new VerletList);
-		AddDetector(new SysMonitor("md-import-s.out"));
+		AddDetector(new SysMonitor("import.out"));
 		AddDetector(new ThermoDetector(0.1));
 	}
 	
 	void BeforeRun() {
-		PrintInfo("pbc_info.out");
-		DumpAtoms("pbc_init.dat");
+		PrintInfo("pbc.info");
+		DumpAtoms("pbc.init");
 	}
 	
 	void AfterRun() {
-		SaveSimulation();
+		SaveSimulation("pbc_import.bin");
 	}
 
 };
 
 int main(int argc, char* argv[]) {
     if(argc==1){
-        std::cerr << "syntax:\n ./pbc_import paramfile pbc.par import filename\n";
+        std::cerr << "syntax:\n ./pbc_import --param pbc.par import filename\n";
         exit(1);
     } 
     creator c;
