@@ -73,14 +73,14 @@ AtomContainer::AtomContainer(string material_file) {
 }
 
 /**
- * Reads material definition file. The first read file has higher priority, so
- * the second read will just be ignored. This behavior is the property of
- * ParamHandler which reads the first parameter name occurance.
+ Reads material definition file. The parameter is cleared, then the material
+ definitions is read. Parameters set prior to this function call are removed.
  */
 
 AtomContainer* AtomContainer::ReadMaterial(string material_file) {
 	assert(material_file!="", "empty material file");
-	mat_file=material_file;	
+	mat_file=material_file;
+	param.clear();
 	param.read(search_path("$OMD_TABLE", "def."+material_file));
 	SetName(param.string_value("element"));
 	blog("reading material: "+mat_file, LOGCREATE);

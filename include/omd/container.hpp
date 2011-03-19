@@ -179,7 +179,13 @@ public:
 		return this;
 	}	
 	
-    virtual AtomContainer* Import(string fname,int aid=-1);
+    virtual AtomContainer* Import(string fname,int aid);
+	virtual AtomContainer* Import(string fname) {return Import(fname,-1);}
+	virtual AtomContainer* Import(string fname, string mat) {
+		AtomContainer* a=Import(fname);
+		ReadMaterial(mat);
+		return a;
+	}
     
 	virtual AtomContainer* DumpAtoms(AtomKeeper& ak, 
 									 string fname, 

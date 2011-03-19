@@ -229,19 +229,32 @@ void MDSystem::ReadParameters() {
 }
 
 // FIXME! Untested....
+
+/**
+ This function should be reimplemented in the descendant class. If not, 
+ the default system creation is defined by the program parameters.
+ - import (crystal file) : import from a crystal file.
+ - load (binary file) : load a atoms from a binary file. This is not restart mode, since
+   the simulation times is reset to zero.
+ */
+
 void MDSystem::CreateSystem() {
 
 	if(param.exist("import")) { // import crystal
+
 		string fname=param.string_value("import");
 		assert(file_exist(fname), "can not find file to import ("+fname+")");
 		blog("importing file "+fname);
 		Import(fname);
+
 	} else if(param.exist("load")) { // load from binary file
+
 		string fname=param.string_value("load");
 		assert(file_exist(fname), "can not find binary file to load ("+fname+")");
 		blog("loading file "+fname);
 		LoadSimulation(fname);
 		ResetSimulationTime();
+
 	}
 
 }
@@ -1346,7 +1359,9 @@ bool MDSystem::GadgetExist(MDGadget* gad){
 /**
  * @brief Importing simulation atoms from a saved text file.
  * 
- * 
+ * The import file must contain material definitions (pseudo command).
+ * - multi-typed crystal: IDn name material
+ * - single-typed: Material material
  */
 
 AtomContainer* MDSystem::Import(string fname){
@@ -1355,7 +1370,7 @@ AtomContainer* MDSystem::Import(string fname){
 	string ids("ID0");
 
 	int ia=0;
-	while(p.exist(ids)) {
+	while(p.exist(ids)) { // ID* name material, can be overriden by parameter
 		int idx=p.index_of(ids);
 		AddAtom(new AtomContainer(p[idx+2]))
 			->Import(fname,ia)
@@ -1381,16 +1396,9 @@ AtomContainer* MDSystem::Import(string fname){
 	}
 	
 	if(!ia) {
-		// if only one type, 'Material' must exist 
-		// or assign mat_file before import
-		if(mat_file=="") {
-			assert(p.exist("Material"), 
-			"'Material' definition needed in import file");
-			mat_file=p.string_value("Material");
-		}
-		
-		AddAtom(new AtomContainer(mat_file))
-			->Import(fname);
+		assert(p.exist("Material"), 
+		"can not find Material tag import file nor material definition in the parameter list");
+		AddAtom(new AtomContainer(p.string_value("Material")))->Import(fname);
 	}
 
 	return this;
