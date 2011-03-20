@@ -446,14 +446,18 @@ void MDSystemGrid::SyncVariable() {
 void MDSystemGrid::CreationFunction() {
 // Here: conditional: restarting or normal.....
 	if(GetRank()==0) {
-		if(Mode==NORMAL_MODE) CreateSystem();
-		if(Mode==RESTART_MODE) LoadSimulation();
+		if(Mode==RESTART_MODE) {
+			blog("running in restart mode");
+			LoadSimulation(param.string_value("restart"));
+		} else {
+			CreateSystem();
+		}
 		Root_Prepare();
 	}
 
+	Communicator->SyncProcesses();
 	SyncEnvironment();
 	SyncVariable();
-
 	Communicator->Broadcast(&ProcInfo,sizeof(StructInfo));
 
 	LoadAtoms(); // all proc loads their own atoms, ThisProcAtomNumber is updated...
@@ -611,6 +615,7 @@ void MDSystemGrid::InitGadgets() {
 	Communicator->DistributeAtomIndex();
 	Communicator->SendReceive(SYNC_SPACE|SYNC_FORCE|SYNC_AUX);
 	FlattenAtomBox();
+	DistributeContainers();
 }
 
 void MDSystemGrid::FirstRun() {
@@ -795,9 +800,7 @@ AtomContainer* MDSystemGrid::Save(string binname, string mode) {
 
 		int sz=SystemAtoms[i]->GetNAtom();
 		int asz[GetGridSize()];
-		
 		Communicator->Gather((void*)&sz, (void*)asz, sizeof(int));
-
 		ac.copy_data(SystemAtoms[i]);
 		ac.GetAtomStorage().set_name("SAVER BUFFER");
 		ac.GetAtomStorage().Copy(SystemAtoms[i]->GetAtomStorage());

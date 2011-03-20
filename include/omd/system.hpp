@@ -149,7 +149,6 @@ protected:
 	int GroupID;
 	int ConditionerID;
 	int DetectorID;
-	bool BoxImport;
 	bool Unificated;
 	bool Enumerated;
 
@@ -294,7 +293,7 @@ public:
 	virtual void   LoadVariables(FILE* fl);
 	virtual void   SaveSimulationConfig(string binfile);
 	virtual void   SaveSimulation(string binfile="");
-	virtual void   LoadSimulation(string binfile="");
+	virtual void   LoadSimulation(string LoadFromFile);
 
 	virtual void BorderOffset(OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz);
 	virtual void BorderOffset(OMD_FLOAT dr){BorderOffset(dr,dr,dr);}

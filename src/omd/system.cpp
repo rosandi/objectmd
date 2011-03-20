@@ -69,11 +69,7 @@ void MDSystem::SystemInit(){
     Potential  = BasePotential =
     Virial     = Kinetic       = 
     Energy     = ElapsedTime   = 
-    Box.x0     = Box.x1        =
-    Box.y0     = Box.y1        =
-    Box.z0     = Box.z1        =
  	SqrMaxVelocity = 0.0;
-	BoxImport=false;
 	Step   = 0;
     MaxTime    = -1.0;
 	SimWallTime = 0.0;
@@ -194,12 +190,12 @@ void MDSystem::ReadParameter() {
 	// TODO: other system settings??
 	param.peek("dir.output", OutputDirectory);
 	param.peek("time.max", MaxTime);
-
+	
 	if(param.exist("restart")) {
 		SetRestartFilename(param.string_value("restart"));
 		if(file_exist(GetRestartFilename())) Mode=RESTART_MODE;
 	}
-
+	
 	if(param.exist("boundary.periodic")) {
 		string pst=lower_case(param.string_value("boundary.periodic"));
 		if(pst=="no"||pst=="false") {PBoundary=0;}
@@ -414,11 +410,13 @@ void MDSystem::UnificateAtoms() {
 
 void MDSystem::CreationFunction() {
 
-    if(Mode==RESTART_MODE)
-    	LoadSimulation();
-    else
+    if(Mode==RESTART_MODE) {
+		blog("running in restart mode");
+    	LoadSimulation(param.string_value("restart"));
+	} else {
     	CreateSystem();
-    	
+	}
+
     for(int i=0;i<(int)SystemAtoms.size();i++)SystemAtoms[i]->set_id(i);
     CreateGadget();
 }
@@ -458,27 +456,22 @@ SysBox& MDSystem::CalcBox() {
 
 /** 
  * Adjust the system and give the right geometrical information to
- * user's SystemSetting() function. The box dimension is recalculated
- * regarding the possibly changed box information. In RESTART_MODE
+ * user's SystemSetting() function. In RESTART_MODE
  * this function is not called.
- * 
- * In static mode, the integrator and force is set to dummy variables
- * if none is specified in the application program.
  * 
  */
 
 void MDSystem::AdjustSystem() {
-	if(Mode!=RESTART_MODE) {
-		if(!BoxImport) CalcBox();
-		SystemSetting();
-		if(PBoundary<0) PBoundary=0;
-	}
+	if(Box.undefined()) CalcBox();
+	if(PBoundary<0) PBoundary=0;
+	if(Mode!=RESTART_MODE) SystemSetting();
 }
 
 /**
  * Message slots from all gadgets are collected to the main MessageSlot. In this
  * way the gadgets take care of their own slots.
- * 
+ * In static mode, the integrator and force are set to a dummy class
+ * if they are not assign in CreateGadget() function.
  */
 
 void MDSystem::InitGadgets() {
@@ -618,8 +611,6 @@ void MDSystem::SaveVariables(FILE* fl){
 	fwrite(&write_mode, sizeof(int), 1, fl);	
 }
 
-// FIXME! BoxImport should be replaced by Box.undefined()...
-
 void MDSystem::LoadVariables(FILE* fl){
 	fread(&SimBeginTime, sizeof(time_t), 1, fl);
 	fread(&Step, sizeof(int), 1, fl);
@@ -632,7 +623,6 @@ void MDSystem::LoadVariables(FILE* fl){
 	fread(&ElapsedTime, sizeof(OMD_FLOAT), 1, fl);
 	fread(&Box, sizeof(SysBox), 1, fl);
 	fread(&write_mode, sizeof(int), 1, fl);
-	BoxImport=true;
 }
 
 AtomContainer* MDSystem::Save(string fname, string mode) {
@@ -733,16 +723,13 @@ void MDSystem::SaveSimulation(string binfile) {
  * 
  */
 
-void MDSystem::LoadSimulation(string binfile) {
+void MDSystem::LoadSimulation(string LoadFromFile) {
 
 	#define TOLE 100
 	int NumCont;
 	int nresvar;
 	char cname[32];
-	
-	string LoadFromFile(binfile);
-	if(LoadFromFile=="") LoadFromFile=GetRestartFilename();
-
+	assert(file_exist(LoadFromFile), "(LOAD) binary file doesn't exist: "+LoadFromFile);
 	FILE* fl = fopen(LoadFromFile.c_str(), "r");
 	assert(fl, "unable to read restart file", LoadFromFile);
 	
@@ -781,7 +768,6 @@ void MDSystem::LoadSimulation(string binfile) {
 	for (int cr=0; cr<NumCont; cr++) {
 		SystemAtoms[cr]->Load(LoadFromFile);
 	}
-
 }
 
 /**
@@ -1394,7 +1380,6 @@ AtomContainer* MDSystem::Import(string fname){
 		Box.hlx=Box.lx/2.0;
 		Box.hly=Box.ly/2.0;
 		Box.hlz=Box.lz/2.0;
-		BoxImport=true;
 	}
 	
 	if(p.exist("PeriodicBoundary")) {
