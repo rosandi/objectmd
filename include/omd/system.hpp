@@ -53,7 +53,7 @@ using std::string;
 #define IS_PERIODIC_Z (PBoundary&PERIODIC_Z)
 
 #define NORMAL_MODE  0
-#define RESTART_MODE 1
+#define CONTINUE_MODE 1
 #define STATIC_MODE  2
 
 #define SYNC_ALL       0x0F00
@@ -107,7 +107,7 @@ class MDIterator;
  * The main loop is invoked by calling Run() function. The function returns a
  * status code after running the simulation (OMD_EXIT_FAILURE, OMD_EXIT_SUCCESS,
  * OMD_EXIT_SUSPEND). Currently, two run modes are implemented: NORMAL_MODE and
- * RESTART_MODE. In the restart mode, the class will read a previously saved
+ * CONTINUE_MODE. In the continue mode, the class will read a previously saved
  * Object-MD binary file, and continue the simulation.
  * 
  * MDSystem claims 3 flag bits from the Atom structure used as 
@@ -143,7 +143,7 @@ protected:
 	int AuxVariableUsed; /**<the bit mask of used variables**/
     int  InterruptFlag;   /**<system interrupt flag**/
 
-	int Mode; /**<the running mode: NORMAL_MODE|RESTART_MODE|TEST_MODE**/
+	int Mode; /**<the running mode: NORMAL_MODE|CONTINUE_MODE|TEST_MODE**/
 
 	int AtomID;
 	int GroupID;
@@ -154,7 +154,7 @@ protected:
 
     MDIterator* Iterator;
 
-	string RestartFileName;
+	string BinaryFilename;
 	string OutputDirectory;
 	
 // RUNTIME FLAGS
@@ -287,8 +287,8 @@ public:
 	virtual void ExecuteDetectors();
 
 	virtual AtomContainer* Save(string binname, string mode="a"); // mode is not applicable...
-	virtual string GetRestartFilename();
-	virtual void   SetRestartFilename(string filename);
+	virtual string GetBinaryFilename();
+	virtual void   SetBinaryFilename(string filename);
 	virtual void   SaveVariables(FILE* fl);
 	virtual void   LoadVariables(FILE* fl);
 	virtual void   SaveSimulationConfig(string binfile);

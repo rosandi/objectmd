@@ -82,7 +82,7 @@ Four interrupt signals are handled, and have default action as followings:
   - TERM, INT, USR1, save the simulation to omd binary and terminate.
   - USR2, save simulation and continue.
 
-The saved simulation file can be used later using RESTART_MODE.
+The saved simulation file can be used later using CONTINUE_MODE.
 The handler actions can be altered by reimplementing OnInterruptXXX, where XXX is replaced
 by the name of signal.
 

@@ -446,9 +446,8 @@ void MDSystemGrid::SyncVariable() {
 void MDSystemGrid::CreationFunction() {
 // Here: conditional: restarting or normal.....
 	if(GetRank()==0) {
-		if(Mode==RESTART_MODE) {
-			blog("running in restart mode");
-			LoadSimulation(param.string_value("restart"));
+		if(Mode==CONTINUE_MODE) {
+			LoadSimulation(param.string_value("continue"));
 		} else {
 			CreateSystem();
 		}

@@ -99,7 +99,7 @@ function. The function accepts the name and variable to be saved.
 The data may be of type integer of double which is fed to a DataSlot. MDGadget will
 scan the variable by its name on program initialization. So, it is necessary to
 give a unique name. The variable is not only registered for saving, but it is also
-loaded by the saved value on RESTART_MODE. A restart variable is saved in string form, 
+loaded by the saved value on CONTINUE_MODE. A restart variable is saved in string form, 
 so it may lose its precission. For example, see the initialization function of 
 DataDumper class.
 

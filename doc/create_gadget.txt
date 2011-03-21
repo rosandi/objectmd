@@ -72,7 +72,7 @@ must halve the value (see MDSystem::MeasurePotential()). The default iterator
 will be created by MDSystem if none is inserted in an application program.
 
 MDSystem also adds a default integrator if none is specified using SetIntegrator()
-function. In NORMAL_MODE and RESTART_MODE the default is the Verlet integrator. 
+function. In NORMAL_MODE and CONTINUE_MODE the default is the Verlet integrator. 
 In STATIC_MODE, the dummy integrator will be assign as default. In this mode no
 force is required when no real integrator is given to the system.
 

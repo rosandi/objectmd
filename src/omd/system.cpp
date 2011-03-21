@@ -153,7 +153,7 @@ int MDSystem::Run(int mode) {
 		ReadParameter();
 		switch(Mode) {
 			case NORMAL_MODE: RunNormal(); break;
-			case RESTART_MODE: RunRestart(); break;
+			case CONTINUE_MODE: RunRestart(); break;
 			case STATIC_MODE: RunStatic(); break;
 		}
 	}
@@ -191,9 +191,9 @@ void MDSystem::ReadParameter() {
 	param.peek("dir.output", OutputDirectory);
 	param.peek("time.max", MaxTime);
 	
-	if(param.exist("restart")) {
-		SetRestartFilename(param.string_value("restart"));
-		if(file_exist(GetRestartFilename())) Mode=RESTART_MODE;
+	if(param.exist("continue")) {
+		SetBinaryFilename(param.string_value("continue"));
+		if(file_exist(GetBinaryFilename())) Mode=CONTINUE_MODE;
 	}
 	
 	if(param.exist("boundary.periodic")) {
@@ -230,7 +230,7 @@ void MDSystem::ReadParameter() {
  This function should be reimplemented in the descendant class. If not, 
  the default system creation is defined by the program parameters.
  - import (crystal file) : import from a crystal file.
- - load (binary file) : load a atoms from a binary file. This is not restart mode, since
+ - load (binary file) : load a atoms from a binary file. This is not continue mode, since
    the simulation times is reset to zero.
  */
 
@@ -410,9 +410,8 @@ void MDSystem::UnificateAtoms() {
 
 void MDSystem::CreationFunction() {
 
-    if(Mode==RESTART_MODE) {
-		blog("running in restart mode");
-    	LoadSimulation(param.string_value("restart"));
+    if(Mode==CONTINUE_MODE) {
+    	LoadSimulation(param.string_value("continue"));
 	} else {
     	CreateSystem();
 	}
@@ -456,7 +455,7 @@ SysBox& MDSystem::CalcBox() {
 
 /** 
  * Adjust the system and give the right geometrical information to
- * user's SystemSetting() function. In RESTART_MODE
+ * user's SystemSetting() function. In CONTINUE_MODE
  * this function is not called.
  * 
  */
@@ -464,7 +463,7 @@ SysBox& MDSystem::CalcBox() {
 void MDSystem::AdjustSystem() {
 	if(Box.undefined()) CalcBox();
 	if(PBoundary<0) PBoundary=0;
-	if(Mode!=RESTART_MODE) SystemSetting();
+	if(Mode!=CONTINUE_MODE) SystemSetting();
 }
 
 /**
@@ -581,18 +580,18 @@ void MDSystem::Initiate() {
 
 //-------------SAVING-AND-LOADING--------------
 
-string MDSystem::GetRestartFilename(){	
-	if(RestartFileName.empty()) {
-		RestartFileName.assign(get_name());
-		RestartFileName.append(".bin");
-		RestartFileName=replace_char(lower_case(RestartFileName), ' ', '_');
+string MDSystem::GetBinaryFilename(){	
+	if(BinaryFilename.empty()) {
+		BinaryFilename.assign(get_name());
+		BinaryFilename.append(".bin");
+		BinaryFilename=replace_char(lower_case(BinaryFilename), ' ', '_');
 	}
-	return RestartFileName;
+	return BinaryFilename;
 }
 
-void MDSystem::SetRestartFilename(string filename){
-	RestartFileName.assign(filename);
-	RestartFileName=replace_char(lower_case(RestartFileName), ' ', '_');
+void MDSystem::SetBinaryFilename(string filename){
+	BinaryFilename.assign(filename);
+	BinaryFilename=replace_char(lower_case(BinaryFilename), ' ', '_');
 }
 
 // MaxTime excluded... to enable continuing simulation
@@ -683,7 +682,7 @@ void MDSystem::SaveSimulationConfig(string binfile) {
 	
 	SaveVariables(fl);
 
-	// restart variables
+	// continue variables
 	int nresvar=RestartVars.size();
 	fwrite(&nresvar, sizeof(int), 1, fl);		
 	for(int i=0; i<nresvar;i++) {
@@ -704,7 +703,7 @@ void MDSystem::SaveSimulationConfig(string binfile) {
 	sprintf(cname, "== END OF CONFIG HEADER ===");
 	fwrite(cname, sizeof(char), 32, fl);
 
-	assert(!ferror(fl), "error writing restart file");
+	assert(!ferror(fl), "error writing binary file");
 	fclose(fl);
 }
 
@@ -718,7 +717,7 @@ void MDSystem::SaveSimulation(string binfile) {
 /**
  * @brief Load a saved simulation binary file
  * 
- * The function is called to create the system on RESTART_MODE. See
+ * The function is called to create the system on CONTINUE_MODE. See
  * SaveSimulation() for the information of the order of the stored data.
  * 
  */
@@ -731,7 +730,7 @@ void MDSystem::LoadSimulation(string LoadFromFile) {
 	char cname[32];
 	assert(file_exist(LoadFromFile), "(LOAD) binary file doesn't exist: "+LoadFromFile);
 	FILE* fl = fopen(LoadFromFile.c_str(), "r");
-	assert(fl, "unable to read restart file", LoadFromFile);
+	assert(fl, "unable to read binary file", LoadFromFile);
 	
 	fread(cname, sizeof(char), 32, fl);
 	assert(string("OMD (c) Y ROSANDI")==cname,
@@ -761,7 +760,7 @@ void MDSystem::LoadSimulation(string LoadFromFile) {
 		AddAtom(new AtomContainer)->set_name(cname);
 	}
 
-	assert(!ferror(fl), "error loading restart file");
+	assert(!ferror(fl), "error loading binary file");
 	fclose(fl);
 
 	// Loads all atoms for each atom containers

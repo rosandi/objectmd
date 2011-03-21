@@ -12,7 +12,7 @@
 #include <detector/SysMonitor.hpp>
 #include <detector/RestartSaver.hpp>
 
-int mode=NORMAL_MODE;
+int mode=CONTINUE_MODE;
 double maxt=1.0;
 
 class MySim:public MDSystem {

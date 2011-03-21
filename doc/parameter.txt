@@ -52,7 +52,7 @@ upon execution. Here brackets is used only to state the values.
 - @b time.max (time unit) : specify the maximum simulation time 
   (usually pico seconds).
 - @b restart (file name) : sets the restart file name. If the file exists in the
-  current directory, the simulation will run in RESTART_MODE and load the
+  current directory, the simulation will run in CONTINUE_MODE and load the
   corresponding file.
 - @b boundary.periodic (no or xyz) : specify the boundary condition. If the
   value is "no", the simulation has non-periodic boundary. Otherwise the
