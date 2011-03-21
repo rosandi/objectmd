@@ -38,11 +38,6 @@ class MySim:public MDSystemGrid {
 		AddDetector(new ThermoDetector(0.01));
 	}
 
-	void SystemSetting() {
-		AcceptSignal(SIGINT);
-		AcceptSignal(SIGUSR1);
-	}
-
 	void BeforeRun() {
 		PrintInfo("info.out");
 		DumpAtoms("init_data");

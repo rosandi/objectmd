@@ -186,7 +186,20 @@ void MDSystem::ReadParameter() {
 		exit(0);
 	}
 
-	if(param.exist("silent")) silent_mode=true;
+	if(param.exist("--silent")) silent_mode=true;
+	
+	if(param.exist("signal")) {
+		std::istringstream ist(replace_char(param.string_value("signal"),'+',' '));
+		while(ist.good()) {
+			string st;
+			ist >> st;
+			if(lower_case(st)=="int")  AcceptSignal(SIGINT);
+			if(lower_case(st)=="term") AcceptSignal(SIGTERM);
+			if(lower_case(st)=="usr1") AcceptSignal(SIGUSR1);
+			if(lower_case(st)=="usr2") AcceptSignal(SIGUSR2);
+		}
+	}
+	
 	// TODO: other system settings??
 	param.peek("dir.output", OutputDirectory);
 	param.peek("time.max", MaxTime);
@@ -1295,13 +1308,6 @@ int MDSystem::GetFlagBitMask(const char* usagecode) {
 	return (1<<i);
 }
 
-void MDSystem::AcceptSignal(int signo) {
-	struct sigaction act;
-	memset(&act,0,sizeof(act));
-	act.sa_handler=&SignalHandler;
-	sigaction(signo,&act,NULL);
-}
-
 MDGadget* MDSystem::SearchGadget(string name) {
 	for(int i=0;i<(int)Conditioners.size();i++) {
 		if(Conditioners[i]->get_name()==name) return Conditioners[i];
@@ -1398,6 +1404,14 @@ AtomContainer* MDSystem::Import(string fname){
 	return this;
 }
 
+void MDSystem::AcceptSignal(int signo) {
+	blog("accepting signal "+as_string(signo));
+	struct sigaction act;
+	memset(&act,0,sizeof(act));
+	act.sa_handler=&SignalHandler;
+	sigaction(signo,&act,NULL);
+}
+
 void MDSystem::CheckInterruption(){
 	InterruptFlag=(int)sig_int_accept;
 	if(InterruptFlag) {
@@ -1405,20 +1419,19 @@ void MDSystem::CheckInterruption(){
 		blog("interrupt signal caught: "+as_string(InterruptFlag));
 		switch(InterruptFlag) {
 			case SIGTERM:
-				OnInterruptTERM();
+				OnInterruptTERM(); // default: dump&terminate
 				break;
 			
 			case SIGINT:
-				OnInterruptINT();
+				OnInterruptINT(); // default: dump&terminate
 				break;
 			
 			case SIGUSR1:
-				OnInterruptUSR1();
+				OnInterruptUSR1(); // default: dump&terminate
 				break;
 
 			case SIGUSR2: 
-				OnInterruptUSR2(); // non-terminating
-				InterruptFlag=0;
+				OnInterruptUSR2(); // default: dump&continue (non-terminating)
 				break;
 
 			default:
@@ -1451,6 +1464,7 @@ void MDSystem::OnInterruptUSR1(){
 void MDSystem::OnInterruptUSR2(){
 	blog("handling SIGUSR1 --- non-terminating interrupt", LOGINFO);
 	SaveSimulation();
+	InterruptFlag=0;
 }
 
 void MDSystem::ActivateGadget(string gname) {
