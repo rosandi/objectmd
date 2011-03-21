@@ -137,6 +137,18 @@ public:
 		e_tally+=delta;
 
 	}
+	
+	void PrintInfo(ostream& ost) {
+		ost << "id."<<id<<" "<<get_name()<<": "<< "mode="<<smode;
+		if(smode=="pulse") {
+			ost <<" energy="<<energy
+				<<" width="<<width
+				<<" time="<<start_time<<"\n";
+		}
+		if(smode=="function") {
+			ost <<" energy="<<energy<<" function="<<sfunc<<" start="<<start_time<<"\n";
+		}
+	}
 
 };
 

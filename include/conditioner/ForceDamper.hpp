@@ -119,7 +119,7 @@ void ForceDamper::ForceModifier()
 }
 
 void ForceDamper::PrintInfo(ostream& ost) {
-		ost << "ID." << id << " " << get_name() << "; Borders:";
+		ost << "id." << id << " " << get_name() << "; Borders:";
  	    if (Box.x0<dWest)   ost << " W=" << dWest; else ost << " W=free";
  	    if (Box.x1>dEast)   ost << " E=" << dEast; else ost << " E=free";
  	    if (Box.y0<dSouth)  ost << " S=" << dSouth; else ost << " S=free";
