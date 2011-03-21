@@ -43,6 +43,7 @@ VerletList::~VerletList() {
 void VerletList::ReadParameter() {
 	SysParam->peek("verlet.update", UpdatePeriod, 5);
 	SysParam->peek("verlet.rebuild", RebuildPeriod, 0);
+	SysParam->peek("verlet.radius", CutRadius, -1.0);
 	SysParam->peek("verlet.radtole", RadiusTolerance, -1.0);
 	SysParam->peek("verlet.n_mean", nmean, 120);
 }
@@ -63,6 +64,9 @@ void VerletList::Init(MDSystem* WorkSys) {
 		assert(System->type_of("simulation_system_grid"), 
 			   "MDSystemGrid is required for periodic boundary simulation");
 	}
+	
+	if(CutRadius<=0.0) CutRadius=System->GetMaxCutRadius();
+	VerletRadius=CutRadius+RadiusTolerance;
 
 }
 
@@ -83,8 +87,8 @@ void VerletList::CalculateBox() {
 	int na=GetNAtom();
 	MinX=MinY=MinZ= DBL_MAX;
 	MaxX=MaxY=MaxZ=-DBL_MAX;
-	
-	VerletRadius=System->GetMaxCutRadius()+RadiusTolerance;
+
+	VerletRadius=CutRadius+RadiusTolerance;
 
 	for(int i=0; i<na; i++) {
 		if (!CheckActive(i)) continue; // consider only active atoms...
@@ -237,7 +241,6 @@ void VerletList::Iterate(MDGadget* IteratedClass, bool force_update) {
 
 void VerletList::PrintInfo(ostream& ost) {
 	ost<<"id."<<id<<" "<<get_name()
-	<<": rebuild_period="<<RebuildPeriod<<" steps, "
-	<<"radius="<<VerletRadius<<" tolerance="<<RadiusTolerance<<std::endl;
+	<<": rebuild_period="<<RebuildPeriod<<" steps "
+	<<"cut_radius="<<CutRadius<<" tolerance="<<RadiusTolerance<<std::endl;
 }
-

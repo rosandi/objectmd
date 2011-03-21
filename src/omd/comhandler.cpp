@@ -76,6 +76,7 @@ CommunicationHandler::~CommunicationHandler() {
 	std::cerr << std::fixed << std::setprecision(4);
 	
 	if(GetRank()==ROOT){
+		if(!System->param.exist("--silent"))
 		std::cerr << "\n(Root) Waiting for child processes to finish\n"
 				  << "[\n ElapsedTime: " << System->ElapsedTime
 				  << "\n Step: " << System->Step << "\n]\n";
@@ -94,9 +95,11 @@ CommunicationHandler::~CommunicationHandler() {
 			if(strncmp(st,"FINISHED",8)==0)
 				blog("Received from proc "+as_string(r)+" Message=\""+st+"\"");
 		}
-		std::cerr << "Simulation walltime: " << walltime << " seconds\n"
-		          << "Communication time: " << comtime << " seconds\n";
-		System->PrintTime(std::cerr);
+		if(!System->param.exist("--silent")) {
+			std::cerr << "Simulation walltime: " << walltime << " seconds\n"
+					  << "Communication time: " << comtime << " seconds\n";
+			System->PrintTime(std::cerr);
+		}
 	} else {
 		sprintf(st, "FINISHED: PROC %d",Rank);
 		RawSend(ROOT,st,DEFAULT_TRANSFER_LENGTH);

@@ -157,11 +157,9 @@ protected:
 	string BinaryFilename;
 	string OutputDirectory;
 	
-// RUNTIME FLAGS
-	bool silent_mode;
-
 public:
 
+	bool silent_mode;
     int* Argc;
     char*** Argv;
     int  ExitCode;

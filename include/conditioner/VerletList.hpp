@@ -46,6 +46,7 @@ class VerletList: public MDIterator {
 	int NeighSize;
 	int AllocSize;
 	OMD_FLOAT VerletRadius;
+	OMD_FLOAT CutRadius;
 	int   *Link;
 	int *NeighborList;
 	int *NeighborIndex;

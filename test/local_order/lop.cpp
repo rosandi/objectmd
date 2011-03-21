@@ -1,6 +1,6 @@
-#include <omd/system.hpp>   
+#include <omd/systemgrid.hpp>   
 #include <omd/paramhandler.hpp>
-#include <conditioner/NeighborCell.hpp>
+#include <conditioner/VerletList.hpp>
 #include <detector/LocalOrderParameter.hpp>
 
 string cryfile;
@@ -9,7 +9,7 @@ double rcut;
 double lconst;
 int pbc=3;
 
-class MyMDClass:public MDSystem {
+class MyMDClass:public MDSystemGrid {
 
     void CreateSystem() {
       ReadMaterial("aluminum");
@@ -17,7 +17,8 @@ class MyMDClass:public MDSystem {
     }
 
     void CreateGadget() {
-        AddConditioner(new NeighborCell(0, rcut));
+        param.append("--silent verlet.radius "+as_string(rcut));
+        AddConditioner(new VerletList);
         AddDetector(new LocalOrderParameter(outfile, lconst, rcut, false));
     }
 
@@ -48,6 +49,7 @@ try{
             <<" pbc="<<pbc<<"\n";
 
   MyMDClass TheSim;
+  TheSim.SetArgument(argc,argv);
   return TheSim.Run(STATIC_MODE);
 
 }
