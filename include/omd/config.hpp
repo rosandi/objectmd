@@ -36,4 +36,15 @@
 #define mdrseed() srand(getpid())
 #define mdrand() ((OMD_FLOAT)rand()/(OMD_FLOAT)RAND_MAX)
 
+/*
+flag bits:
+LOGMEMORY   1
+LOGCREATE   2
+LOGDESTROY  4
+LOGINFO     8
+LOGWARNING 16
+*/
+
+#define LOGFLAG 0x1B
+
 #endif

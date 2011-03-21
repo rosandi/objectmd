@@ -96,7 +96,8 @@ protected:
 public:
 
 	MDToolkit(){
-		logflags=LOGMEMORY|LOGCREATE|LOGDESTROY|LOGINFO|LOGWARNING;
+		// default log flag is defind in config.hpp
+		logflags=LOGFLAG;
 		object_name.assign("md_toolkit");
 		register_class("md_toolkit");
 		debug_flag=false;
@@ -121,32 +122,33 @@ public:
 	virtual void sendlog(string slog){blogstream<<slog<<std::endl;}
 	virtual void sendmemlog(string slog){memlogstream<<slog<<std::endl;}
 
-	virtual void blog(string logtext, int flags=0xFF){
-		if(logflags|flags){
+	virtual void blog(string logtext, int flags=LOGINFO){
+		if(logflags&flags){
 			logger->sendlog("("+get_name()+") "+logtext);
 		}
 	}
 
-	virtual void blog(string logprefix, string logtext, int flags=0xFF){
-		if(logflags|flags){
+	virtual void blog(string logprefix, string logtext, int flags=LOGINFO){
+		if(logflags&flags){
 			logger->sendlog("("+get_name()+") "+logprefix+" "+logtext);
 		}
 	}
 	
 	virtual void logmem(void* ptr){ // free
-		if(log_enabled(LOGMEMORY))
+		if(logflags&LOGMEMORY)
 			logger->sendmemlog("free ("+get_name()+") "+as_string(ptr));
 	}
 
 	virtual void logmem(void* ptr, int size){ // allocate
-		if(log_enabled(LOGMEMORY))
+		if(logflags&LOGMEMORY)
 			logger->sendmemlog("malloc ("+get_name()+") "+
 			        as_string(ptr)+" "+as_string(size));
 	}
 	
 	virtual void logmem(void* oldptr, void* newptr, int size){ // reallocate
-		logger->sendmemlog("realloc ("+get_name()+") "+
-			as_string(oldptr)+" "+as_string(newptr)+" "+as_string(size));
+		if(logflags&LOGMEMORY)
+			logger->sendmemlog("realloc ("+get_name()+") "+
+					as_string(oldptr)+" "+as_string(newptr)+" "+as_string(size));
 	}
 
 	void die(string message) {

@@ -285,8 +285,6 @@ void AtomKeeper::Expand(int sz){
 	if(sz>NAlloc){ // reallocate storage
 		MemRealloc(AtomIndex, sizeof(Ptr)*sz);
 		assert(AtomIndex, "unable to reallocate atoms");
-		blog("expanding storage from "+as_string(nold)+" to "+as_string(sz));
-
 		// if storage: sync the atom index!
 		if(Type==Storage){
 			MemRealloc(AtomArray,sizeof(Atom)*sz);
