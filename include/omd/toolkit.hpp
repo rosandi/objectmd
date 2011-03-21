@@ -41,6 +41,7 @@ using std::ostream;
 #define LOGCREATE  2
 #define LOGDESTROY 4
 #define LOGINFO    8
+#define LOGWARNING 16
 
 #ifndef _OMD_TYPES_
 #define _OMD_TYPES_
@@ -95,7 +96,7 @@ protected:
 public:
 
 	MDToolkit(){
-		logflags=LOGMEMORY|LOGCREATE|LOGDESTROY|LOGINFO;
+		logflags=LOGMEMORY|LOGCREATE|LOGDESTROY|LOGINFO|LOGWARNING;
 		object_name.assign("md_toolkit");
 		register_class("md_toolkit");
 		debug_flag=false;
@@ -122,39 +123,39 @@ public:
 
 	virtual void blog(string logtext, int flags=0xFF){
 		if(logflags|flags){
-			logger->sendlog("'"+get_name()+"' "+logtext);
+			logger->sendlog("("+get_name()+") "+logtext);
 		}
 	}
 
 	virtual void blog(string logprefix, string logtext, int flags=0xFF){
 		if(logflags|flags){
-			logger->sendlog("'"+get_name()+"' "+logprefix+" "+logtext);
+			logger->sendlog("("+get_name()+") "+logprefix+" "+logtext);
 		}
 	}
 	
 	virtual void logmem(void* ptr){ // free
 		if(log_enabled(LOGMEMORY))
-			logger->sendmemlog("free '"+get_name()+"' "+as_string(ptr));
+			logger->sendmemlog("free ("+get_name()+") "+as_string(ptr));
 	}
 
 	virtual void logmem(void* ptr, int size){ // allocate
 		if(log_enabled(LOGMEMORY))
-			logger->sendmemlog("malloc '"+get_name()+"' "+
+			logger->sendmemlog("malloc ("+get_name()+") "+
 			        as_string(ptr)+" "+as_string(size));
 	}
 	
 	virtual void logmem(void* oldptr, void* newptr, int size){ // reallocate
-		logger->sendmemlog("realloc '"+get_name()+"' "+
+		logger->sendmemlog("realloc ("+get_name()+") "+
 			as_string(oldptr)+" "+as_string(newptr)+" "+as_string(size));
 	}
 
 	void die(string message) {
-		std::cerr<<"pid:"<<getpid()<<" '"<<get_name()<<"'=> "<<message<<std::endl;
+		std::cerr<<"pid:"<<getpid()<<" ("<<get_name()<<")=> "<<message<<std::endl;
 		throw "die...";
 	}
 
 	void die(string message, string data) {
-		std::cerr<<"pid:"<<getpid()<<" '"<<get_name()<<"'=> "
+		std::cerr<<"pid:"<<getpid()<<" ("<<get_name()<<")=> "
 		         <<message<<": "<<data<<std::endl;
 		throw "die...";
 	}
@@ -168,7 +169,7 @@ public:
 	}
 	
 	void warn(string message) {
-		sendlog("warning ("+get_name()+"): "+message);
+		if(logflags&LOGWARNING) sendlog("warning ("+get_name()+"): "+message);
 	}
 
 	bool file_exist(string fname){

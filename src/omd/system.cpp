@@ -194,8 +194,9 @@ void MDSystem::ReadParameter() {
 	if(param.exist("continue")) {
 		SetBinaryFilename(param.string_value("continue"));
 		if(file_exist(GetBinaryFilename())) Mode=CONTINUE_MODE;
+		else Mode=NORMAL_MODE;
 	}
-	
+
 	if(param.exist("boundary.periodic")) {
 		string pst=lower_case(param.string_value("boundary.periodic"));
 		if(pst=="no"||pst=="false") {PBoundary=0;}
@@ -932,13 +933,13 @@ void MDSystem::RunNormal() {
 	BeforeFirstRun(); // user app
 	FirstRun();
 	BeforeRun();      // user app
-	blog("starting simulation "+string(ctime(&SimBeginTime)));
+	blog("starting simulation "+replace_char(ctime(&SimBeginTime),'\n',' '));
 	RunKernel();
 	time(&SimEndTime);
 	SimWallTime=difftime(SimEndTime,SimBeginTime);
 	blog("simulation stops. step="+as_string(Step)+
-		 "\nbegin time: "+ctime(&SimBeginTime)+
-		 "\nend time: "+ctime(&SimEndTime)+
+		 "\nbegin time: "+replace_char(ctime(&SimBeginTime),'\n',' ')+
+		 "\nend time: "+replace_char(ctime(&SimEndTime),'\n',' ')+
 		 "\nwall time: "+as_string(SimWallTime)
 		 );
 	if (!InterruptFlag) AfterRun();
@@ -948,13 +949,13 @@ void MDSystem::RunRestart() {
 	Initiate();
 	CheckBeforeRun();
 	BeforeRun();
-	blog("restarting simulation "+string(ctime(&SimBeginTime)));
+	blog("restarting simulation "+replace_char(ctime(&SimBeginTime), '\n',' '));
 	RunKernel();
 	time(&SimEndTime);
 	SimWallTime=difftime(SimEndTime,SimBeginTime);
 	blog("simulation stops. step="+as_string(Step)+
-		 "\nbegin time: "+ctime(&SimBeginTime)+
-		 "\nend time: "+ctime(&SimEndTime)+
+		 "\nbegin time: "+replace_char(ctime(&SimBeginTime),'\n', ' ')+
+		 "\nend time: "+replace_char(ctime(&SimEndTime),'\n',' ')+
 		 "\nwall time: "+as_string(SimWallTime)
 		 );
 
@@ -976,7 +977,8 @@ void MDSystem::RunRestart() {
 // dummy integrator and force used if non is specified @ creation stage
 void MDSystem::RunStatic() {
 	Initiate();
-	blog("molecular static simulation\nstarts: "+string(ctime(&SimBeginTime)));
+	blog("molecular static simulation\nstarted: "+
+		 replace_char(ctime(&SimBeginTime),'\n',' '));
 	BeforeRun();
 	SyncData(SYNC_ALL);
 
@@ -995,7 +997,8 @@ void MDSystem::RunStatic() {
 	time(&SimEndTime);
 	SimWallTime=difftime(SimEndTime,SimBeginTime);	
 	AfterRun();
-	blog("ends: "+string(ctime(&SimBeginTime)));
+	blog("finished: "+replace_char(ctime(&SimEndTime),'\n',' '));
+	blog("walltime: "+as_string(SimWallTime)+" seconds");
 }
 
 /**

@@ -10,6 +10,6 @@ all:
 
 clean:
 	rm -rf *.dSYM export import *.bin *.out *.cry *.info \
-	pomd *.log
+	pomd *.log Data.*
 	
 

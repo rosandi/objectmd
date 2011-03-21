@@ -46,9 +46,9 @@ MDSystemGrid::MDSystemGrid(int &argc,char** &argv,int nx,int ny,int nz)
 	FirstSync=true;
 	BinDirectory="pomd";
 	LocalBuffer.set_logger(logger);
-	LocalBuffer.set_name("localbuffer");
+	LocalBuffer.set_name("LOCAL BUFFER");
 	GhostBuffer.set_logger(logger);
-	GhostBuffer.set_name("ghostbuffer");
+	GhostBuffer.set_name("GHOST BUFFER");
 	LocalAtomNumber=0;
 }
 
@@ -65,9 +65,9 @@ MDSystemGrid::MDSystemGrid(){
 	FirstSync=true;
 	BinDirectory="pomd";
 	LocalBuffer.set_logger(logger);
-	LocalBuffer.set_name("localbuffer");
+	LocalBuffer.set_name("LOCAL BUFFER");
 	GhostBuffer.set_logger(logger);
-	GhostBuffer.set_name("ghostbuffer");
+	GhostBuffer.set_name("GHOST BUFFER");
 	LocalAtomNumber=0;
 }
 

@@ -1,0 +1,10 @@
+checking procedure:
+
+- export.cpp: create crystal&binary file.
+- import.cpp: testing import/continue/load
+
+  * ./import import export.cry <- to check import crystal file
+  * ./import load export.bin max.time (new time) <- checking load binary file
+  * ./import continue export.bin <- continue the simulation
+
+use gnuplot to see the output (export.out, import.out)
