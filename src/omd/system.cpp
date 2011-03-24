@@ -1014,13 +1014,7 @@ void MDSystem::RunStatic() {
 	blog("walltime: "+as_string(SimWallTime)+" seconds");
 }
 
-/**
-  * Compute forces, and measure the potential energy.
-  * 
-*/
-
-void MDSystem::MeasurePotential()
-{
+void MDSystem::MeasurePotential() {
 	int na=GetNAtom();
 	Potential=Virial=0;
 	for(int i=0;i<na;i++){
@@ -1031,10 +1025,7 @@ void MDSystem::MeasurePotential()
 			Potential+=a->potential;
 			Virial+=a->virial;
 		}
-	}
-	// double sum in force-kernel....
-	Potential*=0.5;
-	Virial*=0.5;
+	}	
 }
 
 void MDSystem::MeasureKinetic() {
@@ -1043,7 +1034,7 @@ void MDSystem::MeasureKinetic() {
     Kinetic=0.0;
     SqrMaxVelocity=0.0;
     
-    int natom=GetNAtom();    
+    int natom=GetNAtom();
     for(int i=0;i<natom;i++) {
     	Atom* a=AtomPtr(i);
 		if(a->flag&FLAG_GHOST) continue;

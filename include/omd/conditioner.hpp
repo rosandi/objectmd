@@ -73,8 +73,6 @@ public:
     virtual void PreCalculation()  {} // before force calculation loop
     virtual void ForceModifier()   {} // after force calculation
     virtual void PostIntegration() {} // after integration, before detection
-    virtual void EvaluateForce        // inserted in force loop (before ReturnForce)
-    		(Atom &a, Atom &b, OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz, OMD_FLOAT fr, OMD_FLOAT pot) {}
 
     virtual void Execute(int condtype) {
 		if(!Active) return; // Active stors the type of conditioner...

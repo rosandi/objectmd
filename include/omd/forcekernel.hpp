@@ -58,14 +58,18 @@
  
 class ForceKernel:public MDGadget {
 	friend class MDIntegrator;
-	Conditioner* force_eval;
+	friend class MDSystem;
 
 protected:
 	int A, B;
 
-public:
 	OMD_FLOAT CutRadius;
-	ForceKernel(){CutRadius=0.0; A=B=0;force_eval=NULL;}
+	OMD_FLOAT CutRadiusSqr;
+	MDGadget* force_eval;
+
+public:
+	
+	ForceKernel(){CutRadiusSqr=CutRadius=0.0; A=B=0;force_eval=NULL;}
 	virtual ~ForceKernel(){}
 
 	virtual void Init(MDSystem* WorkSys){
@@ -84,18 +88,19 @@ public:
 		// fr=f/r
 		
 		if(force_eval) { // if exist: force evaluator
-			force_eval->EvaluateForce(at,to,dx,dy,dz,fr,pot);
+			force_eval->EvaluateForce(at,to,dx,dy,dz,fr,pot,this);
 		}
 
 		OMD_FLOAT fx=dx*fr,fy=dy*fr,fz=dz*fr;
-		OMD_FLOAT vir=fx*dx+fy*dy+fz*dz;
+		OMD_FLOAT vir=(fx*dx+fy*dy+fz*dz);
+		vir*=0.5;
+		pot*=0.5;
 		at.virial+=vir;
 		to.virial+=vir;
 		at.potential+=pot;
 		to.potential+=pot;
 		at.fx+=fx;at.fy+=fy;at.fz+=fz;
 		to.fx-=fx;to.fy-=fy;to.fz-=fz;
-		
 	}
 
 	/*

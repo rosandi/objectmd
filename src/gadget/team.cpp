@@ -137,7 +137,7 @@ void TEmbedding::ForceModifier() {
 		if(a->flag&FLAG_GHOST)continue;
 		if(a->flag&FLAG_ACTIVE){
 			int id=a->id;
-			if(0<=AtomID[id][id]) a->potential+=2.0*GetEmb(*a);
+			if(0<=AtomID[id][id]) a->potential+=GetEmb(*a);
 		}
 	}
 }
@@ -206,6 +206,7 @@ void TForceEAM::Init(MDSystem* WorkSys) {
 
 	phi.open(tablefile, "PAIR");
 	CutRadius=phi.max_range();
+	CutRadiusSqr=CutRadius*CutRadius;
 	
 	if(!SearchAttachEmbeddingClass()) {
 		// If no EmbeddingEnergyHandler is found... create one.

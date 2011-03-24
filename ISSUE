@@ -1,0 +1,4 @@
+- LOP has problem with big crystal using VerletList.
+- TODO: for multi element simulation, potential calculation
+  may have different cut_radius. consider using radius matrix!
+  (i.e. cutsq[A][B] for atom type A and B)

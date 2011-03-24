@@ -178,6 +178,11 @@ public:
 		return sqrt(CalcSqrDistance(Atoms(at), Atoms(to), check));
 	}
 	
+	virtual void EvaluateForce        // inserted in force loop (at the begining of ReturnForce)
+	(Atom& a, Atom& b, 
+	 OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz, 
+	 OMD_FLOAT fr, OMD_FLOAT pot, ForceKernel* fkernel) {}
+	
 	void SetUnit(MDUnit* unit){Unit=unit;}
 	
 	DataSlot* RegisterMessageSlot(DataSlot* slot);

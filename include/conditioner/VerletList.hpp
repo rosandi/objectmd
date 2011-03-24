@@ -51,6 +51,13 @@ class VerletList: public MDIterator {
 	int *NeighborList;
 	int *NeighborIndex;
 	SysBox    Box;
+	
+	// iteration uses class these variables
+	int at_idx;
+	int to_idx;
+	int nl_idx;
+	int ls_start;
+	int ls_end;
 
 public:
 	VerletList();
@@ -67,6 +74,9 @@ public:
 	void Iterate(MDGadget* IteratedClass, bool force_update=false);
 	void GetNeighborIndex(int ni, int& start, int& end);
 	int  GetNeighbor(int ni);
+	void GetIterationVariables(int &at, int &to, 
+							   int& neiglist_index, int& list_start, int& list_end)
+	{at=at_idx;to=to_idx;neiglist_index=nl_idx;list_start=ls_start;list_end=ls_end;}
 	void Dump(string fname);
 	void PrintInfo(ostream& ost);
 

@@ -15,6 +15,7 @@ MV = mv
 LIBOBJ = FCC111.o \
 	FCC100.o \
 	team.o \
+	sw.o \
 	StructureDetector.o \
 	VerletList.o
 

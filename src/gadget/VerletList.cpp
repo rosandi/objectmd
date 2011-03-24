@@ -226,15 +226,15 @@ void VerletList::Iterate(MDGadget* IteratedClass, bool force_update) {
 	int na=GetNAtom();
 	int start, end;
 	
-	for(int at=0; at<na; at++) {
-		if(!CheckActive(at)) continue;
-		if(!(IteratedClass->PreIterationNode(at))) continue;
-		GetNeighborIndex(at,start,end);
-		for(int i=start;i<end;i++) {
-			int to=GetNeighbor(i);
-			if(!CheckActive(to)) continue;
-			if((CheckGhost(at)&&CheckGhost(to))) continue;
-			IteratedClass->IterationNode(at,to);
+	for(at_idx=0; at_idx<na; at_idx++) { // outer loop...
+		if(!CheckActive(at_idx)) continue;
+		if(!(IteratedClass->PreIterationNode(at_idx))) continue;
+		GetNeighborIndex(at_idx,ls_start,ls_end);
+		for(nl_idx=ls_start;nl_idx<ls_end;nl_idx++) { // inner loop...
+			to_idx=GetNeighbor(nl_idx);
+			if(!CheckActive(to_idx)) continue;
+			if((CheckGhost(at_idx)&&CheckGhost(to_idx))) continue;
+			IteratedClass->IterationNode(at_idx,to_idx);
 		}
 	}
 }
