@@ -25,6 +25,7 @@
 
 class StillingerWeber: public ForceKernel {
 
+	// --- parameters read from file ---
 	string paramfile;
 	OMD_FLOAT eps;
 	OMD_FLOAT A;
@@ -35,7 +36,11 @@ class StillingerWeber: public ForceKernel {
 	OMD_FLOAT alpha;
 	OMD_FLOAT lambda;
 	OMD_FLOAT gamma;	
+	OMD_FLOAT lc;
+
+	// --- local registers ---
 	OMD_FLOAT *K;
+	double sigga,rsisi,onethird,epsla;
 
 	class VerletList* Verlet;
 	

@@ -1,15 +1,15 @@
 #include <omd/system.hpp>
 #include <omd/container.hpp>
-#include <potential/tersoff.hpp>
+#include <potential/sw.hpp>
 #include <potential/DummyForce.hpp>
-#include <conditioner/NeighborCell.hpp>
+#include <conditioner/VerletList.hpp>
 #include <detector/ThermoDetector.hpp>
 #include <detector/SysMonitor.hpp>
 
 class MyMDClass:public MDSystem {
 
     void CreateSystem() {
-        AtomContainer *A=new AtomContainer(param.string_value("tersoff.material"));
+        AtomContainer *A=new AtomContainer("silicon");
         A->Import(param.string_value("load_crystal"));
         if(param.exist("temperature"))
             A->SetTemperature(param.double_value("temperature"));
@@ -18,16 +18,10 @@ class MyMDClass:public MDSystem {
 
     void CreateGadget() {
         SetIntegrator(new MDIntegrator);
-        AddForce(new Tersoff);
-        AddConditioner(new NeighborCell);
+        AddForce(new StillingerWeber("silicon"));
+        AddConditioner(new VerletList);
         AddDetector(new SysMonitor);  
         AddDetector(new ThermoDetector);
-    }
-
-    void SystemSetting() {
-        PBoundary=NONPERIODIC;
-        param.peek("maxtime", MaxTime, 1.0);
-        SetOutputDirectory("output");
     }
 
     void BeforeRun() {

@@ -1,0 +1,8 @@
+load_crystal 10x10x10
+#load_crystal 1x1x1
+#load_crystal dimer
+#load_crystal trimer
+monitor.filename si.out
+temperature 50
+time.max 5
+dump.sample 0.1

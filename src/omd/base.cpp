@@ -86,7 +86,9 @@ string MDClass::search_path(string path, string fl) {
 		if(file_exist(param.string_value(path)+"/"+fl)) 
 			return (param.string_value(path)+"/"+fl);
 	}
-	die("can not find file '"+fl+"' in current directory and in path "+path);
+	die("can not find file ("+fl+
+		") in current directory and in path "+path+
+		" ("+param.string_value(path)+")");
 	return ""; // avoids warning..
 }
 

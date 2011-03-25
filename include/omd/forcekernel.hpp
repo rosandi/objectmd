@@ -61,7 +61,7 @@ class ForceKernel:public MDGadget {
 	friend class MDSystem;
 
 protected:
-	int A, B;
+	int AtomTypeA, AtomTypeB;
 
 	OMD_FLOAT CutRadius;
 	OMD_FLOAT CutRadiusSqr;
@@ -69,7 +69,7 @@ protected:
 
 public:
 	
-	ForceKernel(){CutRadiusSqr=CutRadius=0.0; A=B=0;force_eval=NULL;}
+	ForceKernel(){CutRadiusSqr=CutRadius=0.0; AtomTypeA=AtomTypeB=0;force_eval=NULL;}
 	virtual ~ForceKernel(){}
 
 	virtual void Init(MDSystem* WorkSys){
@@ -107,7 +107,7 @@ public:
 	 * both reference and index are usefull!
 	 */
 
-	virtual void Compute(Atom &at, Atom &to) {die("Compute() is not implemented!!");}
+	virtual void Compute(Atom &at, Atom &to) {die("Compute(Atom&,Atom&) is not implemented!!");}
 	virtual void Compute(int at, int to) {Compute(Atoms(at), Atoms(to));}
 
 	/**
@@ -115,19 +115,19 @@ public:
 	 */
 	
 	virtual void CheckCompute(int at, int to, int atid, int toid) {
-		if(atid==A&&toid==B){Compute(at,to);return;}
-		if(atid==B&&toid==A){Compute(at,to);return;}
+		if(atid==AtomTypeA&&toid==AtomTypeB){Compute(at,to);return;}
+		if(atid==AtomTypeB&&toid==AtomTypeA){Compute(at,to);return;}
 		die("wrong type id of interacting atoms ids: "+as_string(atid)+" - "+as_string(toid));
 	}
 
 	virtual void   Correction() {}
-	ForceKernel*   SetAtomID(int a, int b) {A=a; B=b; return this;}
+	ForceKernel*   SetAtomID(int a, int b) {AtomTypeA=a; AtomTypeB=b; return this;}
 	ForceKernel*   SetEvaluator(Conditioner* feval){force_eval=feval; return this;}
 
 	bool CheckAtomID(int a, int b) {
 		// commutative...
-		if(a==A&&b==B) return true;
-		if(a==B&&b==A) return true;
+		if(a==AtomTypeA&&b==AtomTypeB) return true;
+		if(a==AtomTypeB&&b==AtomTypeA) return true;
 		return false;
 	}
 	                   

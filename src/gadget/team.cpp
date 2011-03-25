@@ -177,7 +177,8 @@ bool TForceEAM::SearchAttachEmbeddingClass() {
 
 	if(emb){
 		blog("already inserted: "+emb->get_name()+"."+as_string(emb->get_id())+
-		    "embedding function handler for "+as_string(A)+"<-->"+as_string(B), LOGCREATE);
+		    "embedding function handler for "+as_string(AtomTypeA)+"<-->"+
+			 as_string(AtomTypeB), LOGCREATE);
 		return true;
 	}
 
@@ -186,9 +187,10 @@ bool TForceEAM::SearchAttachEmbeddingClass() {
 			
 		if(System->Conditioners[i]->type_of("EMBEDDING_FUNCTION")){
 			emb=dynamic_cast<TEmbedding*>(System->Conditioners[i]);
-			emb->AddTable(A, B, phi.filename);
+			emb->AddTable(AtomTypeA, AtomTypeB, phi.filename);
 			blog("using '"+emb->get_name()+"' "+
-			    "embedding function for "+as_string(A)+"<-->"+as_string(B), LOGCREATE);
+			    "embedding function for "+as_string(AtomTypeA)+
+				 "<-->"+as_string(AtomTypeB), LOGCREATE);
 			return true;
 		}
 	}
@@ -212,7 +214,7 @@ void TForceEAM::Init(MDSystem* WorkSys) {
 		// If no EmbeddingEnergyHandler is found... create one.
 		emb = new TEmbedding();
 		emb->set_logger(logger);
-		emb->AddTable(A, B, phi.filename);
+		emb->AddTable(AtomTypeA, AtomTypeB, phi.filename);
 		WorkSys->AddConditioner(emb);
 	}
 }
@@ -234,8 +236,8 @@ void TForceEAM::Compute(Atom &at, Atom &to) {
 
 void TForceEAM::PrintInfo(ostream& ost){
 	ost  <<"id."<<id<<" "<<get_name()<<"\n"
-	     <<" atoms " << System->SystemAtoms[A]->get_name()
-	     <<"<->"<< System->SystemAtoms[B]->get_name()<< "\n"
+	     <<" atoms " << System->SystemAtoms[AtomTypeA]->get_name()
+	     <<"<->"<< System->SystemAtoms[AtomTypeB]->get_name()<< "\n"
 	     <<" table="<<phi.filename<<" cut_radius="<<CutRadius << "\n"
 	     <<" embedding class id="<<emb->get_id()<<" "<< emb->get_name()<<"\n";
 }

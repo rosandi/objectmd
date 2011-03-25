@@ -79,8 +79,8 @@ void MDIntegrator::Init(MDSystem* WorkSys) {
     
 	// put forces into the kernel matrix
 	for(int i=0;i<(int)ActForces.size();i++){
-		int from=ActForces[i]->A;
-		int to  =ActForces[i]->B;
+		int from=ActForces[i]->AtomTypeA;
+		int to  =ActForces[i]->AtomTypeB;
 
 		assert(from<NType&&to<NType, "wrong atom IDs in the interaction force ("+
 		       as_string(from)+","+as_string(to)+")");
@@ -160,7 +160,7 @@ bool MDIntegrator::Check() {
 
 MDIntegrator* MDIntegrator::AddForce(ForceKernel *forc) 
 {
-	int from=forc->A; int to=forc->B;
+	int from=forc->AtomTypeA; int to=forc->AtomTypeB;
 	assert(from<MAXATOMTYPE&&to<MAXATOMTYPE, "MAXATOMTYPE exceeded");
 	forc->set_id(ForcID++);
 	forc->SetUnit(Unit);

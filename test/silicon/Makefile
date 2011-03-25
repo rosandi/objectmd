@@ -10,4 +10,4 @@ run:
 	
 clean:
 	rm -rf init.dat info.out  si.out output pomd \
-	$(EXE) mem.log run.log *.bin machine *.dSYM
+	$(EXE) mem.log run.log *.bin machine *.dSYM Data.*

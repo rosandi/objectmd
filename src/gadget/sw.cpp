@@ -37,6 +37,7 @@ void StillingerWeber::ReadParameter() {
 	alpha=param.double_value("a");
 	lambda=param.double_value("lambda");
 	gamma=param.double_value("gamma");
+	lc=param.double_value("lattice_constant");
 }
 
 void StillingerWeber::Init(MDSystem* WorkSys) {
@@ -48,16 +49,18 @@ void StillingerWeber::Init(MDSystem* WorkSys) {
 	
 	CutRadius=alpha*sigma;
 	CutRadiusSqr=CutRadius*CutRadius;
-	K=new OMD_FLOAT[9];
-	K[0]=A*eps*p*B*pow(sigma,p);
-	K[1]=A*eps*q*pow(sigma,q);
-	K[2]=A*eps*B*pow(sigma,p+1);
-	K[3]=A*eps*pow(sigma,q+1);
-	K[4]=A*eps*B*pow(sigma,p);
-	K[5]=A*eps*pow(sigma,q);
-	K[6]=sigma*gamma;
-	K[7]=lambda*eps;
-	K[8]=2.0*K[7];
+    K=new OMD_FLOAT[10];
+    K[0]=A*eps*p*B*pow(sigma,p);
+    K[1]=A*eps*q*pow(sigma,q);
+    K[2]=A*eps*B*pow(sigma,p+1);
+    K[3]=A*eps*pow(sigma,q+1);
+    K[4]=A*eps*B*pow(sigma,p);
+    K[5]=A*eps*pow(sigma,q);
+	
+    sigga=sigma*gamma;//*2./lc;
+    rsisi=sigma*alpha;//*2./lc;
+    onethird=1.0/3.0;
+    epsla=eps*lambda;
 }
 
 StillingerWeber::~StillingerWeber() {
@@ -66,8 +69,8 @@ StillingerWeber::~StillingerWeber() {
 
 void StillingerWeber::PrintInfo(ostream& ost) {
 	ost << "id."<<id<<" "<<get_name()<<"\n"
-		<< "atoms "<<System->SystemAtoms[A]->get_name()
-		<< "<->"<< System->SystemAtoms[B]->get_name()<< "\n"
+		<< "atoms "<<System->SystemAtoms[AtomTypeA]->get_name()
+		<< "<->"<< System->SystemAtoms[AtomTypeB]->get_name()<< "\n"
 		<<" parameter="<<paramfile;
 }
 
@@ -98,69 +101,92 @@ void StillingerWeber::TwoBodyTerm(Atom& at, Atom& to,
 }
 
 void StillingerWeber::ThreeBodyTerm(Atom& at0, Atom& at1, Atom& at2,
-									OMD_FLOAT r1, // at <- first_nb
-									OMD_FLOAT dx1,
-									OMD_FLOAT dy1,
-									OMD_FLOAT dz1,
-									OMD_FLOAT r2, // at <- second_nb (iterated)
-									OMD_FLOAT dx2,
-									OMD_FLOAT dy2,
-									OMD_FLOAT dz2)
+                                    OMD_FLOAT rjl, // at <- first_nb
+                                    OMD_FLOAT dxjl,
+                                    OMD_FLOAT dyjl,
+                                    OMD_FLOAT dzjl,
+                                    OMD_FLOAT ril, // at <- second_nb (iterated
+                                    OMD_FLOAT dxil,
+                                    OMD_FLOAT dyil,
+                                    OMD_FLOAT dzil)
 {
-	OMD_FLOAT irr[]   = {1.0/(r1*r1), 1.0/(r2*r2)};
-	OMD_FLOAT ira[]   = {1.0/(r1-CutRadius), 1.0/(r2-CutRadius)};
-	OMD_FLOAT sgira[] = {K[6]*ira[0], K[6]*ira[1]};
-	OMD_FLOAT sgirra[]= {sgira[0]*ira[0]/r1, sgira[1]*ira[1]/r2};
-	OMD_FLOAT esgira[]= {exp(sgira[0]), exp(sgira[1])};	
-	OMD_FLOAT irr12   = 1.0/(r1*r2);
-	OMD_FLOAT costh   = (dx1*dx2+dy1*dy2+dz1*dz2)*irr12 + 1.0/3.0;
-	OMD_FLOAT efac    = esgira[0]*esgira[1];
-	OMD_FLOAT radfac  = K[7]*efac*costh*costh;
-	OMD_FLOAT fac[]   = {radfac*sgirra[0],radfac*sgirra[1]};
-	OMD_FLOAT fang    = K[8]*efac*costh;
-	OMD_FLOAT fang12  = fang*irr12;
-	OMD_FLOAT cosfang = fang*costh;
-	OMD_FLOAT cosf[]  = {irr[0]*cosfang,irr[1]*cosfang};
-	OMD_FLOAT fx[]    = {dx1*(fac[0]+cosf[0])-dx2*fang12, dx1*(fac[1]+cosf[1])-dx2*fang12};
-	OMD_FLOAT fy[]    = {dy1*(fac[0]+cosf[0])-dy2*fang12, dy1*(fac[1]+cosf[1])-dy2*fang12};
-	OMD_FLOAT fz[]    = {dz1*(fac[0]+cosf[0])-dz2*fang12, dz1*(fac[1]+cosf[1])-dz2*fang12};	
+    double edil=1.0/ril;
+    double edjl=1.0/rjl;
+    double f1il=exp(sigga/(ril-rsisi));
+    double f3il=sigga/((ril-rsisi)*(ril-rsisi)*ril);
+    double f1jl=exp(sigga/(rjl-rsisi));
+    double f3jl=sigga/((rjl-rsisi)*(rjl-rsisi)*rjl);
+	
+    double splilj=(dxil*dxjl+dyil*dyjl+dzil*dzjl)*edil*edjl;
+    double f2lilj=splilj+onethird;
+    double f4lilj=splilj*pow(edjl,2.0);
+    double f4ljli=splilj*pow(edil,2.0);
+    double f5lilj=edil*edjl;
+    double ep=epsla*f1il*f1jl*f2lilj*f2lilj/3.0;
+	
+    double vorfak=epsla*f1il*f1jl*f2lilj;
+    double fril=f2lilj*f3il-2.0*(f5lilj-f4ljli);
+    double frjl=f2lilj*f3jl-2.0*(f5lilj-f4lilj);
 
-	// return force...
-	at0.fx-=fx[0]+fx[1];
-	at0.fy-=fy[0]+fy[1];
-	at0.fz-=fz[0]+fz[1];
-	at1.fx+=fx[0];
-	at1.fy+=fy[0];
-	at1.fz+=fz[0];
-	at2.fx+=fx[1];
-	at2.fy+=fy[1];
-	at2.fz+=fz[1];
-	radfac/=3.0;
-	at0.potential+=radfac;
-	at1.potential+=radfac;
-	at2.potential+=radfac;	
+	double frx=-vorfak*(fril*dxil+frjl*dxjl);
+    double fry=-vorfak*(fril*dyil+frjl*dyjl);
+    double frz=-vorfak*(fril*dzil+frjl*dzjl);
+	
+    double fr2il=2.0*f5lilj;
+    double fr2jl=-(f2lilj*f3jl+2.0*f4lilj);
+	
+    double fr2x=-vorfak*(fr2il*dxil+fr2jl*dxjl);
+    double fr2y=-vorfak*(fr2il*dyil+fr2jl*dyjl);
+    double fr2z=-vorfak*(fr2il*dzil+fr2jl*dzjl);
+	
+    double fr3il=-(f2lilj*f3il+2.0*f4ljli);
+    double fr3jl=2.0*f5lilj;
+	
+    double fr3x=-vorfak*(fr3il*dxil+fr3jl*dxjl);
+    double fr3y=-vorfak*(fr3il*dyil+fr3jl*dyjl);
+    double fr3z=-vorfak*(fr3il*dzil+fr3jl*dzjl);
+
+	
+    // return force...
+    at0.fx+=frx;
+    at0.fy+=fry;
+    at0.fz+=frz;
+    at1.fx+=fr2x;
+    at1.fy+=fr2y;
+    at1.fz+=fr2z;
+    at2.fx+=fr3x;
+    at2.fy+=fr3y;
+    at2.fz+=fr3z;
+	
+    at0.potential+=ep;
+    at1.potential+=ep;
+    at2.potential+=ep;
+
 }
 
 
 // FIXME! no virial calculation...
 void StillingerWeber::Compute(Atom& at, Atom& to) {
-	OMD_FLOAT  dx, dy, dz;
-	OMD_FLOAT kdx,kdy,kdz;
-	int iat,ito,nidx,lstart,lend;
-
-	OMD_FLOAT RR=CalcSqrDistance(at,to,dx,dy,dz);
-	if(RR<=CutRadiusSqr) {
-		OMD_FLOAT r=sqrt(RR);
-		TwoBodyTerm(at,to,r,dx,dy,dz);
-		Verlet->GetIterationVariables(iat,ito,nidx,lstart,lend);
-		for(int i=nidx+1;i<lend;i++) {
-			int ka=Verlet->GetNeighbor(i);
-			OMD_FLOAT KRR=CalcSqrDistance(Atoms(ka),at,kdx,kdy,kdz); // sign inverted!
-			if(KRR<=CutRadius) {
-				dx=-dx;dy=-dy;dz=-dz;
-				ThreeBodyTerm(at,to,Atoms(ka),r,-dx,-dy,-dz,sqrt(KRR),kdx,kdy,kdz);
-			}
-		}
-		if(force_eval) force_eval->EvaluateForce(at,to,dx,dy,dz,0.0,0.0,this);
+    OMD_FLOAT dxjl, dyjl, dzjl;
+    OMD_FLOAT dxil, dyil, dzil;
+    int iat,ito,nidx,lstart,lend;
+	
+    OMD_FLOAT RRJL=CalcSqrDistance(at,to,dxjl,dyjl,dzjl);
+    if(RRJL<CutRadiusSqr) {
+        OMD_FLOAT rjl=sqrt(RRJL);
+        TwoBodyTerm(at,to,rjl,dxjl,dyjl,dzjl);
+		
+        Verlet->GetIterationVariables(iat,ito,nidx,lstart,lend);
+        for(int i=nidx+1;i<lend;i++) {
+            int ka=Verlet->GetNeighbor(i);
+            OMD_FLOAT RRIL=CalcSqrDistance(Atoms(ka),at,dxil,dyil,dzil);
+            if(RRIL<CutRadiusSqr) {
+                ThreeBodyTerm(at,to,Atoms(ka),
+                              rjl,-dxjl,-dyjl,-dzjl,
+                              sqrt(RRIL),dxil,dyil,dzil);
+            }
+        }
+ 
+		if(force_eval) force_eval->EvaluateForce(at,to,dxjl,dyjl,dzjl,0.0,0.0,this); 
 	}
 }

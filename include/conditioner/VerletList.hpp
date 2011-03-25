@@ -74,7 +74,7 @@ public:
 	void Iterate(MDGadget* IteratedClass, bool force_update=false);
 	void GetNeighborIndex(int ni, int& start, int& end);
 	int  GetNeighbor(int ni);
-	void GetIterationVariables(int &at, int &to, 
+	void GetIterationVariables(int& at, int& to, 
 							   int& neiglist_index, int& list_start, int& list_end)
 	{at=at_idx;to=to_idx;neiglist_index=nl_idx;list_start=ls_start;list_end=ls_end;}
 	void Dump(string fname);
