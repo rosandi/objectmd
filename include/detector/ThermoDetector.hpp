@@ -173,7 +173,7 @@ public:
 
 	virtual void ExtractTemperature() {
 		process=tempe;
-		Iterator->Iterate(this);
+		Iterator->IterateHalf(this);
 		int na=GetNAtom();
 		int navg=0;
 		avg_temp=0.0;
@@ -220,7 +220,7 @@ public:
 	
 	virtual void ExtractPressure() {
 		process=press;
-		Iterator->Iterate(this);
+		Iterator->IterateHalf(this);
 		int na=GetNAtom();
 		int navg=0;
 		avg_pres=0.0;

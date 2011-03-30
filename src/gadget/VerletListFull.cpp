@@ -15,7 +15,7 @@
  *
 */
 
-#include <conditioner/VerletList.hpp>
+#include <conditioner/VerletListFull.hpp>
 
 using std::cerr;
 using std::ofstream;
@@ -23,26 +23,27 @@ using std::ofstream;
 // FIXME! make a note on VerletRadius and Radius tolerance. CommHandler alter these
 // variable. What is the effect? ...
 
-VerletList::VerletList() {
-	set_name("VERLET LIST");
+VerletListFull::VerletListFull() {
+	set_name("VERLET LIST FULL NEIGHBOR");
 	register_class(get_name());
 	SetConditionerType(COND_PRE_INTEGRATION|COND_PRE_CALCULATION);
-	NeighSize=0;
 	AllocSize=0;
 	Link=NULL;
-	NeighborList=NULL;
-	NeighborIndex=NULL;
+	Neighbors=NULL;
 	half_loop=true;
-	full_loop=false; // default only enables half loop
+	full_loop=true;
 }
 
-VerletList::~VerletList() {
+VerletListFull::~VerletListFull() {
 	MemFree(Link);
-	MemFree(NeighborIndex);
-	MemFree(NeighborList);
+	for(int i=0;i<AllocSize;i++) {
+		MemFree(Neighbors[i].list);
+		MemFree(Neighbors[i].flag);		
+	}
+	MemFree(Neighbors);
 }
 
-void VerletList::ReadParameter() {
+void VerletListFull::ReadParameter() {
 	SysParam->peek("verlet.update", UpdatePeriod, 5);
 	SysParam->peek("verlet.rebuild", RebuildPeriod, 0);
 	SysParam->peek("verlet.radius", CutRadius, -1.0);
@@ -50,7 +51,7 @@ void VerletList::ReadParameter() {
 	SysParam->peek("verlet.n_mean", nmean, 120);
 }
 
-bool VerletList::CheckParameter() {
+bool VerletListFull::CheckParameter() {
 	if(RadiusTolerance<=0.0) {
 		warn("no radius tolerance for verlet list (verlet.radtole). Setting update period to 1");
 		RadiusTolerance=0.0;
@@ -59,7 +60,7 @@ bool VerletList::CheckParameter() {
 	return true;
 }
 
-void VerletList::Init(MDSystem* WorkSys) {
+void VerletListFull::Init(MDSystem* WorkSys) {
 	Conditioner::Init(WorkSys);
 	
 	if (System->PBoundary) {
@@ -72,7 +73,7 @@ void VerletList::Init(MDSystem* WorkSys) {
 
 }
 
-void VerletList::CellNumber(int at, int& xid, int& yid, int& zid) {
+void VerletListFull::CellNumber(int at, int& xid, int& yid, int& zid) {
 	xid=(int)((Atoms(at).x-Box.x0)/VerletRadius);
 	yid=(int)((Atoms(at).y-Box.y0)/VerletRadius);
 	zid=(int)((Atoms(at).z-Box.z0)/VerletRadius);
@@ -84,7 +85,7 @@ void VerletList::CellNumber(int at, int& xid, int& yid, int& zid) {
 	if(zid<0)zid=0;
 }
 
-void VerletList::CalculateBox() {
+void VerletListFull::CalculateBox() {
 	OMD_FLOAT MinX, MaxX, MinY, MaxY, MinZ, MaxZ;        
 	int na=GetNAtom();
 	MinX=MinY=MinZ= DBL_MAX;
@@ -117,18 +118,40 @@ void VerletList::CalculateBox() {
 	blog("linked cell dimension ("+as_string(U)+","+as_string(V)+","+as_string(W)+")");
 }
 
-void VerletList::Refresh(){
+void VerletListFull::Refresh(){
 	CalculateBox();
 	SetDirty();
 }
 
-void VerletList::Update() {
+void VerletListFull::ReallocNeighborList(int idx) {
+	if(Neighbors[idx].end>=Neighbors[idx].size) {
+		int newsize=Neighbors[idx].size+nmean;
+		MemRealloc(Neighbors[idx].list, newsize*sizeof(int));
+		MemRealloc(Neighbors[idx].flag, newsize*sizeof(int));
+		for(int i=Neighbors[idx].size;i<newsize;i++) {
+			Neighbors[idx].list[i]=-1;
+			Neighbors[idx].flag[i]=-1;
+		}
+		Neighbors[idx].size=newsize;
+	}
+}
+
+void VerletListFull::Update() {
 
 	int na=GetNAtom();
 	
 	if(AllocSize<na) {
 		MemRealloc(Link, na*sizeof(int));
-		MemRealloc(NeighborIndex, (na+1)*sizeof(int));
+		MemRealloc(Neighbors, na*sizeof(NeighborList));
+		for(int i=AllocSize;i<na;i++) {
+			Neighbors[i].start=0.0;
+			Neighbors[i].end=0.0;
+			Neighbors[i].size=0.0;
+			MemAlloc(Neighbors[i].list,nmean*sizeof(int));
+			MemAlloc(Neighbors[i].flag,nmean*sizeof(int));
+			memset(Neighbors[i].list,-1,nmean*sizeof(int));
+			memset(Neighbors[i].flag,-1,nmean*sizeof(int));			
+		}
 		AllocSize=na;
 	}
 
@@ -145,6 +168,7 @@ void VerletList::Update() {
 	// Find membership of every atom in the system
 	// Remember! smallest number in cell must be the header
 	// This algorithm ensures that.
+	// Link[i] --> next index after i
 	
 	for (int at=na-1;at>=0;at--) {
 		int u, v, w;
@@ -153,12 +177,12 @@ void VerletList::Update() {
 		CellHeaders[u][v][w]=at;
 	}
 
-	// Create Verlet neighbour list
+	// Create Verlet neighbor list
 	// Every atom only search to atoms in it cell and 
 	// other 26 neighboring cells
 	OMD_FLOAT  xto, yto, zto;
 	OMD_FLOAT  rd, Rsq=VerletRadius*VerletRadius;
-	int NCounter=0;
+//	int NCounter=0;
 
 	for (int me=0;me<na;me++) {
 		int u, v, w;
@@ -170,7 +194,8 @@ void VerletList::Update() {
 
 		//start=NeighborIndex[ni]; end=NeighborIndex[ni+1];
 		CellHeaders[u][v][w]=Link[me];
-		NeighborIndex[me]=NCounter;
+		Neighbors[me].start=Neighbors[me].end;
+
 		for (int k=w-1; k<=w+1; k++) {
 			if(k==-1||k==W) continue;
 			for (int j=v-1; j<=v+1; j++) {
@@ -179,13 +204,19 @@ void VerletList::Update() {
 					if(i==-1||i==U) continue;
 					int to=CellHeaders[i][j][k];
 					while (to>=0) {
+						if(me==to) continue;
 						rd=CalcSqrDistance(me, to, xto, yto, zto);
 						if(rd<=Rsq) {
-							if(NCounter>=NeighSize) {
-								NeighSize+=nmean;
-								MemRealloc(NeighborList, NeighSize*sizeof(int));
-							}
-							NeighborList[NCounter++]=to;
+							
+							ReallocNeighborList(me);
+							ReallocNeighborList(to);
+							
+							Neighbors[me].list[Neighbors[me].end]=to;
+							Neighbors[me].flag[Neighbors[me].end++]=0;
+							
+							Neighbors[to].list[Neighbors[to].end]=me;
+							Neighbors[to].flag[Neighbors[to].end++]=1;
+							
 						}
 						to=Link[to]; // next atom in this cell
 					}
@@ -193,41 +224,46 @@ void VerletList::Update() {
 			} 
 		}
 	}
-	NeighborIndex[na]=0;
+	
 	dirty=false;
 }
 
-void VerletList::Dump(string fname) {
+void VerletListFull::Dump(string fname) {
 	ofstream fl(fname.c_str());
-	for (int i = 0; i < GetNAtom(); i++) fl << NeighborIndex[i] << '\n';
+	for (int i=0;i<GetNAtom();i++) {
+		fl << i <<": ";
+		for(int j=0;j<Neighbors[i].end;j++)
+			fl << "("<<Neighbors[i].list[j]<<","<<Neighbors[i].flag[j]<< ") ";
+		fl << std::endl;
+	}
 	fl.close();
 }
 
 // one-shot...
-void VerletList::PreIntegration() {
+void VerletListFull::PreIntegration() {
 	AllocSize=GetNAtom();
-	NeighSize=AllocSize*nmean;
 	MemRealloc(Link, AllocSize*sizeof(int));
-	MemRealloc(NeighborIndex, (AllocSize+1)*sizeof(int));
-	MemRealloc(NeighborList,NeighSize*sizeof(int));
+	MemRealloc(Neighbors, AllocSize*sizeof(NeighborList));
+	
+	for(int i=0;i<AllocSize;i++) {
+		Neighbors[i].start=0.0;
+		Neighbors[i].end=0.0;
+		Neighbors[i].size=nmean;
+		MemAlloc(Neighbors[i].list, nmean*sizeof(int));
+		MemAlloc(Neighbors[i].flag, nmean*sizeof(int));
+		memset(Neighbors[i].list,-1,nmean*sizeof(int));
+		memset(Neighbors[i].flag,-1,nmean*sizeof(int));		
+	}
+	
 	Refresh();
 	SetConditionerType(COND_PRE_CALCULATION);
 }
 
-void VerletList::GetNeighborIndex(int ni, int &start, int &end) {
-	start=NeighborIndex[ni];
-	end=NeighborIndex[ni+1];
-}
-
-int VerletList::GetNeighbor(int ni) {
-	return NeighborList[ni];
-}
-
-void VerletList::IterateHalf(MDGadget* IteratedClass) {
+void VerletListFull::IterateHalf(MDGadget* IteratedClass) {
 	
 	if(!half_loop) return;
+	
 	looping_full=false;
-
 	int na=GetNAtom();
 	
 	if(dirty) Update();
@@ -235,11 +271,13 @@ void VerletList::IterateHalf(MDGadget* IteratedClass) {
 	for(at_idx=0; at_idx<na; at_idx++) { // outer loop...
 		if(!CheckActive(at_idx)) continue;
 		if(!(IteratedClass->PreIterationNode(at_idx))) continue;
-		GetNeighborIndex(at_idx,ls_start,ls_end);
-		for(nl_idx=ls_start;nl_idx<ls_end;nl_idx++) { // inner loop...
-			
-			to_idx=GetNeighbor(nl_idx);
-			
+		for(
+			nl_idx=Neighbors[at_idx].start;
+			nl_idx<Neighbors[at_idx].end;
+			nl_idx++
+			) 
+		{ // inner loop...
+			to_idx=Neighbors[at_idx].list[nl_idx];
 			if(!CheckActive(to_idx)) continue;
 			if((CheckGhost(at_idx)&&CheckGhost(to_idx))) continue;
 			IteratedClass->IterationNode(at_idx,to_idx);
@@ -247,7 +285,43 @@ void VerletList::IterateHalf(MDGadget* IteratedClass) {
 	}
 }
 
-void VerletList::PrintInfo(ostream& ost) {
+void VerletListFull::IterateFull(MDGadget* IteratedClass) {
+	
+	if(!full_loop) return;
+
+	looping_full=true;
+	int na=GetNAtom();
+	
+	if(dirty) Update();
+	
+	for(at_idx=0; at_idx<na; at_idx++) { // outer loop...
+		if(!CheckActive(at_idx)) continue;
+		if(!(IteratedClass->PreIterationNode(at_idx))) continue;
+		for(
+			nl_idx=0; // start from the begining of the list...
+			nl_idx<Neighbors[at_idx].end;
+			nl_idx++
+			) 
+		{ // inner loop...
+			to_idx=Neighbors[at_idx].list[nl_idx];
+			if(!CheckActive(to_idx)) continue;
+			if((CheckGhost(at_idx)&&CheckGhost(to_idx))) continue;
+			IteratedClass->IterationNode(at_idx,to_idx);
+		}
+	}
+}
+
+void VerletListFull::GetIterationVariables(int& at, int& to, 
+										   int& at_nbidx, 
+										   NeighborList*& at_nblist)
+{
+	at=at_idx;
+	to=to_idx;
+	at_nbidx=nl_idx;
+	at_nblist=&(Neighbors[at]);
+}
+
+void VerletListFull::PrintInfo(ostream& ost) {
 	ost<<"id."<<id<<" "<<get_name()
 	<<": rebuild_period="<<RebuildPeriod<<" steps "
 	<<"cut_radius="<<CutRadius<<" tolerance="<<RadiusTolerance<<std::endl;

@@ -54,7 +54,7 @@ void StructureDetector::FindStructure(){
 	}
 
 	for(int i=0;i<na;i++)neig[i].clear();
-	Iterator->Iterate(this);
+	Iterator->IterateHalf(this);
 	
 	for(int i=0;i<na;i++){
 		Atom* Ai=AtomPtr(i);

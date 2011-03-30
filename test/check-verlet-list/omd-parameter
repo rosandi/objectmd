@@ -1,4 +1,3 @@
-#load_crystal 10x10x10
 #load_crystal 1x1x1
 #load_crystal dimer
 #load_crystal trimer

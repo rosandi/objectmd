@@ -20,6 +20,15 @@
 
 #include <omd/iterator.hpp>
 
+struct NeighborList {
+	// index=0 for accessing full neighbor list
+	int  start;
+	int  end;
+	int  size;
+	int* list;
+	int* flag;
+};
+
 /**
  @ingroup iterator
  @brief Verlet neighbor list (Iterator)
@@ -40,31 +49,30 @@
 
 **/
 
-class VerletList: public MDIterator {
+class VerletListFull: public MDIterator {
 	int U, V, W;
 	int nmean; 
-	int NeighSize;
 	int AllocSize;
 	OMD_FLOAT VerletRadius;
 	OMD_FLOAT CutRadius;
-	int   *Link;
-	int *NeighborList;
-	int *NeighborIndex;
+	int *Link;
+	
+	NeighborList* Neighbors;
+	
 	SysBox    Box;
 	
 	// iteration uses class these variables
 	int at_idx;
 	int to_idx;
 	int nl_idx;
-	int ls_start;
-	int ls_end;
 
 public:
-	VerletList();
-	virtual ~VerletList();
+	VerletListFull();
+	virtual ~VerletListFull();
 	
 	void ReadParameter();
 	bool CheckParameter();
+	void ReallocNeighborList(int idx);
 	void Update();
 	void Refresh();
 	void CellNumber(int, int&, int&, int&);
@@ -72,11 +80,11 @@ public:
 	void CalculateBox();
 	void PreIntegration();
 	void IterateHalf(MDGadget* IteratedClass);
-	void GetNeighborIndex(int ni, int& start, int& end);
-	int  GetNeighbor(int ni);
-	void GetIterationVariables(int& at, int& to, 
-							   int& neiglist_index, int& list_start, int& list_end)
-	{at=at_idx;to=to_idx;neiglist_index=nl_idx;list_start=ls_start;list_end=ls_end;}
+	void IterateFull(MDGadget* IteratedClass);
+	void GetIterationVariables(int& at, int& to, // the index of iterating atom
+							   int& at_nbidx, // the current neighborlist index
+							   NeighborList*& at_nblist); // complete neighbor list
+	NeighborList* GetNeighborList(){return Neighbors;}
 	void Dump(string fname);
 	void PrintInfo(ostream& ost);
 

@@ -12,7 +12,8 @@
 class DummyForce: public ForceKernel {
 	public:	
 	DummyForce(){CutRadius=1.0;}
-	void Compute(Atom &at, Atom &to) {}
+	void ComputeHalf(Atom& at, Atom& to) {}
+	void ComputeFull(Atom& at, Atom& to) {}
 };
 
 #endif

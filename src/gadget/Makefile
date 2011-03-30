@@ -15,9 +15,11 @@ MV = mv
 LIBOBJ = FCC111.o \
 	FCC100.o \
 	team.o \
-	sw.o \
 	StructureDetector.o \
-	VerletList.o
+	VerletList.o \
+	VerletListFull.o \
+	sw.o
+
 
 LIBOMD = ../../lib/libomd_object-$(shell uname -m).a
 

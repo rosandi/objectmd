@@ -2,3 +2,6 @@
 - TODO: for multi element simulation, potential calculation
   may have different cut_radius. consider using radius matrix!
   (i.e. cutsq[A][B] for atom type A and B)
+- CASE: using MDSystemGrid
+  @CreateSystem: import crystal position, set temperature
+  temperature is zeroed befor running!

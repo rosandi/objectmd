@@ -76,7 +76,7 @@ void MDIntegrator::Init(MDSystem* WorkSys) {
 
 	assert(ActForces.size()>0, "no defined force kernel");
     NType = WorkSys->SystemAtoms.size();
-    
+
 	// put forces into the kernel matrix
 	for(int i=0;i<(int)ActForces.size();i++){
 		int from=ActForces[i]->AtomTypeA;
@@ -91,6 +91,7 @@ void MDIntegrator::Init(MDSystem* WorkSys) {
 			Forces[from][to]->get_name());
 
 		Forces[from][to]=Forces[to][from]=ActForces[i];
+		
 	}
 
 	// using one interaction force, all atoms has the same ID=0
@@ -179,7 +180,8 @@ void MDIntegrator::IterationNode(int at, int to)
 {	
 	int atid=Atoms(at).id;
 	int toid=Atoms(to).id;
-	Forces[(int)(atid)][(int)(toid)]->CheckCompute(at,to,atid,toid);
+//	std::cerr << "got here...\n";
+	Forces[atid][toid]->CheckCompute(at,to,atid,toid);
 }
 
 /**
@@ -205,7 +207,8 @@ void MDIntegrator::Iterate() {
 		a->fx=a->fy=a->fz=a->virial=a->potential=0.0;		
 	}
 	for(int i=0;i<(int)ActForces.size();i++) ActForces[i]->ClearAccumulators();
-	Iterator->Iterate(this);
+	Iterator->IterateHalf(this);
+	Iterator->IterateFull(this);
 	for (int i=0; i<(int)ActForces.size(); i++) ActForces[i]->Correction();
 	SyncData(SYNC_FORCE);
     System->ExecuteConditioners(COND_FORCE_MODIFIER);

@@ -45,7 +45,7 @@ public:
 		CutRadius=R_CUT;
 	}
 	
-	void Compute(int at, int to) {
+	void ComputeHalf(int at, int to) {
 		OMD_FLOAT dx, dy, dz;
 		OMD_FLOAT r = sqrt(CalcSqrDistance(at, to, dx, dy, dz));
 		OMD_FLOAT ff;

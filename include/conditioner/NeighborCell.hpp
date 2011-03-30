@@ -64,6 +64,7 @@ public:
 	 	Cell=CellTail=NULL;
 	 	NMember=NULL;
 	 	RadiusTolerance=rtol;
+		looping_full=false;
 	}
 
 	void Release(){
@@ -265,11 +266,10 @@ public:
  * altered by explicitly unset force_update parameter.
  */
 
-	void Iterate(MDGadget* IteratedClass, bool force_update=false) {
-
-		if(dirty||force_update) Update();
-		
+	void IterateHalf(MDGadget* IteratedClass) {		
 		IndexList *atptr,*toptr;
+		looping_full=false;
+	
 		for(int c=0;c<TotalGrid;c++) {
 			if(!Cell[c])continue;
 

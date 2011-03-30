@@ -24,6 +24,7 @@
 
 #include <omd/gadget.hpp>
 #include <omd/conditioner.hpp>
+#include <omd/iterator.hpp>
 
 //----------------ForceKernel---------------------//
 
@@ -69,7 +70,12 @@ protected:
 
 public:
 	
-	ForceKernel(){CutRadiusSqr=CutRadius=0.0; AtomTypeA=AtomTypeB=0;force_eval=NULL;}
+	ForceKernel(){
+		CutRadiusSqr=CutRadius=0.0; 
+		AtomTypeA=AtomTypeB=0;
+		force_eval=NULL;
+	}
+
 	virtual ~ForceKernel(){}
 
 	virtual void Init(MDSystem* WorkSys){
@@ -107,16 +113,42 @@ public:
 	 * both reference and index are usefull!
 	 */
 
-	virtual void Compute(Atom &at, Atom &to) {die("Compute(Atom&,Atom&) is not implemented!!");}
-	virtual void Compute(int at, int to) {Compute(Atoms(at), Atoms(to));}
+	virtual void ComputeHalf(Atom &at, Atom &to) {
+		die("ComputeHalf() (Atom&,Atom&) is not implemented!!");
+	}
+	
+	virtual void ComputeHalf(int at, int to) {ComputeHalf(Atoms(at), Atoms(to));}
+	
+	virtual void ComputeFull(Atom &at, Atom &to) {
+		die("ComputeFull (Atom&,Atom&) is not implemented!!");
+	}
+	
+	virtual void ComputeFull(int at, int to) {ComputeFull(Atoms(at), Atoms(to));}
 
 	/**
 	 * makes sure that the for calculate the right interacting atoms
 	 */
 	
-	virtual void CheckCompute(int at, int to, int atid, int toid) {
-		if(atid==AtomTypeA&&toid==AtomTypeB){Compute(at,to);return;}
-		if(atid==AtomTypeB&&toid==AtomTypeA){Compute(at,to);return;}
+	void CheckCompute(int at, int to, int atid, int toid) {
+		
+		if(atid==AtomTypeA&&toid==AtomTypeB){
+			if(Iterator->looping_full) {
+				ComputeFull(at,to);
+			} else {
+				ComputeHalf(at,to);
+			}
+			return;
+		}
+		
+		if(atid==AtomTypeB&&toid==AtomTypeA){
+			if(Iterator->looping_full) {
+				ComputeFull(at,to);
+			} else {
+				ComputeHalf(at,to);
+			}
+			return;
+		}
+		
 		die("wrong type id of interacting atoms ids: "+as_string(atid)+" - "+as_string(toid));
 	}
 

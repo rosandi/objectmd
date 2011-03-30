@@ -28,20 +28,19 @@ class StillingerWeber: public ForceKernel {
 	// --- parameters read from file ---
 	string paramfile;
 	OMD_FLOAT eps;
-	OMD_FLOAT A;
-	OMD_FLOAT B;
-	OMD_FLOAT p;
-	OMD_FLOAT q;
+	OMD_FLOAT bigA;
+	OMD_FLOAT bigB;
+	OMD_FLOAT powerp;
+	OMD_FLOAT powerq;
 	OMD_FLOAT sigma;
 	OMD_FLOAT alpha;
 	OMD_FLOAT lambda;
-	OMD_FLOAT gamma;	
-	OMD_FLOAT lc;
+	OMD_FLOAT gamma;
 
 	// --- local registers ---
-	OMD_FLOAT *K;
-	double sigga,rsisi,onethird,epsla;
 
+	double sigma_gamma, lambda_eps, lambda_eps2;
+	double c1,c2,c3,c4,c5,c6;
 	class VerletList* Verlet;
 	
 public:
@@ -66,7 +65,8 @@ public:
 					   OMD_FLOAT dy2,
 					   OMD_FLOAT dz2);
 	
-	void Compute(Atom& at, Atom& to);
+	void ComputeHalf(Atom& at, Atom& to);
+//	void ComputeFull(Atom& at, Atom& to);
 	void PrintInfo(ostream& ost);
 
 };

@@ -40,9 +40,12 @@ protected:
 	OMD_FLOAT RadiusTolerance;
 	int   RebuildPeriod;
 	int   UpdatePeriod;
-	bool dirty;
+	bool  dirty;
 	
 public:
+	bool  full_loop;
+	bool  half_loop;
+	bool  looping_full;
 	
 	MDIterator(){
 		set_name("iterator");
@@ -53,6 +56,8 @@ public:
 		RebuildPeriod=0;
 		UpdatePeriod=0;
 		dirty=true;
+		full_loop=false;
+		half_loop=false;
 	}
 	
 	virtual ~MDIterator(){}
@@ -76,6 +81,7 @@ public:
 		RadiusTolerance=tole;
 	}
 	
+	void EnebleFullLoop(){full_loop=true;}
 	void SetDirty(){dirty=true;}
 	void SetUpdatePeriod(int up){UpdatePeriod=up;}
 	void SetRebuildPeriod(int bp){RebuildPeriod=bp;}
@@ -92,19 +98,44 @@ public:
 	}
 
 	/**
-	 * Perform iteration on all atoms in the system. When implementing an
+	 * Perform half iteration on all atoms in the system. When implementing an
 	 * Iterrator class, the descendant must ensure to handle the inactive and
 	 * ghost atoms properly. The corresponding status can be checked by
 	 * CheckActive and CheckGhost() class member of MGGadget.
 	 * 
 	 */
 
-	virtual void Iterate(MDGadget* IteratedClass, bool force_update=false) {
-		if(dirty||force_update) Update();
+	virtual void IterateHalf(MDGadget* IteratedClass) {
+
+		if(!half_loop) return;
+		if(dirty) Update();
+		looping_full=false; // FALSE -> half loop
+		
 		int na=GetNAtom();
 		for(int at=0;at<na-1;at++) {
 			if(!IteratedClass->PreIterationNode(at))continue;
 			for(int to=(at+1);to<na;to++) {
+				IteratedClass->IterationNode(at,to);
+			}
+		}
+	}
+	
+	/**
+	 * Perform full iteration on all atoms in the system.
+	 * 
+	 */
+	
+	virtual void IterateFull(MDGadget* IteratedClass) {
+
+		if(!full_loop) return;
+		if(dirty) Update();
+		looping_full=true; // doing full loop
+		
+		int na=GetNAtom();
+		for(int at=0;at<na;at++) {
+			if(!IteratedClass->PreIterationNode(at))continue;
+			for(int to=0;to<na;to++) {
+				if(at==to) continue;
 				IteratedClass->IterationNode(at,to);
 			}
 		}

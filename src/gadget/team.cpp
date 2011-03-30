@@ -97,7 +97,7 @@ void TEmbedding::IterationNode(Atom &at, Atom &to) {
 void TEmbedding::PreCalculation() {
 	int na=GetNAtom();
 	for (int i = 0; i<na; i++) Atoms(i).aux[ED_idx]=0.0;
-	Iterator->Iterate(this);
+	Iterator->IterateHalf(this);
 	SyncData(SYNC_AUX,ED_idx);
 }
 
@@ -219,7 +219,7 @@ void TForceEAM::Init(MDSystem* WorkSys) {
 	}
 }
 
-void TForceEAM::Compute(Atom &at, Atom &to) {
+void TForceEAM::ComputeHalf(Atom &at, Atom &to) {
 	OMD_FLOAT EmbAt, EmbTo, DRhoAt, DRhoTo;
 	OMD_FLOAT fr, R, dx, dy, dz, p, dp;
 	R = sqrt(CalcSqrDistance(at, to, dx, dy, dz));

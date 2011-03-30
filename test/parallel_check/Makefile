@@ -6,7 +6,7 @@ LIBS=-lm -lomd_object-$(shell uname -m) -lomd-$(shell uname -m)
 EXE=small
 
 all:
-	$(CXX) -O3 -o $(EXE) $(EXE).cpp $(FLAGS) $(LIB_PATH) $(INCLUDE_PATH) $(LIBS)
+	$(CXX) -g -o $(EXE) $(EXE).cpp $(FLAGS) $(LIB_PATH) $(INCLUDE_PATH) $(LIBS)
 
 lib:
 	make -C ../..

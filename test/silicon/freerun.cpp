@@ -1,8 +1,7 @@
-#include <omd/system.hpp>
+#include <omd/systemgrid.hpp>
 #include <omd/container.hpp>
 #include <potential/sw.hpp>
-#include <potential/DummyForce.hpp>
-#include <conditioner/VerletList.hpp>
+#include <conditioner/VerletListFull.hpp>
 #include <detector/ThermoDetector.hpp>
 #include <detector/SysMonitor.hpp>
 
@@ -19,13 +18,17 @@ class MyMDClass:public MDSystem {
     void CreateGadget() {
         SetIntegrator(new MDIntegrator);
         AddForce(new StillingerWeber("silicon"));
-        AddConditioner(new VerletList);
+        AddConditioner(new VerletListFull);
         AddDetector(new SysMonitor);  
         AddDetector(new ThermoDetector);
     }
-
+    
+    void SystemSetting() {
+      SetTemperature(param.double_value("temperature"));
+    }
+    
     void BeforeRun() {
-        DumpAtoms("init.dat");
+        DumpAtoms("init.dat", WM_VELOCITY);
         PrintInfo("info.out");
     }
     

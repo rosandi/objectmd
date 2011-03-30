@@ -93,7 +93,7 @@ public:
 
 	virtual bool SearchAttachEmbeddingClass();
 	virtual void Init(MDSystem* WorkSys); 
-	virtual void Compute(Atom &at, Atom &to);
+	virtual void ComputeHalf(Atom &at, Atom &to);
 	virtual void PrintInfo(ostream& ost);
 };
 

@@ -58,7 +58,7 @@ class TForcePair: public ForceKernel {
 			CutRadius=phi.max_range();
 		}
 
-		void Compute(Atom &at, Atom &to) {
+		void ComputeHalf(Atom &at, Atom &to) {
 			OMD_FLOAT ff, dx, dy, dz, r;
 			OMD_FLOAT pot,drpot;
 			r = sqrt(CalcSqrDistance(at, to, dx, dy, dz));
