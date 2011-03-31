@@ -291,16 +291,18 @@ void MDSystemGrid::Root_Prepare() {
 	// In this stage Box contains simulation Box
 	UnificateAtoms();
 	EnumerateAtoms();
-	MDSystem::AdjustSystem();	
+	MDSystem::AdjustSystem(); // box is checked here...	
 	ProcInfo.Box=Box; // This is the valid system box...
 	ProcInfo.TotalAtom=GetNAtom();
 	ProcInfo.NumberOfContainers=SystemAtoms.size();
 	Root_ArrangeNeighbor();
 	Root_DistributeAtoms();
+		
 	for(int a=0;a<(int)SystemAtoms.size();a++) {
 		SystemAtoms[a]->Release();
 		delete SystemAtoms[a];
 	}
+	
 	AtomID=0;
 	AtomStorage.Release();
 	SystemAtoms.clear();
@@ -360,12 +362,14 @@ bool MDSystemGrid::CheckArch() {
 
 void MDSystemGrid::LoadAtoms() {
 	string fname(BinDirectory+"/p"+as_string(GetRank())+"-crystal");
+	
 	for(int i=0;i<ProcInfo.NumberOfContainers;i++) {
 		AtomContainer* A=new AtomContainer;
 		A->set_logger(logger);
 		A->Load(fname, ProcInfo.AtomNames[i]);
-		AddAtom(A);
+		AddAtom(A);		
 	}
+		
 	// don't re-enumerate!
 	Enumerated=true;
 }
@@ -461,6 +465,7 @@ void MDSystemGrid::CreationFunction() {
 
 	LoadAtoms(); // all proc loads their own atoms, ThisProcAtomNumber is updated...
 
+	
 	CreateGadget();
 	SyncEnvironment();
 }
@@ -535,8 +540,8 @@ void MDSystemGrid::DistributeContainers() {
 	cntatom=Communicator->TakeSUM(cntatom);
 
 	if(cntatom!=(int)ProcInfo.TotalAtom) {
-		DumpAtoms(LocalBuffer, "dump-err-local-"+as_string(GetRank()),WM_GHOST|WM_ID|WM_XID|WM_NID);
-		DumpAtoms(GhostBuffer, "dump-err-ghost-"+as_string(GetRank()),WM_GHOST|WM_ID|WM_XID|WM_NID);
+		DumpAtoms(LocalBuffer, "dump-err-local-"+as_string(GetRank()),WM_GHOST|WM_VELOCITY|WM_ID|WM_XID|WM_NID);
+		DumpAtoms(GhostBuffer, "dump-err-ghost-"+as_string(GetRank()),WM_GHOST|WM_VELOCITY|WM_ID|WM_XID|WM_NID);
 		Communicator->SyncProcesses();
 		die( "missing atoms "+as_string(cntatom)+" total="+as_string(ProcInfo.TotalAtom)+
 	       ". to check: boundary conditions, box size, box offset");
@@ -610,9 +615,11 @@ void MDSystemGrid::InitGadgets() {
 	Iterator->SetDirty();
 	Iterator->SetUpdatePeriod(0); // controlled update by MDSystemGrid...
 
+
 	// FirstSync... get ghosts from neighbors...
 	Communicator->DistributeAtomIndex();
-	Communicator->SendReceive(SYNC_SPACE|SYNC_FORCE|SYNC_AUX);
+	Communicator->SendReceive(SYNC_SPACE|SYNC_VELOCITY|SYNC_FORCE|SYNC_AUX);
+	
 	FlattenAtomBox();
 	DistributeContainers();
 }

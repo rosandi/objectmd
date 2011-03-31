@@ -1159,7 +1159,9 @@ Conditioner* MDSystem::AddConditioner(Conditioner* Cond) {
 
 AtomContainer* MDSystem::AddAtom(AtomContainer* Atm) {	
 	Atm->set_logger(this);
+	
 	if(!Atm->created) Atm->Create();
+	
 	if(Atm->get_name()=="ATOM_CONTAINER"){
 		char nst[32];
 		sprintf(nst,"ATOM_%d",AtomID);

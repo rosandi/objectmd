@@ -38,15 +38,13 @@ class StillingerWeber: public ForceKernel {
 	OMD_FLOAT gamma;
 
 	// --- local registers ---
+	OMD_FLOAT c1,c2,c3,c4,c5,c6,c7,c8,c9;
 
-	double sigma_gamma, lambda_eps, lambda_eps2;
-	double c1,c2,c3,c4,c5,c6;
 	class VerletListFull* Verlet;
 	
 public:
 
 	StillingerWeber(string material);
-	virtual ~StillingerWeber();
 	void Init(class MDSystem* WorkSys);
 	void ReadParameter();
 	void TwoBodyTerm(Atom& at, Atom& to,

@@ -66,6 +66,14 @@ public:
 	bool undefined() {
 		return x0==DBL_MAX&&y0==DBL_MAX&&z0==DBL_MAX&&x1==-DBL_MAX&&y1==-DBL_MAX&&z1==-DBL_MAX;
 	}
+	
+	void Dump(ostream& ost) {
+		ost << "X(" << x0 << ", " << x1 << ") "
+			<< "Y(" << y0 << ", " << y1 << ") "
+			<< "Z(" << z0 << ", " << z1 << ") "
+			<< "L(" << lx << ", " << ly << ", " << lz
+			<< ")\n";
+	}
 
 };
 

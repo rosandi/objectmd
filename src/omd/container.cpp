@@ -297,7 +297,7 @@ AtomContainer* AtomContainer::Import(string fname, int aid) {
 			warn("reading material data from "+material_file);
 		} else warn("material properties was set before import");
 	}
-
+	
 	int ix=0, iy=1, iz=2, ivx=-1, ivy=-1, ivz=-1, iid=-1, ixid=-1;
 	if(p.exist("Fields")) {
 		// take x,y,z and vx,vy,vz,xid fields if exist
@@ -370,7 +370,24 @@ AtomContainer* AtomContainer::Import(string fname, int aid) {
 
     Allocate(atom_register.size());
     for(int i=0;i<(int)atom_register.size();i++) Atoms(i)=atom_register[i];
-
+/*
+	if(p.exist("Box")) {
+		blog("reading saved box geometry", LOGCREATE);
+		int idx=p.index_of("Box")+1;
+		Box.x0=p.double_value(idx++);
+		Box.y0=p.double_value(idx++);
+		Box.z0=p.double_value(idx++);
+		Box.x1=p.double_value(idx++);
+		Box.y1=p.double_value(idx++);
+		Box.z1=p.double_value(idx);
+		Box.lx=fabs(Box.x1-Box.x0);
+		Box.ly=fabs(Box.y1-Box.y0);
+		Box.lz=fabs(Box.z1-Box.z0);		
+		Box.hlx=Box.lx/2.0;
+		Box.hly=Box.ly/2.0;
+		Box.hlz=Box.lz/2.0;
+	} else CalcBox();
+*/
 	created=true;
     posf.close();
     blog("read "+as_string(GetNAtom())+" atoms from "+filename, LOGCREATE);
@@ -641,6 +658,8 @@ AtomContainer* AtomContainer::Load(string binname, string blockname) {
 	assert(!ferror(fl), "error loading file '"+binname+"'");
 	fclose(fl);
 	blog("Loaded: "+get_name()+"@"+binname, LOGCREATE);
+
+	created=true;
 
 	return this;
 }

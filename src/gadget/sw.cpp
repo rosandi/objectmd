@@ -54,13 +54,9 @@ void StillingerWeber::Init(MDSystem* WorkSys) {
 	c4 = bigA*eps*pow(sigma,powerq+1.0);
     c5 = bigA*eps*bigB*pow(sigma,powerp);
     c6 = bigA*eps*pow(sigma,powerq);
-	
-	sigma_gamma=sigma*gamma;
-	lambda_eps=lambda*eps;
-	lambda_eps2=2.0*lambda*eps;
-}
-
-StillingerWeber::~StillingerWeber() {
+	c7 = sigma*gamma;
+	c8 = lambda*eps;
+	c9 = 2.0*lambda*eps;
 }
 
 void StillingerWeber::PrintInfo(ostream& ost) {
@@ -85,15 +81,15 @@ void StillingerWeber::TwoBodyTerm(Atom& at, Atom& to,
 								  OMD_FLOAT dy,
 								  OMD_FLOAT dz)
 {
-	double rinvsq = 1.0/(r*r);
-	double rp = pow(r,-powerp);
-	double rq = pow(r,-powerq);
-	double rainv = 1.0 / (r - CutRadius);
-	double rainvsq = rainv*rainv*r;
-	double expsrainv = exp(sigma * rainv);
-	double fr = (c1*rp - c2*rq +
+	OMD_FLOAT rinvsq = 1.0/(r*r);
+	OMD_FLOAT rp = pow(r,-powerp);
+	OMD_FLOAT rq = pow(r,-powerq);
+	OMD_FLOAT rainv = 1.0 / (r - CutRadius);
+	OMD_FLOAT rainvsq = rainv*rainv*r;
+	OMD_FLOAT expsrainv = exp(sigma * rainv);
+	OMD_FLOAT fr = (c1*rp - c2*rq +
 			  (c3*rp - c4*rq) * rainvsq) * expsrainv * rinvsq;
-	double ep = 0.5*(c5*rp - c6*rq) * expsrainv;
+	OMD_FLOAT ep = 0.5*(c5*rp - c6*rq) * expsrainv;
 
 	// return force...
 	at.fx+=dx*fr;
@@ -118,39 +114,39 @@ void StillingerWeber::ThreeBodyTerm(Atom& at0, Atom& at1, Atom& at2,
 									OMD_FLOAT dy2,
 									OMD_FLOAT dz2)
 {
-	double rinvsq1 = 1.0/(r1*r1);
-	double rainv1 = 1.0/(r1 - CutRadius);
-	double gsrainv1 = sigma_gamma * rainv1;
-	double gsrainvsq1 = gsrainv1*rainv1/r1;
-	double expgsrainv1 = exp(gsrainv1);
+	OMD_FLOAT rinvsq1 = 1.0/(r1*r1);
+	OMD_FLOAT rainv1 = 1.0/(r1 - CutRadius);
+	OMD_FLOAT gsrainv1 = c7 * rainv1;
+	OMD_FLOAT gsrainvsq1 = gsrainv1*rainv1/r1;
+	OMD_FLOAT expgsrainv1 = exp(gsrainv1);
 	
-	double rinvsq2 = 1.0/(r2*r2);
-	double rainv2 = 1.0/(r2 - CutRadius);
-	double gsrainv2 = sigma_gamma * rainv2;
-	double gsrainvsq2 = gsrainv2*rainv2/r2;
-	double expgsrainv2 = exp(gsrainv2);
+	OMD_FLOAT rinvsq2 = 1.0/(r2*r2);
+	OMD_FLOAT rainv2 = 1.0/(r2 - CutRadius);
+	OMD_FLOAT gsrainv2 = c7 * rainv2;
+	OMD_FLOAT gsrainvsq2 = gsrainv2*rainv2/r2;
+	OMD_FLOAT expgsrainv2 = exp(gsrainv2);
 	
-	double rinv12 = 1.0/(r1*r2);
-	double cs = (dx1*dx2 + dy1*dy2 + dz1*dz2) * rinv12;
-	double delcs = cs + 1.0/3.0;
-	double delcssq = delcs*delcs;
+	OMD_FLOAT rinv12 = 1.0/(r1*r2);
+	OMD_FLOAT cs = (dx1*dx2 + dy1*dy2 + dz1*dz2) * rinv12;
+	OMD_FLOAT delcs = cs + 1.0/3.0;
+	OMD_FLOAT delcssq = delcs*delcs;
 
-	double facexp = expgsrainv1*expgsrainv2;
+	OMD_FLOAT facexp = expgsrainv1*expgsrainv2;
 	
-	double facrad = lambda_eps * facexp*delcssq;
-	double frad1 = facrad*gsrainvsq1;
-	double frad2 = facrad*gsrainvsq2;
-	double facang = lambda_eps2 * facexp*delcs;
-	double facang12 = rinv12*facang;
-	double csfacang = cs*facang;
-	double csfac1 = rinvsq1*csfacang;
-	double fj[3], fk[3];
+	OMD_FLOAT facrad = c8 * facexp*delcssq;
+	OMD_FLOAT frad1 = facrad*gsrainvsq1;
+	OMD_FLOAT frad2 = facrad*gsrainvsq2;
+	OMD_FLOAT facang = c9 * facexp*delcs;
+	OMD_FLOAT facang12 = rinv12*facang;
+	OMD_FLOAT csfacang = cs*facang;
+	OMD_FLOAT csfac1 = rinvsq1*csfacang;
+	OMD_FLOAT fj[3], fk[3];
 
 	fj[0] = dx1*(frad1+csfac1)-dx2*facang12;
 	fj[1] = dy1*(frad1+csfac1)-dy2*facang12;
 	fj[2] = dz1*(frad1+csfac1)-dz2*facang12;
 	
-	double csfac2 = rinvsq2*csfacang;
+	OMD_FLOAT csfac2 = rinvsq2*csfacang;
 	fk[0] = dx2*(frad2+csfac2)-dx1*facang12;
 	fk[1] = dy2*(frad2+csfac2)-dy1*facang12;
 	fk[2] = dz2*(frad2+csfac2)-dz1*facang12;

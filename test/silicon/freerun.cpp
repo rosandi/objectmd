@@ -5,13 +5,13 @@
 #include <detector/ThermoDetector.hpp>
 #include <detector/SysMonitor.hpp>
 
-class MyMDClass:public MDSystem {
+class MyMDClass:public MDSystemGrid {
 
     void CreateSystem() {
         AtomContainer *A=new AtomContainer("silicon");
         A->Import(param.string_value("load_crystal"));
-//        if(param.exist("temperature"))
-//            A->SetTemperature(param.double_value("temperature"));
+        if(param.exist("temperature"))
+            A->SetTemperature(param.double_value("temperature"));
         AddAtom(A)->SetName("Crystal");
     }
 
@@ -23,10 +23,12 @@ class MyMDClass:public MDSystem {
         AddDetector(new ThermoDetector);
     }
     
+/*
     void SystemSetting() {
       if(param.exist("temperature"))
       SetTemperature(param.double_value("temperature"));
     }
+*/
     
     void BeforeRun() {
         DumpAtoms("init.dat", WM_VELOCITY);
