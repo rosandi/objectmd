@@ -370,7 +370,7 @@ AtomContainer* AtomContainer::Import(string fname, int aid) {
 
     Allocate(atom_register.size());
     for(int i=0;i<(int)atom_register.size();i++) Atoms(i)=atom_register[i];
-/*
+
 	if(p.exist("Box")) {
 		blog("reading saved box geometry", LOGCREATE);
 		int idx=p.index_of("Box")+1;
@@ -387,7 +387,7 @@ AtomContainer* AtomContainer::Import(string fname, int aid) {
 		Box.hly=Box.ly/2.0;
 		Box.hlz=Box.lz/2.0;
 	} else CalcBox();
-*/
+
 	created=true;
     posf.close();
     blog("read "+as_string(GetNAtom())+" atoms from "+filename, LOGCREATE);
