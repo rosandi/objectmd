@@ -8,4 +8,4 @@ hostname >> mach
 hostname >> mach
 hostname >> mach
 
-mpirun -machinefile mach -np 4 ./freerun
+mpirun -machinefile mach -np 4 ./freerun $@

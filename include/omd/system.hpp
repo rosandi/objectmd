@@ -160,6 +160,8 @@ protected:
 public:
 
 	bool silent_mode;
+	int  print_every;
+
     int* Argc;
     char*** Argv;
     int  ExitCode;

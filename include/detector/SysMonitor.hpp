@@ -25,7 +25,7 @@ using std::string;
  Parameters:
     - @e monitor.filename (file name)
     - @e monitor.nofile : suppress creating output file
-    - @e monitor.noscreen : dont print data to screen, FIXME! conflict with @e silent parameter (MDSystem)
+    - @e monitor.every  : write data every nstep steps. Used also by MDSystem.
 
 **/
 
@@ -35,74 +35,71 @@ class SysMonitor:public Detector, public ParallelGadget {
 	bool     usefile;
 	bool     usescreen;
 	bool     firsttime;
+	int      every;
+	
 	OMD_FLOAT   RelPotential;
 	OMD_FLOAT   MechanicEnergy;
 	
 public:
 
-    SysMonitor(string fn="md.out", bool usescr=true, bool oneline=false) {
+    SysMonitor(string fn="md.out", bool oneline=false) {
                   	
 		set_name("SYSTEM_MONITOR_GRID");
 		register_class("SYSTEM_MONITOR");
 		usefile=true;
-
+		every=1;
 		SetFilename(fn);
-		
-		usescreen=usescr;
 		firsttime=true;
 	}
 	        
     virtual ~SysMonitor() {
     	if(GetRank()==0&&usefile) fout.close();
 	}
+	
+	void ReadParameter() {
+		SysParam->peek("monitor.filename", Filename);
+	    if(SysParam->exist("monitor.nofile")) usefile=false;
+		SysParam->peek("monitor.every", every);
+		if(every<1) every=1;
+	}
     
     void Init(MDSystem* WorkSys) {
     	Detector::Init(WorkSys);
     	ParallelGadget::Init(WorkSys);
-
-	    // read settings from parameter file
-	    SysParam->peek("monitor.filename", Filename);
-	    if(SysParam->exist("monitor.nofile")) usefile=false;
-	    if(SysParam->exist("monitor.noscreen")) usescreen=false;
 
 	    if(GetRank()==ROOT) {
 	    	if(usefile)fout.open(GetFilename().c_str(), ios::trunc);
 
 	    	RegisterMessageSlot(new DataSlot("@",0))
 	    		->SetFormat("%d")
-	    		->SetData(System->Step)
-	    		->SetPrintable(usescreen);
+				->SetData(System->Step);
 
 	    	RegisterMessageSlot(new DataSlot("t",0))
 	    		->SetFormat("%0.3E")
-	    		->SetData(System->ElapsedTime)
-	    		->SetPrintable(usescreen);
-
+				->SetData(System->ElapsedTime);
+			
 	    	RegisterMessageSlot(new DataSlot("dt",0))
 	    		->SetFormat("%0.3E")
-	    		->SetData(System->Integrator->TimeStep)
-	    		->SetPrintable(usescreen);
-
-	    	RegisterMessageSlot(new DataSlot("Ek",0))
+				->SetData(System->Integrator->TimeStep);
+	    	
+			RegisterMessageSlot(new DataSlot("Ek",0))
 	    		->SetFormat("%0.5E")
-	    		->SetData(System->Kinetic)
-	    		->SetPrintable(usescreen);
+	    		->SetData(System->Kinetic);
 
 	    	RegisterMessageSlot(new DataSlot("Ep",0))
 	    		->SetFormat("%0.5E")
-	    		->SetData(RelPotential)
-	    		->SetPrintable(usescreen);
+	    		->SetData(RelPotential);
 
 	    	RegisterMessageSlot(new DataSlot("E",0))
 	    		->SetFormat("%0.5E")
-	    		->SetData(MechanicEnergy)
-	    		->SetPrintable(usescreen);
+	    		->SetData(MechanicEnergy);
 
 		}
 
     }
 
 	virtual void Measure() {
+		if(System->Step%every) return;
 		if(GetRank()==ROOT){
 			RelPotential=System->Potential-System->BasePotential;
 			MechanicEnergy=System->Kinetic+System->Potential-System->BasePotential;

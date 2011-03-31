@@ -3,11 +3,14 @@ load_crystal 10x10x10
 #load_crystal dimer
 #load_crystal trimer
 #load_crystal tetra
+
 monitor.filename si.out
+monitor.every 5
+
 temperature 100
-time.max 2
+time.max 5
 time.step 0.001
-dump.sample 0.01
+dump.sample 0.05
 comm.arch  2 2 1
 #comm.arch 1 1 1
 comm.refresh 5

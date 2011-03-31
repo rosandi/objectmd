@@ -95,6 +95,7 @@ void MDSystem::SystemInit(){
 	Unit=new MDUnit;
 	OutputDirectory="";
 	silent_mode=false;
+	print_every=1;
 }
 
 MDSystem::MDSystem(int &argc, char** &argv){
@@ -203,6 +204,8 @@ void MDSystem::ReadParameter() {
 	// TODO: other system settings??
 	param.peek("dir.output", OutputDirectory);
 	param.peek("time.max", MaxTime);
+	param.peek("monitor.every", print_every);
+	if(print_every<1) print_every=1;
 	
 	if(param.exist("continue")) {
 		SetBinaryFilename(param.string_value("continue"));
@@ -931,7 +934,10 @@ void MDSystem::RunKernel() {
 		ExecuteConditioners(COND_POST_INTEGRATION);
 		ExecuteDetectors();
 		CheckBoundary();
-		if(!silent_mode) PrintMessages(std::cout);
+		
+		if(!silent_mode && !(Step%print_every))
+			PrintMessages(std::cout);
+		
 		ElapsedTime+=Integrator->TimeStep;
 		Step++;
 		CheckInterruption();
