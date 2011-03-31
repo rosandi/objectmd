@@ -309,16 +309,7 @@ void VerletListFull::IterateFull(MDGadget* IteratedClass) {
 			IteratedClass->IterationNode(at_idx,to_idx);
 		}
 	}
-	
-	// DEBUG
-	/*
-	for(int i=0;i<na;i++) {
-		std::cerr << i<<": ("<<Atoms(i).x<<","<<Atoms(i).y<<","<<Atoms(i).z<<") ("
-		<< Atoms(i).fx<<","<<Atoms(i).fy<<","<<Atoms(i).fz<<")\n";
-	}
-	
-	if(System->Step==5) die("hope..hope..");
-	*/
+
 }
 
 void VerletListFull::GetIterationVariables(int& at, int& to, 
