@@ -113,16 +113,10 @@ public:
 	 * both reference and index are usefull!
 	 */
 
-	virtual void ComputeHalf(Atom &at, Atom &to) {
-		die("ComputeHalf() (Atom&,Atom&) is not implemented!!");
-	}
-	
+	virtual void ComputeHalf(Atom &at, Atom &to) {}
 	virtual void ComputeHalf(int at, int to) {ComputeHalf(Atoms(at), Atoms(to));}
-	
-	virtual void ComputeFull(Atom &at, Atom &to) {
-		die("ComputeFull (Atom&,Atom&) is not implemented!!");
-	}
-	
+
+	virtual void ComputeFull(Atom &at, Atom &to) {}
 	virtual void ComputeFull(int at, int to) {ComputeFull(Atoms(at), Atoms(to));}
 
 	/**
@@ -149,7 +143,8 @@ public:
 			return;
 		}
 		
-		die("wrong type id of interacting atoms ids: "+as_string(atid)+" - "+as_string(toid));
+		die("wrong type id of interacting atoms ids: "+
+			as_string(atid)+" - "+as_string(toid));
 	}
 
 	virtual void   Correction() {}

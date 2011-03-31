@@ -5,3 +5,18 @@
 - CASE: using MDSystemGrid
   @CreateSystem: import crystal position, set temperature
   temperature is zeroed befor running!
+
+! Loop algorithm is changed.
+  An iterator my provide two types of loops: half-loop and full-loop.
+  half-loop: pair looping, each atoms are visited only once in the loop.
+  full-loop: each atoms are visited twice, using a full neighbor list.
+             i.e. interaction between atom 0-1 is called, as well as
+             interaction between atom 1-0.
+  The function Iterator::Iterate() calls both loops. The loop-mode is
+  checked in the force-kernel to decide which mode is currently running.
+
+  A looping gadget (e.g. detectors) should call directly IterateHalf()
+  of IterateFull() functions, unless it needs both to be called sequentially.
+  Integrator calls Iterate() function. So the loop-mode may be 
+  activate/deactivate by Iterator::Enable/DisableHalf/FullLoop().
+

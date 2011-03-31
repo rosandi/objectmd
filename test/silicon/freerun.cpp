@@ -10,8 +10,8 @@ class MyMDClass:public MDSystem {
     void CreateSystem() {
         AtomContainer *A=new AtomContainer("silicon");
         A->Import(param.string_value("load_crystal"));
-        if(param.exist("temperature"))
-            A->SetTemperature(param.double_value("temperature"));
+//        if(param.exist("temperature"))
+//            A->SetTemperature(param.double_value("temperature"));
         AddAtom(A)->SetName("Crystal");
     }
 
@@ -24,6 +24,7 @@ class MyMDClass:public MDSystem {
     }
     
     void SystemSetting() {
+      if(param.exist("temperature"))
       SetTemperature(param.double_value("temperature"));
     }
     

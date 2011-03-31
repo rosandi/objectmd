@@ -17,7 +17,7 @@
 */
 
 #include <omd/system.hpp>
-#include <conditioner/VerletList.hpp>
+#include <conditioner/VerletListFull.hpp>
 #include <potential/sw.hpp>
 
 StillingerWeber::StillingerWeber(string material) {
@@ -42,10 +42,10 @@ void StillingerWeber::ReadParameter() {
 void StillingerWeber::Init(MDSystem* WorkSys) {
 	ForceKernel::Init(WorkSys);
 	
-	Verlet=dynamic_cast<VerletList*>(System->GetIterator());
-	assert(Verlet->type_of("verlet list"), 
-		   "StillingerWeber potential kernel needs (VERLET LIST) iterator");
-		
+	Verlet=dynamic_cast<VerletListFull*>(System->GetIterator());
+	assert(Verlet->type_of("verlet list full neighbor"), 
+		   "StillingerWeber potential kernel needs (VERLET LIST FULL NEIGHBOR) iterator");
+
 	CutRadius=alpha*sigma;
 	CutRadiusSqr=CutRadius*CutRadius;
 	c1 = bigA*eps*powerp*bigB*pow(sigma,powerp);
@@ -105,8 +105,7 @@ void StillingerWeber::TwoBodyTerm(Atom& at, Atom& to,
  
 	at.potential+=ep;
 	to.potential+=ep;
-	
-	std::cerr << "pair("<<at.nid<<","<<to.nid<<")\n";
+
 }
 
 void StillingerWeber::ThreeBodyTerm(Atom& at0, Atom& at1, Atom& at2,
@@ -172,33 +171,10 @@ void StillingerWeber::ThreeBodyTerm(Atom& at0, Atom& at1, Atom& at2,
 	at1.potential+=facrad;
 	at2.potential+=facrad;	
 	
-	std::cerr << "ang("<<at0.nid<<","<<at1.nid<<","<<at2.nid<<")\n";
-}
-
-void StillingerWeber::ComputeHalf(Atom& at, Atom& to) {
-	OMD_FLOAT  dx, dy, dz;
-	OMD_FLOAT kdx,kdy,kdz;
-	int iat,ito,nidx,lstart,lend;
-
-	OMD_FLOAT RR=CalcSqrDistance(at,to,dx,dy,dz);
-	if(RR<CutRadiusSqr) {
-		TwoBodyTerm(at,to,sqrt(RR),dx,dy,dz);
-		OMD_FLOAT RR=CalcSqrDistance(to,at,dx,dy,dz);
-		if(RR<CutRadiusSqr) {
-			Verlet->GetIterationVariables(iat,ito,nidx,lstart,lend);
-			for(int i=nidx+1;i<lend;i++) {
-				int ka=Verlet->GetNeighbor(i);
-				OMD_FLOAT KRR=CalcSqrDistance(Atoms(ka),at,kdx,kdy,kdz);
-				if(KRR<CutRadiusSqr)
-					ThreeBodyTerm(at,to,Atoms(ka),sqrt(RR),dx,dy,dz,sqrt(KRR),kdx,kdy,kdz);
-			}
-		}
-		if(force_eval) force_eval->EvaluateForce(at,to,dx,dy,dz,0.0,0.0,this);
-	}
 }
 
 // FIXME! no virial calculation...
-/*
+
 void StillingerWeber::ComputeHalf(Atom& at, Atom& to) {
 	OMD_FLOAT  dx, dy, dz;
 	OMD_FLOAT RR=CalcSqrDistance(at,to,dx,dy,dz);
@@ -208,13 +184,16 @@ void StillingerWeber::ComputeHalf(Atom& at, Atom& to) {
 void StillingerWeber::ComputeFull(Atom& at, Atom& to) {
 	OMD_FLOAT  dx, dy, dz;
 	OMD_FLOAT kdx,kdy,kdz;
-	int iat,ito,nidx,lstart,lend;
 	
+	int iat,ito,nidx;
+	NeighborList* nlist;
+	Verlet->GetIterationVariables(iat,ito,nidx,nlist);
+	if(ito==nlist->end-1) return;
+
 	OMD_FLOAT RR=CalcSqrDistance(to,at,dx,dy,dz);
 	if(RR<CutRadiusSqr) {
-		Verlet->GetIterationVariables(iat,ito,nidx,lstart,lend);
-		for(int i=nidx+1;i<lend;i++) {
-			int ka=Verlet->GetNeighbor(i);
+		for(int i=nidx+1;i<nlist->end;i++) {
+			int ka=nlist->list[i];
 			OMD_FLOAT KRR=CalcSqrDistance(Atoms(ka),at,kdx,kdy,kdz);
 			if(KRR<CutRadiusSqr)
 				ThreeBodyTerm(at,to,Atoms(ka),sqrt(RR),dx,dy,dz,sqrt(KRR),kdx,kdy,kdz);
@@ -222,4 +201,3 @@ void StillingerWeber::ComputeFull(Atom& at, Atom& to) {
 		if(force_eval) force_eval->EvaluateForce(at,to,dx,dy,dz,0.0,0.0,this);
 	}
 }
-*/

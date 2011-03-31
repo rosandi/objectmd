@@ -41,7 +41,7 @@ class StillingerWeber: public ForceKernel {
 
 	double sigma_gamma, lambda_eps, lambda_eps2;
 	double c1,c2,c3,c4,c5,c6;
-	class VerletList* Verlet;
+	class VerletListFull* Verlet;
 	
 public:
 
@@ -66,7 +66,7 @@ public:
 					   OMD_FLOAT dz2);
 	
 	void ComputeHalf(Atom& at, Atom& to);
-//	void ComputeFull(Atom& at, Atom& to);
+	void ComputeFull(Atom& at, Atom& to);
 	void PrintInfo(ostream& ost);
 
 };

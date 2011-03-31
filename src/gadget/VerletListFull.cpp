@@ -123,17 +123,15 @@ void VerletListFull::Refresh(){
 	SetDirty();
 }
 
-void VerletListFull::ReallocNeighborList(int idx) {
-	if(Neighbors[idx].end>=Neighbors[idx].size) {
-		int newsize=Neighbors[idx].size+nmean;
-		MemRealloc(Neighbors[idx].list, newsize*sizeof(int));
-		MemRealloc(Neighbors[idx].flag, newsize*sizeof(int));
-		for(int i=Neighbors[idx].size;i<newsize;i++) {
-			Neighbors[idx].list[i]=-1;
-			Neighbors[idx].flag[i]=-1;
-		}
-		Neighbors[idx].size=newsize;
+void VerletListFull::GrowNeighborList(int idx) {
+	int newsize=Neighbors[idx].size+nmean;
+	MemRealloc(Neighbors[idx].list, newsize*sizeof(int));
+	MemRealloc(Neighbors[idx].flag, newsize*sizeof(int));
+	for(int i=Neighbors[idx].size;i<newsize;i++) {
+		Neighbors[idx].list[i]=-1;
+		Neighbors[idx].flag[i]=-1;
 	}
+	Neighbors[idx].size=newsize;
 }
 
 void VerletListFull::Update() {
@@ -144,8 +142,6 @@ void VerletListFull::Update() {
 		MemRealloc(Link, na*sizeof(int));
 		MemRealloc(Neighbors, na*sizeof(NeighborList));
 		for(int i=AllocSize;i<na;i++) {
-			Neighbors[i].start=0.0;
-			Neighbors[i].end=0.0;
 			Neighbors[i].size=0.0;
 			MemAlloc(Neighbors[i].list,nmean*sizeof(int));
 			MemAlloc(Neighbors[i].flag,nmean*sizeof(int));
@@ -184,6 +180,8 @@ void VerletListFull::Update() {
 	OMD_FLOAT  rd, Rsq=VerletRadius*VerletRadius;
 //	int NCounter=0;
 
+	for(int i=0;i<na;i++) Neighbors[i].end=0;
+	
 	for (int me=0;me<na;me++) {
 		int u, v, w;
 		CellNumber(me, u, v, w);
@@ -208,8 +206,10 @@ void VerletListFull::Update() {
 						rd=CalcSqrDistance(me, to, xto, yto, zto);
 						if(rd<=Rsq) {
 							
-							ReallocNeighborList(me);
-							ReallocNeighborList(to);
+							if(Neighbors[me].end>=Neighbors[me].size)
+								GrowNeighborList(me);
+							if(Neighbors[to].end>=Neighbors[to].size)
+								GrowNeighborList(to);
 							
 							Neighbors[me].list[Neighbors[me].end]=to;
 							Neighbors[me].flag[Neighbors[me].end++]=0;
@@ -309,6 +309,16 @@ void VerletListFull::IterateFull(MDGadget* IteratedClass) {
 			IteratedClass->IterationNode(at_idx,to_idx);
 		}
 	}
+	
+	// DEBUG
+	/*
+	for(int i=0;i<na;i++) {
+		std::cerr << i<<": ("<<Atoms(i).x<<","<<Atoms(i).y<<","<<Atoms(i).z<<") ("
+		<< Atoms(i).fx<<","<<Atoms(i).fy<<","<<Atoms(i).fz<<")\n";
+	}
+	
+	if(System->Step==5) die("hope..hope..");
+	*/
 }
 
 void VerletListFull::GetIterationVariables(int& at, int& to, 

@@ -81,7 +81,11 @@ public:
 		RadiusTolerance=tole;
 	}
 	
-	void EnebleFullLoop(){full_loop=true;}
+	void EnableFullLoop(){full_loop=true;}
+	void EnableHalfLoop(){half_loop=true;}
+	void DisableFullLoop(){full_loop=false;}
+	void DisableHalfLoop(){half_loop=false;}
+
 	void SetDirty(){dirty=true;}
 	void SetUpdatePeriod(int up){UpdatePeriod=up;}
 	void SetRebuildPeriod(int bp){RebuildPeriod=bp;}
@@ -140,6 +144,12 @@ public:
 			}
 		}
 	}
+	
+	virtual void Iterate(MDGadget* IteratedClass) {
+		if(half_loop) IterateHalf(IteratedClass);
+		if(full_loop) IterateFull(IteratedClass);
+	}
+	
 };
 
 #endif

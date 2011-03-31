@@ -72,7 +72,7 @@ public:
 	
 	void ReadParameter();
 	bool CheckParameter();
-	void ReallocNeighborList(int idx);
+	void GrowNeighborList(int idx);
 	void Update();
 	void Refresh();
 	void CellNumber(int, int&, int&, int&);

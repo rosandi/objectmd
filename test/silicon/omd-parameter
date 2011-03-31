@@ -6,6 +6,7 @@ load_crystal tetra
 monitor.filename si.out
 #temperature 50
 time.max 1
+time.step 0.001
 dump.sample 0.01
 #comm.arch  2 2 1
 comm.arch 1 1 1

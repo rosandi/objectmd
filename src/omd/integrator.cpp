@@ -180,7 +180,6 @@ void MDIntegrator::IterationNode(int at, int to)
 {	
 	int atid=Atoms(at).id;
 	int toid=Atoms(to).id;
-//	std::cerr << "got here...\n";
 	Forces[atid][toid]->CheckCompute(at,to,atid,toid);
 }
 
@@ -207,8 +206,7 @@ void MDIntegrator::Iterate() {
 		a->fx=a->fy=a->fz=a->virial=a->potential=0.0;		
 	}
 	for(int i=0;i<(int)ActForces.size();i++) ActForces[i]->ClearAccumulators();
-	Iterator->IterateHalf(this);
-	Iterator->IterateFull(this);
+	Iterator->Iterate(this);
 	for (int i=0; i<(int)ActForces.size(); i++) ActForces[i]->Correction();
 	SyncData(SYNC_FORCE);
     System->ExecuteConditioners(COND_FORCE_MODIFIER);
