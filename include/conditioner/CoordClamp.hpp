@@ -20,7 +20,7 @@
 class CoordClamp: public Force_Conditioner {
 	bool use_range;
 	int axis;
-	int xid;	
+	int gid;	
 	OMD_FLOAT West, East, South, North, Bottom, Top;
 	int NClamp;
 	int ClampBit;
@@ -33,12 +33,12 @@ class CoordClamp: public Force_Conditioner {
 			axis=clamped_axis;
 			set_name("coordinate clamper");
 			use_range=false;
-			xid=-1;
+			gid=-1;
 		}
 		
-		CoordClamp(string clamped_name, int clamped_xid, int clamped_axis) {
+		CoordClamp(string clamped_name, int clamped_gid, int clamped_axis) {
 			TargetName=clamped_name;
-			xid=clamped_xid;
+			gid=clamped_gid;
 			axis=clamped_axis;
 			use_range=false;
 			set_name("coordinate clamper");
@@ -79,15 +79,15 @@ class CoordClamp: public Force_Conditioner {
 		void Init(MDSystem* WorkSys){
 			Force_Conditioner::Init(WorkSys);
 			ClampBit=ClaimFlagBit();
-			if(xid>=0) {
+			if(gid>=0) {
 				NClamp=0;
 				for(int i=0;i<GetNAtom();i++){
-					if(Atoms(i).xid==xid){
+					if(Atoms(i).gid==gid){
 						Atoms(i).flag|=ClampBit;
 						NClamp++;
 					}
 				}
-				assert(NClamp>0, "can not find atoms to clamp. xid="+as_string(xid));
+				assert(NClamp>0, "can not find atoms to clamp. gid="+as_string(gid));
 			} else {
 				assert(use_range, "missing: coordinate range to clamp");
 				UpdateRange();

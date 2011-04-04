@@ -36,10 +36,14 @@ class StillingerWeber: public ForceKernel {
 	OMD_FLOAT alpha;
 	OMD_FLOAT lambda;
 	OMD_FLOAT gamma;
+	OMD_FLOAT icos0;
 
 	// --- local registers ---
-	OMD_FLOAT c1,c2,c3,c4,c5,c6,c7,c8,c9;
-
+	OMD_FLOAT c1,c2,c3,c4,c5,c6,c7,c8,c9,c10;
+	OMD_FLOAT zc,ze0,ze1,ze2,ze3;
+	OMD_FLOAT sx0,sx1,sa0,sa1,sa2,sa3;
+	
+	bool  usezbl;
 	class VerletListFull* Verlet;
 	
 public:
@@ -47,6 +51,19 @@ public:
 	StillingerWeber(string material);
 	void Init(class MDSystem* WorkSys);
 	void ReadParameter();
+
+	void ZBL(Atom& at, Atom& to,
+					 OMD_FLOAT r,
+					 OMD_FLOAT dx,
+					 OMD_FLOAT dy,
+					 OMD_FLOAT dz);
+
+	void Spline(Atom& at, Atom& to,
+					 OMD_FLOAT r,
+					 OMD_FLOAT dx,
+					 OMD_FLOAT dy,
+					 OMD_FLOAT dz);
+	
 	void TwoBodyTerm(Atom& at, Atom& to,
 					 OMD_FLOAT r,
 					 OMD_FLOAT dx,

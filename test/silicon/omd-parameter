@@ -1,22 +1,19 @@
-load_crystal 10x10x10
 #load_crystal 1x1x1
 #load_crystal dimer
 #load_crystal trimer
 #load_crystal tetra
 
-monitor.filename si.out
-monitor.every 5
+load_crystal 10x10x10
+temperature 20
 
-temperature 100
-time.max 5
+monitor.filename si.out
+monitor.sample 10
+
+time.max 10
 time.step 0.001
-dump.sample 0.05
+
+dump.sample 0.015
+
 comm.arch  2 2 1
 #comm.arch 1 1 1
 comm.refresh 5
-
-#todo:
-#potential(0-0) sw silicon
-#potential(0-1) pair ar-pt.zbl
-#potential(1-1) eam aluminum
-#potential(0-1) morse

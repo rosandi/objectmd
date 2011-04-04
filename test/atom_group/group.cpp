@@ -18,7 +18,7 @@
 #include <fstream>
 #include <omd/systemgrid.hpp>
 #include <potential/team.hpp>
-#include <conditioner/NeighborCell.hpp>
+#include <conditioner/VerletList.hpp>
 #include <crystal/FCC100.hpp>
 #include <detector/ThermoDetector.hpp>
 #include <detector/StructureDetector.hpp>
@@ -38,13 +38,13 @@ class MySim:public MDSystemGrid {
 		AddAtomGroup("hot slab")
 			->SelectGT(WEST_EDGE, SOUTH_EDGE, -16*LC)
 			->SetTemperature(600)
-			->DumpAtoms("hot", WM_VELOCITY|WM_ID);
+			->DumpAtoms("hot", WM_VELOCITY|WM_TID);
 	}
 	
 	void CreateGadget() {
 		SetIntegrator(new MDIntegrator);
 		AddForce(new TForceEAM("platinum"));
-		AddConditioner(new NeighborCell);		
+		AddConditioner(new VerletList);		
 		AddDetector(new SysMonitor("md.out"));
 		AddDetector(new ThermoDetector(0.01));
 	}
@@ -57,7 +57,7 @@ class MySim:public MDSystemGrid {
 
 	void BeforeRun() {
 		PrintInfo("info.out");
-		DumpAtoms("init_data");
+		DumpAtoms("init_data", WM_GID|WM_NID);
 	}
 	
 	void AfterRun() {

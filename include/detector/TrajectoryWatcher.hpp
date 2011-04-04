@@ -14,18 +14,18 @@ class TrajectoryWatcher: public Detector, public ParallelGadget {
 
 	ofstream fl;
 	string filename;
-	int xid;
+	int gid;
 	int watchflag;
 	char st[256];
 	
 	public:
 		
 		TrajectoryWatcher(string TargetAtom, string fname) {
-			TargetName=TargetAtom; xid=-1; filename=fname;
+			TargetName=TargetAtom; gid=-1; filename=fname;
 		}
 
 		TrajectoryWatcher(int x_id, string fname) {
-			xid=x_id; filename=fname;
+			gid=x_id; filename=fname;
 		}
 		
 		~TrajectoryWatcher() {fl.close();}
@@ -45,9 +45,9 @@ class TrajectoryWatcher: public Detector, public ParallelGadget {
 			watchflag=ClaimFlagBit();
 			
 			if(GetNAtom()) {
-				if(xid>=0) {
+				if(gid>=0) {
 					for(int i=0; i<GetNAtom(); i++)
-						if(Atoms(i).xid==xid){SetFlag(i, watchflag);break;}
+						if(Atoms(i).gid==gid){SetFlag(i, watchflag);break;}
 				} else {SetFlag(0, watchflag);}
 			}
 

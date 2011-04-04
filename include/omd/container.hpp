@@ -37,8 +37,8 @@ using std::ofstream;
 #define WM_GHOST     32
 #define WM_POTENTIAL 64
 #define WM_VIRIAL    128
-#define WM_ID        256
-#define WM_XID       512
+#define WM_TID       256
+#define WM_GID       512
 #define WM_NID       1024
 #define WM_ZIP       2048
 
@@ -128,9 +128,9 @@ public:
 		return AtomStorage.AtomPtr(idx);
 	}
 	
-	virtual MDClass* set_id(int nid);
-	virtual AtomContainer*       SetID(int nid){set_id(nid); return this;}
-	virtual AtomContainer*       SetXID(int nid);
+	virtual MDClass* set_id(int tid);
+	virtual AtomContainer*       SetID(int id){set_id(id); return this;}
+	virtual AtomContainer*       SetGID(int id);
 
 	/** Sets the name of the AtomContainer. By default a newly created 
 	 *  class is named "AtomContainer" **/

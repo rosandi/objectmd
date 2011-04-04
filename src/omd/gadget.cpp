@@ -113,11 +113,11 @@ Atom*  MDGadget::AtomPtr(int idx) {return Target->AtomPtr(idx);}
 int   MDGadget::GetNAtom() {return Target->GetNAtom();}
 OMD_FLOAT MDGadget::GetTimeStep() {return System->Integrator->TimeStep;}
 OMD_FLOAT MDGadget::GetElapsedTime() {return System->ElapsedTime;}
-OMD_FLOAT MDGadget::GetMass(Atom &a) {return System->SystemAtoms[a.id]->M;}
-OMD_FLOAT MDGadget::GetMass(Atom *a) {return System->SystemAtoms[a->id]->M;}
+OMD_FLOAT MDGadget::GetMass(Atom &a) {return System->SystemAtoms[a.tid]->M;}
+OMD_FLOAT MDGadget::GetMass(Atom *a) {return System->SystemAtoms[a->tid]->M;}
 OMD_FLOAT MDGadget::GetMass(int idx) {return System->GetMass(idx);}
 
-OMD_FLOAT MDGadget::GetZ(Atom &a) {return System->SystemAtoms[a.id]->Z;}
+OMD_FLOAT MDGadget::GetZ(Atom &a) {return System->SystemAtoms[a.tid]->Z;}
 OMD_FLOAT MDGadget::GetZ(int idx) {return System->GetZ(idx);}
 
 int   MDGadget::ClaimFlagBit() {return System->ClaimFlagBit(this);}

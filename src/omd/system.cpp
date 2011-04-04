@@ -204,7 +204,7 @@ void MDSystem::ReadParameter() {
 	// TODO: other system settings??
 	param.peek("dir.output", OutputDirectory);
 	param.peek("time.max", MaxTime);
-	param.peek("monitor.every", print_every);
+	param.peek("monitor.sample", print_every);
 	if(print_every<1) print_every=1;
 	
 	if(param.exist("continue")) {
@@ -229,9 +229,9 @@ void MDSystem::ReadParameter() {
 		while(ist.good()) {
 			string st;
 			ist >> st;
-			if(lower_case(st)=="id") SetWriteMode(WM_ID);
+			if(lower_case(st)=="tid") SetWriteMode(WM_TID);
 			if(lower_case(st)=="nid") SetWriteMode(WM_NID);
-			if(lower_case(st)=="xid") SetWriteMode(WM_XID);
+			if(lower_case(st)=="gid") SetWriteMode(WM_GID);
 			if(lower_case(st)=="velocity") SetWriteMode(WM_VELOCITY);
 			if(lower_case(st)=="force") SetWriteMode(WM_FORCE);
 			if(lower_case(st)=="potential") SetWriteMode(WM_POTENTIAL);
@@ -491,7 +491,13 @@ void MDSystem::AdjustSystem() {
  */
 
 void MDSystem::InitGadgets() {
-
+	
+	// Synchronize atom's group flag...
+	
+	for(int i=0;i<(int)SystemAtomGroups.size();i++) {
+		SystemAtomGroups[i]->SyncAtomGroupMask();
+	}
+	
 	// Search for the Iterator. Add if not found.
    	for (int i=0; i<(int)Conditioners.size(); i++) {
 		if(Conditioners[i]->type_of("iterator"))
@@ -584,7 +590,7 @@ void MDSystem::Initiate() {
 	ArrangeMessageSlots();
 	PushInfo("$ PeriodicBoundary "+as_string(PBoundary));
 	
-	if(write_mode&WM_ID) {
+	if(write_mode&WM_TID) {
 		// ID? name material_file
 		for(int i=0;i<(int)SystemAtoms.size();i++){
 			PushInfo("$ ID"+as_string(i)+" "+
@@ -1186,7 +1192,7 @@ AtomContainer* MDSystem::AddAtom(AtomContainer* Atm) {
 
 AtomGroup* MDSystem::AddAtomGroup(string group_name) {
 	AtomGroup *ag=new AtomGroup(group_name, this, this);
-	ag->set_id(GroupID++);
+	ag->SetGroupMask(SystemAtomGroups.size());
 	SystemAtomGroups.push_back(ag);
 	blog("added atom group: "+group_name, LOGCREATE);
 	return ag;
@@ -1197,7 +1203,7 @@ void MDSystem::ChangeAtomID(int idx, int NewID)
 	assert(idx<GetNAtom(), 
 	       "changing atom id out of bound index="+as_string(idx)+
 	       " to id="+as_string(NewID));
-	Atoms(idx).id=NewID;
+	Atoms(idx).tid=NewID;
 }
 
 void MDSystem::ChangeAtomID(int start, int end, int NewID)
@@ -1205,17 +1211,17 @@ void MDSystem::ChangeAtomID(int start, int end, int NewID)
 	assert(start>=0&&end<GetNAtom(),
 	       "changing atom id out of bound start="+as_string(start)+
 	       " end="+as_string(end)+" to id="+as_string(NewID));
-	for (int i=start;i<=end;i++) Atoms(i).id=NewID;
+	for (int i=start;i<=end;i++) Atoms(i).tid=NewID;
 }
 
 OMD_FLOAT MDSystem::GetMaxCutRadius(){return Integrator->MaxCutRadius;}
 OMD_FLOAT MDSystem::GetMaxVelocity(){return sqrt(SqrMaxVelocity);}
 
-OMD_FLOAT MDSystem::GetMass(int idx){return SystemAtoms[Atoms(idx).id]->M;}
-OMD_FLOAT MDSystem::GetMass(Atom* a){return SystemAtoms[a->id]->M;}
-OMD_FLOAT MDSystem::GetMass(Atom& a){return SystemAtoms[a.id]->M;}
+OMD_FLOAT MDSystem::GetMass(int idx){return SystemAtoms[Atoms(idx).tid]->M;}
+OMD_FLOAT MDSystem::GetMass(Atom* a){return SystemAtoms[a->tid]->M;}
+OMD_FLOAT MDSystem::GetMass(Atom& a){return SystemAtoms[a.tid]->M;}
 
-OMD_FLOAT MDSystem::GetZ(int idx){return SystemAtoms[Atoms(idx).id]->Z;}
+OMD_FLOAT MDSystem::GetZ(int idx){return SystemAtoms[Atoms(idx).tid]->Z;}
 
 int MDSystem::ClaimFlagBit(MDClass* user,string sinfo) {
 	int a=1<<FlagBitUsed;

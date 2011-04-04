@@ -25,6 +25,7 @@ AtomGroup::AtomGroup(string group_name, AtomContainer* ac, MDSystem* WorkSys) {
 	set_name(group_name);
 	register_class("atom_group");
 	source=ac;
+	key=tag;
 	System=WorkSys;
 	scratch_ak.set_name("ATOM GROUP SCRATCH");
 	scratch_ak.ReferArray(ac->GetAtomStorage()); // this is the scratch...
@@ -32,7 +33,6 @@ AtomGroup::AtomGroup(string group_name, AtomContainer* ac, MDSystem* WorkSys) {
 }
 
 AtomContainer* AtomGroup::Create() { // commit.. called by MDSystem...
-	if(!created) group_flagmask=System->ClaimFlagBit(this, "group");
 	AtomStorage.ReferArray(scratch_ak);
 	created=true;
 	return this;
@@ -105,7 +105,7 @@ AtomGroup* AtomGroup::SelectType(int type_id) {
 	int na=scratch_ak.GetNAtom();
 
 	for(int i=0;i<na;i++) {
-		if(scratch_ak[i].id==type_id) tmpa.IndexBook.push(i);
+		if(scratch_ak[i].tid==type_id) tmpa.IndexBook.push(i);
 	}
 
 	tmpa.AssignByIndex(scratch_ak);
@@ -113,13 +113,13 @@ AtomGroup* AtomGroup::SelectType(int type_id) {
 	return this;
 }
 
-AtomGroup* AtomGroup::SelectXID(int xid) {
+AtomGroup* AtomGroup::SelectGID(int gid) {
 	AtomKeeper tmpa(AtomKeeper::Referral);
 	tmpa.disable_log(LOGMEMORY);
 	int na=scratch_ak.GetNAtom();
 
 	for(int i=0;i<na;i++) {
-		if(scratch_ak[i].xid==xid) tmpa.IndexBook.push(i);
+		if(scratch_ak[i].gid==gid) tmpa.IndexBook.push(i);
 	}
 
 	tmpa.AssignByIndex(scratch_ak);
@@ -184,4 +184,11 @@ AtomGroup* AtomGroup::SelectLE(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z) {
 
 OMD_FLOAT AtomGroup::GetMass(int idx) {
 	return System->GetMass(idx);
+}
+
+void AtomGroup::SyncAtomGroupMask() {
+	int na=GetNAtom();
+	for(int i=0;i<na;i++) {
+		Atoms(i).gid|=group_flagmask;
+	}
 }

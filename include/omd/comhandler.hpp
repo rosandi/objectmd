@@ -79,8 +79,8 @@ struct PackageScalar {
 };
 
 struct PackageSpace {
-    char  id;              ///< atom's type id: interaction and container membership
-    char  xid;             ///< extended id, tagging, etc
+    int tid;              ///< atom's type id: interaction and container membership
+    int gid;             ///< extended id, tagging, etc
     int nid;			   ///< enumerated id
     int flag;            ///< the status and multi-purpose flag
     OMD_FLOAT x,   y,  z;

@@ -166,8 +166,8 @@ void CommunicationHandler::PrepareSpaceBuffers(){
 		NeigRubix[i]->reset();
 		while((a=NeigRubix[i]->fetch())>=0) {
 			Atom* A=System->AtomPtr(a);
-			X->id=A->id;
-			X->xid=A->xid;
+			X->tid=A->tid;
+			X->gid=A->gid;
 			X->nid=A->nid;
 			X->flag=A->flag;
 			X->x=A->x;
@@ -356,8 +356,8 @@ void CommunicationHandler::UnpackSpace() {
 
 		for(int c=0;c<RecvNumber[b];c++) {
 			Atom* A=System->AtomPtr(c+newna);
-			A->id=X->id;
-			A->xid=X->xid;
+			A->tid=X->tid;
+			A->gid=X->gid;
 			A->nid=X->nid;
 			A->flag=X->flag|FLAG_GHOST;
 			A->x=X->x;
@@ -648,12 +648,18 @@ void CommunicationHandler::DistributeAtomIndexSlab(int slab) {
 
 	OMD_FLOAT rcut=System->GetMaxCutRadius()+CellRadiusTolerance;
 
-	if(rcut>System->ProcInfo.LCellX || rcut>System->ProcInfo.LCellY || rcut>System->ProcInfo.LCellZ)
+	if(
+	   (rcut>System->ProcInfo.LCellX && System->ClusterNX>1) ||
+	   (rcut>System->ProcInfo.LCellY && System->ClusterNY>1) || 
+	   (rcut>System->ProcInfo.LCellZ && System->ClusterNZ>1)
+	   )
+		
 		die("processor cell size is too small cell=("+
 				as_string(System->ProcInfo.LCellX)+","+
 				as_string(System->ProcInfo.LCellY)+","+
 				as_string(System->ProcInfo.LCellZ)+") border radius="+as_string(rcut));
 
+	
 	int na=System->GetLocalAtomNumber();
 	SysBox Border=System->GetCellBorder();
 

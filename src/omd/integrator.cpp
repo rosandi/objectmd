@@ -178,8 +178,8 @@ MDIntegrator* MDIntegrator::AddForce(ForceKernel *forc)
 
 void MDIntegrator::IterationNode(int at, int to)
 {	
-	int atid=Atoms(at).id;
-	int toid=Atoms(to).id;
+	int atid=Atoms(at).tid;
+	int toid=Atoms(to).tid;
 	Forces[atid][toid]->CheckCompute(at,to,atid,toid);
 }
 

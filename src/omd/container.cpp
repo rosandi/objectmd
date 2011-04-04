@@ -97,14 +97,14 @@ AtomContainer* AtomContainer::ReadMaterial(string material_file) {
 	return this;
 }
 
-MDClass* AtomContainer::set_id(int nid){
-	id=nid;
-	for (int i=0; i<GetNAtom(); i++) Atoms(i).id=(char)nid;
+MDClass* AtomContainer::set_id(int id){
+	id=id;
+	for (int i=0; i<GetNAtom(); i++) Atoms(i).tid=(char)id;
 	return this;
 }
 
-AtomContainer* AtomContainer::SetXID(int nid){
-	for (int i=0; i<GetNAtom(); i++) Atoms(i).xid=(char)nid;
+AtomContainer* AtomContainer::SetGID(int id){
+	for (int i=0; i<GetNAtom(); i++) Atoms(i).gid=(char)id;
 	return this;
 }
 
@@ -151,7 +151,7 @@ void AtomContainer::Allocate(int na, bool clear, AtomKeeper::KeeperType type)
         		Atoms(i).x=Atoms(i).vx=Atoms(i).fx=0.0;
         		Atoms(i).y=Atoms(i).vy=Atoms(i).fy=0.0;
         		Atoms(i).z=Atoms(i).vz=Atoms(i).fz=0.0;
-        		Atoms(i).id=id;    
+        		Atoms(i).tid=id;    
     		}
 		}
 	}
@@ -338,7 +338,7 @@ AtomContainer* AtomContainer::Import(string fname, int aid) {
 		istringstream ist(stbuff);
 		OMD_FLOAT dd;
 		Atom a;
-		a.id=a.xid=-1;a.flag=1; //active
+		a.tid=a.gid=-1;a.flag=1; //active
 		a.x=a.y=a.z=a.vx=a.vy=a.vz=a.fx=a.fy=a.fz=0.0;
 
 		try {
@@ -356,7 +356,7 @@ AtomContainer* AtomContainer::Import(string fname, int aid) {
 				a.vz=vline.at(ivz);
 			}
 
-			if(ixid>=0) a.xid=(int)vline.at(ixid);
+			if(ixid>=0) a.gid=(int)vline.at(ixid);
 			atom_register.push_back(a);
 
 		} catch(...) {
@@ -457,8 +457,8 @@ AtomContainer* AtomContainer::DumpAtoms(AtomKeeper& ak,
 			if(mode&WM_FORCE)    f<<" fx fy fz";
 			if(mode&WM_POTENTIAL)f<<" pot";
 			if(mode&WM_VIRIAL)   f<<" vir";
-			if(mode&WM_ID)       f<<" id";
-			if(mode&WM_XID)      f<<" xid";
+			if(mode&WM_TID)       f<<" id";
+			if(mode&WM_GID)      f<<" xid";
 			if(mode&WM_NID)      f<<" nid";
 								 f<<" --\n";
 		}
@@ -487,8 +487,8 @@ AtomContainer* AtomContainer::DumpAtoms(AtomKeeper& ak,
 		if(mode&WM_FORCE)    f<<ak[i].fx<<" "<<ak[i].fy<<" "<<ak[i].fz<<" ";
 		if(mode&WM_POTENTIAL)f<<ak[i].potential<<" ";
 		if(mode&WM_VIRIAL)   f<<ak[i].virial<<" ";
-		if(mode&WM_ID)       f<<(int)ak[i].id<<" ";
-		if(mode&WM_XID)      f<<(int)ak[i].xid<<" ";
+		if(mode&WM_TID)       f<<(int)ak[i].tid<<" ";
+		if(mode&WM_GID)      f<<(int)ak[i].gid<<" ";
 		if(mode&WM_NID)      f<<(int)ak[i].nid<<" ";
                              f << "\n";
 	}

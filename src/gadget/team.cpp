@@ -43,7 +43,7 @@ TEmbedding::TEmbedding() {
 
 // for the same atom type 
 void TEmbedding::AddTable(int aid, string tabfile) {
-	assert(aid<MAX_ALLOWED_SPECIES, "attempt to insert table for atom.id="+as_string(aid)+
+	assert(aid<MAX_ALLOWED_SPECIES, "attempt to insert table for atom.tid="+as_string(aid)+
 	       " "+as_string(MAX_ALLOWED_SPECIES)+" maximum allowed atom species exeeded!");
 	AtomID[aid][aid]=id_size;
 	embed[id_size  ].open(tabfile,"EMBED");
@@ -53,7 +53,7 @@ void TEmbedding::AddTable(int aid, string tabfile) {
 // for different atom type
 void TEmbedding::AddTable(int aid_at, int aid_to, string tabfile) {
 	assert(aid_at<MAX_ALLOWED_SPECIES&&aid_to<MAX_ALLOWED_SPECIES,
-	       "attempt to insert table for atom.id=("+as_string(aid_at)+","+as_string(aid_to)+
+	       "attempt to insert table for atom.tid=("+as_string(aid_at)+","+as_string(aid_to)+
 	       ") "+as_string(MAX_ALLOWED_SPECIES)+" maximum allowed atom species exeeded!");
 
 	if (aid_at==aid_to) AddTable(aid_at, tabfile);
@@ -79,7 +79,7 @@ void TEmbedding::Init(MDSystem* WorkSys) {
 void TEmbedding::IterationNode(Atom &at, Atom &to) {	
 	OMD_FLOAT R, Dens, Dx, Dy, Dz;
 	int   Tab;	
-	Tab=AtomID[(int)(at.id)][(int)(to.id)]; // Take edens table index
+	Tab=AtomID[(int)(at.tid)][(int)(to.tid)]; // Take edens table index
 	if (Tab<0) return; // avoids non eam interactions
 	R=sqrt(CalcSqrDistance(at, to, Dx, Dy, Dz));
 	if (R<=CutRadius[Tab]) {
@@ -112,21 +112,21 @@ void TEmbedding::Dump() {
 }
 
 OMD_FLOAT TEmbedding::GetEmb(Atom &at) {
-	int id=at.id;
-	return embed[AtomID[id][id]].read(at.aux[ED_idx]);
+	int tid=at.tid;
+	return embed[AtomID[tid][tid]].read(at.aux[ED_idx]);
 }
 
 OMD_FLOAT TEmbedding::GetEmbDeriv(Atom &at) {
-	int id=at.id;
-	return embed[AtomID[id][id]].dread(at.aux[ED_idx]);
+	int tid=at.tid;
+	return embed[AtomID[tid][tid]].dread(at.aux[ED_idx]);
 }
 
 OMD_FLOAT TEmbedding::GetRho(Atom &at) {return at.aux[ED_idx];}
 
 OMD_FLOAT TEmbedding::GetRhoDeriv(OMD_FLOAT r, Atom &at) {
-	int id=at.id;
-	if (r>CutRadius[AtomID[id][id]]) return 0.0;
-	return edens[AtomID[id][id]].dread(r);
+	int tid=at.tid;
+	if (r>CutRadius[AtomID[tid][tid]]) return 0.0;
+	return edens[AtomID[tid][tid]].dread(r);
 }
 
 // The correction by electron density is done here.. 
@@ -136,7 +136,7 @@ void TEmbedding::ForceModifier() {
 		Atom* a=AtomPtr(i);
 		if(a->flag&FLAG_GHOST)continue;
 		if(a->flag&FLAG_ACTIVE){
-			int id=a->id;
+			int id=a->tid;
 			if(0<=AtomID[id][id]) a->potential+=GetEmb(*a);
 		}
 	}

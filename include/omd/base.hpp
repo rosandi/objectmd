@@ -120,10 +120,10 @@ enum stage_type {
 
 class Atom {
 public:
-    char  id;              ///< atom's type id: interaction and container membership
-    char  xid;             ///< extended id, tagging, grouping, etc
-    int nid;			   ///< enumerated id
-    int flag;            ///< the status and multi-purpose flag
+    int  tid;              ///< atom's type id: interaction and container membership
+    int  gid;             ///< extended id, tagging, grouping, etc
+    int  nid;			   ///< enumerated number id
+    int  flag;            ///< the status and multi-purpose flag
     OMD_FLOAT x,   y,  z;
     OMD_FLOAT vx, vy, vz;
     OMD_FLOAT fx, fy, fz;

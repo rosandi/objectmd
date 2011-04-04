@@ -25,7 +25,8 @@ using std::string;
  Parameters:
     - @e monitor.filename (file name)
     - @e monitor.nofile : suppress creating output file
-    - @e monitor.every  : write data every nstep steps. Used also by MDSystem.
+    - @e monitor.sample (step)  : write data every nstep steps (sample time). 
+      Used also by MDSystem.
 
 **/
 
@@ -59,7 +60,7 @@ public:
 	void ReadParameter() {
 		SysParam->peek("monitor.filename", Filename);
 	    if(SysParam->exist("monitor.nofile")) usefile=false;
-		SysParam->peek("monitor.every", every);
+		SysParam->peek("monitor.sample", every);
 		if(every<1) every=1;
 	}
     

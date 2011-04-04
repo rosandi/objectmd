@@ -1,4 +1,4 @@
 comm.refresh 5
 comm.arch 2 2 1
-maxtime 10.0
+time.max 10.0
 boundary.periodic xyz

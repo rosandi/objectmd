@@ -234,7 +234,7 @@ void AtomKeeper::Allocate(int sz, KeeperType t){
 			
 			// Initialize as active ~outside ~ghost ~mirror
 			for(int i=0;i<sz;i++) {
-				a->id=a->xid=-1;a->flag=1;AtomIndex[i].p=a++;
+				a->tid=a->gid=-1;a->flag=1;AtomIndex[i].p=a++;
 			}
 
 			NAlloc=NAtom=sz;
@@ -294,7 +294,7 @@ void AtomKeeper::Expand(int sz){
 			assert(AtomArray, "unable to reallocate atoms");
 			for(int i=0;i<sz;i++)AtomIndex[i].p=a++;
 			for(int i=nold;i<NAtom;i++)
-				{AtomArray[i].id=-1;AtomArray[i].flag=0;}
+				{AtomArray[i].tid=-1;AtomArray[i].flag=0;}
 		}
 		NAlloc=NAtom=sz;
 	} else { //use garbage collection

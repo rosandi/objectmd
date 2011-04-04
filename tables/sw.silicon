@@ -1,13 +1,17 @@
 # Stillinger-Weber potential parameter
 # material: Silicon
 
-epsilon 2.1683
-A 7.049556277
-B 0.6022245584
-p 4
-q 0
-sigma 2.0951
-a 1.80
-lambda 21.0
-gamma 1.20
-lattice_constant 5.43
+sw.epsilon 2.1683
+sw.A 7.049556277
+sw.B 0.6022245584
+sw.p 4
+sw.q 0
+sw.sigma 2.0951
+sw.a 1.80
+sw.lambda 21.0
+sw.gamma 1.20
+sw.invers_cos0 -3.0
+
+zbl yes
+spline.range 1.2107 1.8456
+spline.coeff 335.0594 -492.3905 244.5280 -41.2347
