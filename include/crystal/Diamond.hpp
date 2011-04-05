@@ -1,4 +1,4 @@
-//----------------------Crystal FCC(111)----------------------//
+//----------------------Diamond Structure----------------------//
 
 #ifndef _CRYSTAL_DIAMOMD_HPP_
 #define _CRYSTAL_DIAMOND_HPP_

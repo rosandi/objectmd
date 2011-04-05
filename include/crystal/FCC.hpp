@@ -1,4 +1,4 @@
-//----------------------Crystal FCC(111)----------------------//
+//----------------------Crystal FCC----------------------//
 
 #ifndef _CRYSTAL_FCC_HPP_
 #define _CRYSTAL_FCC_HPP_

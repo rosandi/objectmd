@@ -1,4 +1,4 @@
-//--------------FCC 110 Crystal------------------//
+//--------------FCC 100 Crystal------------------//
 
 #ifndef _CRYSTAL_FCC_100_HPP_
 #define _CRYSTAL_FCC_100_HPP_

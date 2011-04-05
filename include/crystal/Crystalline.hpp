@@ -1,4 +1,3 @@
-//----------------------Crystal FCC(111)----------------------//
 
 #ifndef _CRYSTALLINE_HPP_
 #define _CRYSTALLINE_HPP_
