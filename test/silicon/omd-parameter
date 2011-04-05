@@ -2,9 +2,10 @@
 #load_crystal dimer
 #load_crystal trimer
 #load_crystal tetra
+#load_crystal 10x10x10
 
-load_crystal 10x10x10
-temperature 20
+monolayer 40 40 40
+temperature 100
 
 monitor.filename si.out
 monitor.sample 10

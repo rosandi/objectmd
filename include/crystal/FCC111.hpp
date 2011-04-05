@@ -3,40 +3,18 @@
 #ifndef _CRYSTAL_FCC_111_HPP_
 #define _CRYSTAL_FCC_111_HPP_
 
-#include <omd/container.hpp>
+#include <crystal/Crystalline.hpp>
 
-/**
-  @ingroup atom
-  @brief FCC(111) Crystal
-  
-  The class to create a bulk FCC(111) crystal.  
-
-  Geometry:
- 
-   <pre>
-   xy:                        xz: 
-             north   x1,y1               top      x1,z1
-          +---------+                +-----------+
-          |         |                |           |
-   west   |   (.)   | east      west |    (x)    | east
-          |   +z    |                |    +y     |
-          +---------+                +-----------+
-      x0,y0  south               x0,z0  bottom
-   </pre>
-*/
-
-class CrystalFCC111:public AtomContainer {
-protected:
-	int xml, yml, zml;
-	OMD_FLOAT lattice_constant;
-	OMD_FLOAT XMLDist, YMLDist, ZMLDist;
+class FCC111:public Crystalline {
 
 public: 
-	CrystalFCC111(int XMLayer, int YMLayer, int ZMLayer, string mat_file);
-	CrystalFCC111(const char* fname, string mat_file);
+	FCC111(int XMLayer, int YMLayer, int ZMLayer, string mat_file):
+	Crystalline("111", XMLayer, YMLayer, ZMLayer, mat_file){}	
+	
 	virtual AtomContainer* Create();
-	virtual SysBox& CalcBox();
 };
 
+// compatibility...
+#define CrystalFCC111 FCC111
 
 #endif

@@ -18,14 +18,14 @@
 //#include <conditioner/NeighborCell.hpp>
 #include <conditioner/VerletList.hpp>
 //#include <conditioner/VerletListFull.hpp>
-#include <crystal/FCC111.hpp>
+#include <crystal/FCC.hpp>
 #include <detector/ThermoDetector.hpp>
 #include <detector/StructureDetector.hpp>
 #include <detector/SysMonitor.hpp>
 
 class MySim:public MDSystemGrid {
 	void CreateSystem() {
-		AddAtom(new CrystalFCC111(30,20,10, "platinum"))
+		AddAtom(new FCC("111",30,20,10, "platinum"))
 		   ->Create()
 		   ->SetName("Crystal");
 

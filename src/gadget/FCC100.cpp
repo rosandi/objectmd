@@ -2,7 +2,14 @@
 
 #include <crystal/FCC100.hpp>
 
-AtomContainer* CrystalFCC100::Create() { 
+/*
+ This part of code is taken from impact code, AG Urbassek (Thomas J. Colla).
+ The function takes monolayer numbers, x, y, z, and the lattice constant.
+ The boundary box of the crystal is not defined here.
+ The caller object must take responsible for it. 
+ */
+
+AtomContainer* FCC100::Create() { 
   int     ATOMS_PER_UC=4;
   OMD_FLOAT  XUCOffset, YUCOffset, ZUCOffset,
 		  XRelPos[ATOMS_PER_UC], YRelPos[ATOMS_PER_UC], ZRelPos[ATOMS_PER_UC],
@@ -43,6 +50,7 @@ AtomContainer* CrystalFCC100::Create() {
 	YMLDist = hlc; //YUCOffset / (double) YMLayerPerUC;
 	ZMLDist = hlc; //ZUCOffset / (double) ZMLayerPerUC;
 
+	Box.x0=Box.x1=Box.y0=Box.y1=Box.z0=Box.z1=0.0;
 	Box.x1=Box.x0+XMLDist*((OMD_FLOAT)xml-1.);
 	Box.y1=Box.y0+YMLDist*((OMD_FLOAT)yml-1.);
 	Box.z0=Box.z1-ZMLDist*((OMD_FLOAT)zml-1.);

@@ -3,8 +3,7 @@
 #ifndef _CRYSTAL_FCC_100_HPP_
 #define _CRYSTAL_FCC_100_HPP_
 
-#include <omd/container.hpp>
-#include <crystal/FCC111.hpp>
+#include <crystal/Crystalline.hpp>
 
 /**
  @ingroup atom
@@ -14,19 +13,14 @@
  The algorithm is taken from Impact code. Default=Platinum
 */
 
-class CrystalFCC100: public CrystalFCC111 {
+class FCC100: public Crystalline {
 public:
-	CrystalFCC100(int XMLayer, int YMLayer, int ZMLayer, string mat_file):
-	CrystalFCC111(XMLayer, YMLayer, ZMLayer, mat_file) {}
-
-	/**
-	 This part of code is taken from impact code, AG Urbassek (Thomas J. Colla).
-	 The function takes monolayer numbers, x, y, z, and the lattice constant.
-	 The boundary box of the crystal is not defined here.
-	 The caller object must take responsible for it. 
-	*/
+	FCC100(int XMLayer, int YMLayer, int ZMLayer, string mat_file):
+	Crystalline("100", XMLayer, YMLayer, ZMLayer, mat_file) {}
 
 	AtomContainer* Create();
 };
+
+#define CrystalFCC100 FCC100
 
 #endif

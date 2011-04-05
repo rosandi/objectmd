@@ -12,7 +12,8 @@ RANLIB = ranlib
 RM = rm
 MV = mv
 
-LIBOBJ = FCC111.o \
+LIBOBJ = FCC.o \
+	FCC111.o \
 	FCC100.o \
 	team.o \
 	StructureDetector.o \

@@ -167,11 +167,11 @@ public:
 	virtual AtomKeeper& GetAtomStorage(){return AtomStorage;}
 	
 	/** Releases the atom storage by calling the AtomKeeper::Release() **/
-	void           Release();
+	void Release();
 
 	/** prints the information of the class **/
- 	virtual void           PrintInfo(ostream& ost);
-	virtual void           Allocate(int na, bool clear=true, AtomKeeper::KeeperType type=AtomKeeper::Storage);
+ 	virtual void PrintInfo(ostream& ost);
+	virtual void Allocate(int na, bool clear=true, AtomKeeper::KeeperType type=AtomKeeper::Storage);
 	
 	virtual AtomContainer* Create(){
 		if(CanImport())Import(filename);

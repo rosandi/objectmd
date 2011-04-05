@@ -1,6 +1,7 @@
 #include <omd/systemgrid.hpp>
 #include <omd/container.hpp>
 #include <potential/sw.hpp>
+#include <crystal/Diamond.hpp>
 #include <conditioner/VerletListFull.hpp>
 #include <detector/ThermoDetector.hpp>
 #include <detector/SysMonitor.hpp>
@@ -8,11 +9,19 @@
 class MyMDClass:public MDSystemGrid {
 
     void CreateSystem() {
-        AtomContainer *A=new AtomContainer("silicon");
-        A->Import(param.string_value("load_crystal"));
-        if(param.exist("temperature"))
-            A->SetTemperature(param.double_value("temperature"));
-        AddAtom(A)->SetName("Crystal");
+        if(param.exist("load.crystal")) {
+            AddAtom(new AtomContainer("silicon"))
+              ->Import(param.string_value("load_crystal"))
+              ->SetName("Crystal");
+        } else {
+            AddAtom(new Diamond("100",
+                    param.double_value("monolayer",0),
+                    param.double_value("monolayer",1),
+                    param.double_value("monolayer",2),
+                    "silicon"))
+                    
+              ->SetName("Crystal");
+        }
     }
 
     void CreateGadget() {
@@ -23,12 +32,10 @@ class MyMDClass:public MDSystemGrid {
         AddDetector(new ThermoDetector);
     }
     
-/*
     void SystemSetting() {
       if(param.exist("temperature"))
-      SetTemperature(param.double_value("temperature"));
+        SetTemperature(param.double_value("temperature"));
     }
-*/
     
     void BeforeRun() {
         DumpAtoms("init.dat", WM_VELOCITY);
