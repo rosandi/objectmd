@@ -99,12 +99,14 @@ AtomContainer* AtomContainer::ReadMaterial(string material_file) {
 
 MDClass* AtomContainer::set_id(int id){
 	id=id;
-	for (int i=0; i<GetNAtom(); i++) Atoms(i).tid=(char)id;
+	for (int i=0; i<GetNAtom(); i++)
+		Atoms(i).tid=id;
 	return this;
 }
 
 AtomContainer* AtomContainer::SetGID(int id){
-	for (int i=0; i<GetNAtom(); i++) Atoms(i).gid=(char)id;
+	for (int i=0; i<GetNAtom(); i++) 
+		Atoms(i).gid=id;
 	return this;
 }
 

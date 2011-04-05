@@ -412,7 +412,7 @@ void MDSystem::UnificateAtoms() {
 		Atoms(i).potential=0.0;
 		Atoms(i).virial=0.0;
 	}
-	
+	created=true;
     Unificated=true;
 }
 

@@ -18,6 +18,8 @@ public:
 	void Create100();
 	
 	virtual AtomContainer* Create() {
+		
+		if(created) return this;
 
 		if(orientation=="111") {
 			Create111();

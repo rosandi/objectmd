@@ -25,19 +25,18 @@ protected:
 	OMD_FLOAT Factor;
 	
 public:
-	Quencher(OMD_FLOAT QFactor, int per=0) 
-	{
+	Quencher(OMD_FLOAT QFactor, int per=0) {
 		Factor=QFactor; Period=per; Step=0;
-		set_name("Quencher");
+		set_name("QUENCHER");
+		register_class(get_name());
 	}
 	
 	void PrintInfo(ostream& ost) {
-		ost << "ID." << id << " " << Name << " -- quench Factor=" 
-		    << Factor << ", period=" << Period << "steps\n";
+		ost << "ID." << id << " " << Name << " -- quench factor=" 
+		    << Factor << "; period=" << Period << "steps\n";
 	}
 		
-	void PostIntegration() 
-	{
+	void PostIntegration() {
 		if (Step>=Period) {
 			Step=0;
 			int na=Target->GetNAtom();

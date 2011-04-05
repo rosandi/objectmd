@@ -57,6 +57,8 @@ public:
 	
 	virtual AtomContainer* Create() {
 		
+		if(created) return this;
+		
 		if(orientation=="100") {
 			Create100();
 			created=true;

@@ -10,6 +10,8 @@
  */
 
 AtomContainer* FCC100::Create() { 
+	if(created) return this;
+
   int     ATOMS_PER_UC=4;
   OMD_FLOAT  XUCOffset, YUCOffset, ZUCOffset,
 		  XRelPos[ATOMS_PER_UC], YRelPos[ATOMS_PER_UC], ZRelPos[ATOMS_PER_UC],

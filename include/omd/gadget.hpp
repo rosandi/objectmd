@@ -52,9 +52,9 @@ class MDGadget: public MDClass {
 protected:
     MDSystem* System;
     AtomContainer* Target;
+	string TargetName;
 	int  Active;
 	int  ActiveCode;
-	string TargetName;
 	bool Ready;
 	MDIterator* Iterator;
 	MDIntegrator* Integrator;

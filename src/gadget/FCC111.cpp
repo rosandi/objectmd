@@ -15,6 +15,8 @@
 
 AtomContainer* FCC111::Create() {
 	
+	if(created) return this;
+	
 #define S2                sqrt(2.)
 #define S6                sqrt(6.)
 #define V2S3              (2. * sqrt(3.))

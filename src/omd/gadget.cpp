@@ -98,7 +98,8 @@ void MDGadget::Init(MDSystem* WorkSys){
 	Iterator=WorkSys->GetIterator();
 	Integrator=WorkSys->GetIntegrator();
 	if(Target==NULL){
-		if(TargetName=="-"||TargetName=="")Target=WorkSys;
+		string nst=lower_case(TargetName);
+		if(nst=="-"||nst==""||nst=="all"||nst=="system")Target=WorkSys;
 		else Target=SearchTarget(TargetName);
 	}
 	
