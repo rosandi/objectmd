@@ -50,9 +50,7 @@ public:
 		}
 		
 		XMLDist=YMLDist=ZMLDist=a/8.0;
-		
-		DumpAtoms("cry");
-		
+
 	}
 	
 	virtual AtomContainer* Create() {
