@@ -17,7 +17,8 @@ class MyMDClass:public MDSystemGrid {
             int xml=param.int_value("monolayer",0);
             int yml=param.int_value("monolayer",1);
             int zml=param.int_value("monolayer",2);
-            AddAtom(new Diamond("100",xml,yml,zml,"silicon"))
+            string ori=param.string_value("orientation");
+            AddAtom(new Diamond(ori,xml,yml,zml,"silicon"))
               ->SetName("Crystal");
         }
     }

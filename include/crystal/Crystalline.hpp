@@ -39,7 +39,7 @@ public:
 		assert(param.exist("lattice_constant"), 
 			   "lattice_constant needed in material definition file: "+mat_file);
 		lattice_constant=param.double_value("lattice_constant");
-		orientation=orien;
+		orientation=replace_char(orien, ' ', '_');
 		xml=XMLayer;
 		yml=YMLayer;
 		zml=ZMLayer;

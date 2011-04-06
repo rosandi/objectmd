@@ -211,7 +211,7 @@ public:
 		}
 		return str;		
 	}
-
+		
 	// class polling
 	bool type_of(string type) {
     	type=lower_case(type);
