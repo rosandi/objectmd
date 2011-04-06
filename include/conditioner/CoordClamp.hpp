@@ -27,7 +27,7 @@ class CoordClamp: public Force_Conditioner {
 	
 	public:
 
-		CoordClamp(string clamped_name, int clamped_axis)
+		CoordClamp(string clamped_name, string clamped_axis)
 		{
 			TargetName=clamped_name;
 			axis=clamped_axis;
