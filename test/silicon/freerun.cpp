@@ -14,12 +14,10 @@ class MyMDClass:public MDSystemGrid {
               ->Import(param.string_value("load_crystal"))
               ->SetName("Crystal");
         } else {
-            AddAtom(new Diamond("100",
-                    param.double_value("monolayer",0),
-                    param.double_value("monolayer",1),
-                    param.double_value("monolayer",2),
-                    "silicon"))
-                    
+            int xml=param.int_value("monolayer",0);
+            int yml=param.int_value("monolayer",1);
+            int zml=param.int_value("monolayer",2);
+            AddAtom(new Diamond("100",xml,yml,zml,"silicon"))
               ->SetName("Crystal");
         }
     }

@@ -52,6 +52,7 @@ AtomContainer::AtomContainer(AtomContainer& a, AtomContainer& b) {
 	posprec=valprec=5;
 	MasterContainer=NULL;
 	M=Z=-1.0;
+	created=false;
 	write_mode=0;
 	Combine(a);
 	Combine(b);
@@ -64,6 +65,7 @@ AtomContainer::AtomContainer(string material_file) {
 	set_name("ATOM CONTAINER");
 	register_class("atom_container");
 	Value=0.0;
+	created=false;
 	posprec=valprec=5;
 	MasterContainer=NULL;
 	write_mode=0;
@@ -168,7 +170,9 @@ void AtomContainer::Allocate(int na, bool clear, AtomKeeper::KeeperType type)
 */
 
 SysBox& AtomContainer::CalcBox(){
-	OMD_FLOAT MinX, MaxX, MinY, MaxY, MinZ, MaxZ;        
+	OMD_FLOAT MinX, MaxX, MinY, MaxY, MinZ, MaxZ;
+	if(!created) Create();
+
 	int natom=GetNAtom();
 	bool checkin=false;
 	

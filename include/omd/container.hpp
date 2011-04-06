@@ -173,11 +173,7 @@ public:
  	virtual void PrintInfo(ostream& ost);
 	virtual void Allocate(int na, bool clear=true, AtomKeeper::KeeperType type=AtomKeeper::Storage);
 	
-	virtual AtomContainer* Create(){
-		if(CanImport())Import(filename);
-		created=true;
-		return this;
-	}	
+	virtual AtomContainer* Create(){created=true; return this;}
 	
     virtual AtomContainer* Import(string fname,int aid);
 	virtual AtomContainer* Import(string fname) {return Import(fname,-1);}
