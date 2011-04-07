@@ -6,7 +6,7 @@ LIBS=-lm -lomd_object-$(shell uname -m) -lomd-$(shell uname -m)
 EXE=periodic
 
 all:
-	$(CXX) -O3 -o $(EXE) $(EXE).cpp $(LIB_PATH) $(INCLUDE_PATH) $(LIBS)
+	$(CXX) -g -o $(EXE) $(EXE).cpp $(LIB_PATH) $(INCLUDE_PATH) $(LIBS)
 
 runsingle:
 	./$(EXE)

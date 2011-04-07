@@ -112,7 +112,7 @@ AtomContainer* FCC100::Create() {
 		}
 	}
 
-	CalcBox();
 	created=true;
+	CalcBox();
 	return this;
 }

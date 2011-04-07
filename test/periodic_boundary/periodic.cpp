@@ -66,6 +66,7 @@ class MySim:public MDSystemGrid {
 //		BorderOffset(0.25*LC);
 		AcceptSignal(SIGINT);
 		AcceptSignal(SIGUSR1);
+//		SetBoundaryCondition(PERIODIC_X|PERIODIC_Y);
 	}
 
 	void BeforeRun() {

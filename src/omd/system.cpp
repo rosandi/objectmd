@@ -479,8 +479,8 @@ SysBox& MDSystem::CalcBox() {
 
 void MDSystem::AdjustSystem() {
 	if(Box.undefined()) CalcBox();
-	if(PBoundary<0) PBoundary=0;
 	if(Mode!=CONTINUE_MODE) SystemSetting();
+	if(PBoundary<0) PBoundary=0;
 }
 
 /**
