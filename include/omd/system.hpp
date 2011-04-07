@@ -373,7 +373,10 @@ public:
 	void SetMaxTime(OMD_FLOAT maxtime) {if(MaxTime<0)MaxTime=maxtime;}
 
 	/** sets boundary condition only when is not already done previously **/
-	void SetBoundaryCondition(int pbc) {if(PBoundary<0)PBoundary=pbc;}
+	void SetBoundaryCondition(int pbc, bool force=false) {
+		if(force) PBoundary=pbc;
+		else if(PBoundary<0) PBoundary=pbc;
+	}
 
 	virtual int GetLocalAtomNumber(){return GetNAtom();}
 	virtual int GetTotalAtomNumber(){return GetNAtom();}

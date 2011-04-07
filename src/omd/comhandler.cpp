@@ -655,9 +655,10 @@ void CommunicationHandler::DistributeAtomIndexSlab(int slab) {
 	   )
 		
 		die("processor cell size is too small cell=("+
-				as_string(System->ProcInfo.LCellX)+","+
-				as_string(System->ProcInfo.LCellY)+","+
-				as_string(System->ProcInfo.LCellZ)+") border radius="+as_string(rcut));
+			as_string(System->ProcInfo.LCellX)+","+
+			as_string(System->ProcInfo.LCellY)+","+
+			as_string(System->ProcInfo.LCellZ)+") border radius="+
+			as_string(rcut)+" (tol="+as_string(CellRadiusTolerance)+")");
 
 	
 	int na=System->GetLocalAtomNumber();

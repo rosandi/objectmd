@@ -53,7 +53,7 @@ public:
 			bx+=a;
 		}
 		
-		XMLDist=YMLDist=ZMLDist=a/8.0;
+		XMLDist=YMLDist=ZMLDist=a/4.0;
 
 	}
 	

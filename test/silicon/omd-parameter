@@ -4,11 +4,13 @@
 #load_crystal tetra
 #load_crystal 10x10x10
 
-#orientation 100
+orientation 100
+monolayer 40 40 40
+
+#orientation 100_110
 #monolayer 40 40 40
 
-orientation 100_110
-monolayer 40 40 40
+boundary.periodic xy
 
 temperature 100
 
