@@ -1,0 +1,19 @@
+import final.dat
+
+monitor.filename qnc.out
+monitor.sample 10
+boundary.periodic no
+
+time.max 10
+time.step 0.001
+
+dump.sample 0.015
+
+comm.arch  2 2 1
+comm.refresh 5
+
+clamp.axis   xyz
+clamp.target border
+
+quench.factor 0.0
+quench.every 100
