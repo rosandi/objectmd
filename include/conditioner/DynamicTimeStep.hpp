@@ -19,7 +19,7 @@
 
 **/
 
-class DynamicTimeStep: public Pre_Conditioner, public ParallelGadget {
+class DynamicTimeStep: public PreConditioner, public ParallelGadget {
 	OMD_FLOAT maxp;
 	OMD_FLOAT maxdt;
 	int upd;

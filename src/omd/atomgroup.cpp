@@ -32,7 +32,7 @@ AtomGroup::AtomGroup(string group_name, AtomContainer* ac, MDSystem* WorkSys) {
 	group_flagmask=0;
 }
 
-AtomContainer* AtomGroup::Create() { // commit.. called by MDSystem...
+AtomGroup* AtomGroup::Create() { // commit.. called by MDSystem...
 	AtomStorage.ReferArray(scratch_ak);
 	created=true;
 	return this;
@@ -174,12 +174,56 @@ AtomGroup* AtomGroup::SelectLE(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z) {
 	int na=scratch_ak.GetNAtom();
 
 	for(int i=0;i<na;i++) {
-		if((scratch_ak[i].x<=x)&&(scratch_ak[i].y<=y)&&(scratch_ak[i].z<=z)) tmpa.IndexBook.push(i);
+		if((scratch_ak[i].x<=x)&&(scratch_ak[i].y<=y)&&(scratch_ak[i].z<=z))
+			tmpa.IndexBook.push(i);
 	}
 
 	tmpa.AssignByIndex(scratch_ak);
 	scratch_ak.ReferArray(tmpa);
 	return this;
+}
+
+AtomGroup* AtomGroup::SelectBox(OMD_FLOAT x0, OMD_FLOAT x1, 
+								OMD_FLOAT y0, OMD_FLOAT y1,
+								OMD_FLOAT z0, OMD_FLOAT z1)
+{
+	AtomKeeper tmpa(AtomKeeper::Referral);
+	tmpa.disable_log(LOGMEMORY);
+	int na=scratch_ak.GetNAtom();
+	
+	for(int i=0;i<na;i++) {
+		if(((scratch_ak[i].x>x0)&&(scratch_ak[i].x<x1)) &&
+		   ((scratch_ak[i].y>y0)&&(scratch_ak[i].y<y1)) &&
+		   ((scratch_ak[i].z>z0)&&(scratch_ak[i].z<z1)))
+			
+			tmpa.IndexBook.push(i);
+	}
+	
+	tmpa.AssignByIndex(scratch_ak);
+	scratch_ak.ReferArray(tmpa);
+	return this;
+}
+
+AtomGroup* AtomGroup::SelectInverseBox(OMD_FLOAT x0, OMD_FLOAT x1, 
+									   OMD_FLOAT y0, OMD_FLOAT y1,
+									   OMD_FLOAT z0, OMD_FLOAT z1)
+{
+	AtomKeeper tmpa(AtomKeeper::Referral);
+	tmpa.disable_log(LOGMEMORY);
+	int na=scratch_ak.GetNAtom();
+	
+	for(int i=0;i<na;i++) {
+		if(((scratch_ak[i].x>x0)&&(scratch_ak[i].x<x1)) &&
+		   ((scratch_ak[i].y>y0)&&(scratch_ak[i].y<y1)) &&
+		   ((scratch_ak[i].z>z0)&&(scratch_ak[i].z<z1)))
+			continue;
+			tmpa.IndexBook.push(i);
+	}
+	
+	tmpa.AssignByIndex(scratch_ak);
+	scratch_ak.ReferArray(tmpa);
+	return this;
+	
 }
 
 OMD_FLOAT AtomGroup::GetMass(int idx) {

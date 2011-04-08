@@ -52,7 +52,10 @@
  *	- 8 --> Post-integration conditioner
  * 
  * Zero value is always mean inactive. The bits of this variable is be examined
- * in the Conditioner::Execute() function.
+ * in the Conditioner::Execute() function. The calling number (NCalls) will be increased
+ * when the corresponding integrator function is executed. If a conditioner has 
+ * multiple-type, NCalls will be increased in every conditioner function.
+ * (NCalls/step=number_of_type)
  *
 */
 
@@ -76,37 +79,41 @@ public:
 
     virtual void Execute(int condtype) {
 		if(!Active) return; // Active stors the type of conditioner...
-    	if(condtype&COND_PRE_INTEGRATION&Active)  PreIntegration();
-    	if(condtype&COND_PRE_CALCULATION&Active)  PreCalculation();
-    	if(condtype&COND_FORCE_MODIFIER&Active)   ForceModifier();
-    	if(condtype&COND_POST_INTEGRATION&Active) PostIntegration();
-		NCalls++;
+    	if(condtype&COND_PRE_INTEGRATION&Active){PreIntegration(); NCalls++;}
+    	if(condtype&COND_PRE_CALCULATION&Active){PreCalculation(); NCalls++;}
+    	if(condtype&COND_FORCE_MODIFIER&Active){ForceModifier(); NCalls++;}
+    	if(condtype&COND_POST_INTEGRATION&Active){PostIntegration(); NCalls++;}
+	}
+	
+	virtual Conditioner* SetName(string newname) {
+		set_name(newname);
+		return this;
 	}
 
 };
 
 /** @brief Pre integration conditioner **/
-class Pre_Conditioner:public Conditioner {
+class PreConditioner:public Conditioner {
 	public:
-		Pre_Conditioner(){Active=ActiveCode=COND_PRE_INTEGRATION;}
+		PreConditioner(){Active=ActiveCode=COND_PRE_INTEGRATION;}
 };
 
 /** @brief Pre force calculation loop conditioner **/
-class Calc_Conditioner:public Conditioner {
+class CalcConditioner:public Conditioner {
 	public:
-		Calc_Conditioner(){Active=ActiveCode=COND_PRE_CALCULATION;}
+		CalcConditioner(){Active=ActiveCode=COND_PRE_CALCULATION;}
 };
 
 /** @brief Force modifier container **/
-class Force_Conditioner:public Conditioner {
+class ForceConditioner:public Conditioner {
 	public:
-		Force_Conditioner(){Active=ActiveCode=COND_FORCE_MODIFIER;}
+		ForceConditioner(){Active=ActiveCode=COND_FORCE_MODIFIER;}
 };
 
 /** @brief Post integration conditioner **/
-class Post_Conditioner:public Conditioner {
+class PostConditioner:public Conditioner {
 	public:
-		Post_Conditioner(){Active=ActiveCode=COND_POST_INTEGRATION;}
+		PostConditioner(){Active=ActiveCode=COND_POST_INTEGRATION;}
 };
 
 #endif

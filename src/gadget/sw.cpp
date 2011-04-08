@@ -89,25 +89,26 @@ void StillingerWeber::Init(MDSystem* WorkSys) {
 }
 
 void StillingerWeber::PrintInfo(ostream& ost) {
-	ost << "id."<<id<<" "<<get_name()<<"\n"
-		<< "atoms "<<System->SystemAtoms[AtomTypeA]->get_name()
-		<< "<->"<< System->SystemAtoms[AtomTypeB]->get_name()<< "\n"
-		<<" parameter:"
-		<<"\n epsilon="<<eps
-		<<"\n A="<<bigA
-		<<"\n B="<<bigB
-		<<"\n p="<<powerp
-		<<"\n q="<<powerq
-		<<"\n sigma="<<sigma
-		<<"\n a="<<alpha
-		<<"\n lambda="<<lambda
-		<<"\n gamma="<<gamma
-		<<"\n cos0="<<1./icos0<<"\n";
+	ost << "id."<<id<<" "<<get_name()<<" -- "
+		<< "atoms ("<<System->SystemAtoms[AtomTypeA]->get_name()
+		<< "<->"<< System->SystemAtoms[AtomTypeB]->get_name()
+		<<"); epsilon="<<eps
+		<<"; A="<<bigA
+		<<"; B="<<bigB
+		<<"; p="<<powerp
+		<<"; q="<<powerq
+		<<"; sigma="<<sigma
+		<<"; a="<<alpha
+		<<"; lambda="<<lambda
+		<<"; gamma="<<gamma
+		<<"; cos0="<<1./icos0;
 	
 	if(usezbl) {
-		ost << "spline to ZBL at ("<<sx0<<","<<sx1
-		<< ") coeff: "<<sa0<<" "<<sa1<<" "<<sa2<<" "<<sa3<<"\n";
+		ost << "; spline to ZBL at ("<<sx0<<","<<sx1
+		<< ") coeff ("<<sa0<<" "<<sa1<<" "<<sa2<<" "<<sa3<<")";
 	}
+	
+	ost << std::endl;
 }
 
 void StillingerWeber::ZBL(Atom& at, Atom& to, 

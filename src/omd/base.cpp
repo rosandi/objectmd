@@ -234,7 +234,7 @@ void AtomKeeper::Allocate(int sz, KeeperType t){
 			
 			// Initialize as active ~outside ~ghost ~mirror
 			for(int i=0;i<sz;i++) {
-				a->tid=a->gid=-1;a->flag=1;AtomIndex[i].p=a++;
+				a->tid=a->gid=0;a->flag=1;AtomIndex[i].p=a++;
 			}
 
 			NAlloc=NAtom=sz;

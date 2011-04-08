@@ -11,7 +11,7 @@
  * This class it stops atoms in a defined region.
 */
 
-class ForceStopper: public Force_Conditioner {
+class ForceStopper: public ForceConditioner {
 	OMD_FLOAT dWest, dEast, dNorth, dSouth, dTop, dBottom;
 	int fixflag;
 

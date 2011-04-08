@@ -125,8 +125,8 @@ public:
 	}
 
 	virtual void PrintInfo(ostream& ost) {
-		Detector::PrintInfo(ost);
-		ost << "  sample_time="<<TSample<<"; filename="<<Filename<<"; extension_length="<<XLength<<std::endl;
+		ost<<"id."<<id<<" "<<get_name()<<" -- target: "<<Target->get_name();
+		ost << "; sample_time="<<TSample<<"; filename="<<Filename<<"; extension_length="<<XLength<<std::endl;
 	}
 
     virtual bool Check(){

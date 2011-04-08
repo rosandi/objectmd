@@ -19,7 +19,7 @@
  * 
 */
 
-class RangeLimiter: public Post_Conditioner {
+class RangeLimiter: public PostConditioner {
 	OMD_FLOAT StopBorder, lW, lE, lN, lS, lT, lB;	
 public:
 	

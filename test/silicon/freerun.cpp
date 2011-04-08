@@ -41,6 +41,11 @@ class MyMDClass:public MDSystemGrid {
         PrintInfo("info.out");
     }
     
+    void AfterRun() {
+      DumpAtoms("final.dat", WM_VELOCITY|WM_NID);
+      SaveSimulation("saved.bin");
+    }
+    
 };
 
 int main(int argc, char* argv[]) {

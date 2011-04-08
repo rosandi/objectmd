@@ -344,7 +344,7 @@ AtomContainer* AtomContainer::Import(string fname, int aid) {
 		istringstream ist(stbuff);
 		OMD_FLOAT dd;
 		Atom a;
-		a.tid=a.gid=-1;a.flag=1; //active
+		a.tid=a.gid=0;a.flag=1; //active
 		a.x=a.y=a.z=a.vx=a.vy=a.vz=a.fx=a.fy=a.fz=0.0;
 
 		try {

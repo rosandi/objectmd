@@ -183,18 +183,19 @@ public:
 		return a;
 	}
     
+	virtual AtomContainer* DumpAtoms(string fname="",
+	                                 int mode=0, 
+	                                 bool* AuxPrintable=NULL, 
+	                                 char* AuxFormat[]=NULL, 
+	                                 string AuxNames="");
+
 	virtual AtomContainer* DumpAtoms(AtomKeeper& ak, 
 									 string fname, 
 									 int mode=0, 
 									 bool* AuxPrintable=NULL, 
 									 char* AuxFormat[]=NULL, 
 									 string AuxNames="");
-									
-	virtual AtomContainer* DumpAtoms(string fname="",
-	                                 int mode=0, 
-	                                 bool* AuxPrintable=NULL, 
-	                                 char* AuxFormat[]=NULL, 
-	                                 string AuxNames="");
+	
 	                                 
 	AtomContainer*         Combine(AtomContainer& a);
 	

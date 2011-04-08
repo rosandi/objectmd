@@ -14,7 +14,7 @@
  * 
 */
 
-class PotentialMinimizer:public Post_Conditioner {
+class PotentialMinimizer:public PostConditioner {
 protected:
 	OMD_FLOAT factor;
 	OMD_FLOAT last_pot;

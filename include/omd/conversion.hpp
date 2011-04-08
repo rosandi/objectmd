@@ -47,4 +47,6 @@
 
 // eV.ps
 #define MD_PLANK 4.13566733e-3
+#define INFINITE DBL_MAX
+
 #endif

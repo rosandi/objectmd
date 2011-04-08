@@ -41,7 +41,7 @@ public:
 	enum GroupKey {tag, geometry} key;
 
 	AtomGroup(string group_name, AtomContainer* ac, MDSystem* WorkSys);
-	AtomContainer* Create();
+	AtomGroup* Create();
 	AtomGroup* Source(AtomContainer* a);
 	AtomGroup* Union(AtomContainer& a);
 	AtomGroup* Insert(Atom& a);
@@ -52,7 +52,16 @@ public:
 	AtomGroup* SelectGE(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z); // greater or equal
 	AtomGroup* SelectLT(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z); // less than
 	AtomGroup* SelectLE(OMD_FLOAT x, OMD_FLOAT y, OMD_FLOAT z); // less or equal
-	AtomGroup* Commit(){return dynamic_cast<AtomGroup*>(Create());}
+	
+	AtomGroup* SelectBox(OMD_FLOAT x0, OMD_FLOAT x1, 
+						 OMD_FLOAT y0, OMD_FLOAT y1, 
+						 OMD_FLOAT z0, OMD_FLOAT z1);
+	
+	AtomGroup* SelectInverseBox(OMD_FLOAT x0, OMD_FLOAT x1, 
+								 OMD_FLOAT y0, OMD_FLOAT y1, 
+								 OMD_FLOAT z0, OMD_FLOAT z1);
+	
+	AtomGroup* Commit(){return Create();}
 
 	int  GetGroupMask() {return group_flagmask;}
 

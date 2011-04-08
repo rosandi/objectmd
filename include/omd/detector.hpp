@@ -122,6 +122,7 @@ public:
 	}
 
     OMD_FLOAT GetSampleTime(){return TSample;}
+	virtual Detector* SetName(string newname){set_name(newname); return this;}
 
 };
 

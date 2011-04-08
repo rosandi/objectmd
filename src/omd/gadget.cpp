@@ -97,20 +97,22 @@ void MDGadget::Init(MDSystem* WorkSys){
 	SysParam=&(System->param);
 	Iterator=WorkSys->GetIterator();
 	Integrator=WorkSys->GetIntegrator();
+	ReadParameter();
+	assert(CheckParameter(), "check parameter failed");
+	
 	if(Target==NULL){
 		string nst=lower_case(TargetName);
 		if(nst=="-"||nst==""||nst=="all"||nst=="system")Target=WorkSys;
 		else Target=SearchTarget(TargetName);
 	}
 	
-	ReadParameter();
-	assert(CheckParameter(), "check parameter failed");
 	IsReady  = true;
 }
 
 // redirect atom access to Target...    
 Atom&  MDGadget::Atoms(int idx) {return Target->Atoms(idx);}
 Atom*  MDGadget::AtomPtr(int idx) {return Target->AtomPtr(idx);}
+
 int   MDGadget::GetNAtom() {return Target->GetNAtom();}
 OMD_FLOAT MDGadget::GetTimeStep() {return System->Integrator->TimeStep;}
 OMD_FLOAT MDGadget::GetElapsedTime() {return System->ElapsedTime;}

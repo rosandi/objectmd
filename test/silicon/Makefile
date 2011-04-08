@@ -1,13 +1,17 @@
 CXX=$(OMD_CXX)
-EXE=freerun
 LIBS=-L../../lib -I../../include -lm -lomd-$(shell uname -m) -lomd_object-$(shell uname -m)
 
-all:
-	$(CXX) -g -o $(EXE) $(EXE).cpp $(LIBS)
+all: freerun quench
 
-run:
-	./run
-	
+freerun:
+	$(CXX) -g -o freerun freerun.cpp $(LIBS)
+
+quench:
+	$(CXX) -g -o quench quench.cpp $(LIBS)
+
+damp:
+	$(CXX) -g -o damp damp.cpp $(LIBS)
+
 clean:
-	rm -rf init.dat info.out  si.out output pomd \
+	rm -rf init.dat info.out  si.out output pomd quench \
 	$(EXE) mem.log run.log *.bin machine *.dSYM Data.* dump-*

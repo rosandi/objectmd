@@ -61,7 +61,6 @@ public:
 //--------------------------------------------------//
 
 void MDSystem::SystemInit(){
-	stage=stage_prepare;
 	set_name("SIMULATION_SYSTEM");
 	register_class(get_name());
 	Argc=NULL;Argv=NULL;
@@ -96,6 +95,7 @@ void MDSystem::SystemInit(){
 	OutputDirectory="";
 	silent_mode=false;
 	print_every=1;
+	ParameterFilename=DEFAULT_CONFIG_FILENAME;
 }
 
 MDSystem::MDSystem(int &argc, char** &argv){
@@ -174,12 +174,16 @@ int MDSystem::Run(int mode) {
 void MDSystem::ReadParameter() {
 	
 	if(param.exist("--param")) {
-		string paramfilename=param.string_value("--param");
-		assert(file_exist(paramfilename),
+		ParameterFilename=param.string_value("--param");
+		assert(file_exist(ParameterFilename),
 		       "can not find parameter file "+param.string_value("--param"));
-		param.read(paramfilename);
+		blog("reading parameters from ("+ParameterFilename+")");
+		param.read(ParameterFilename);
 	} else {
-		if(file_exist(DEFAULT_CONFIG_FILENAME)) param.read(DEFAULT_CONFIG_FILENAME);
+		if(file_exist(ParameterFilename)) {
+			blog("reading parameters from ("+ParameterFilename+")");			
+			param.read(ParameterFilename);
+		}
 	}
 	
 	if(param.exist("--version")) {
@@ -433,7 +437,7 @@ void MDSystem::CreationFunction() {
     	CreateSystem();
 	}
 
-    for(int i=0;i<(int)SystemAtoms.size();i++)SystemAtoms[i]->set_id(i);
+    for(int i=0;i<(int)SystemAtoms.size();i++) SystemAtoms[i]->set_id(i);
     CreateGadget();
 }
 
@@ -495,6 +499,7 @@ void MDSystem::InitGadgets() {
 	// Synchronize atom's group flag...
 	
 	for(int i=0;i<(int)SystemAtomGroups.size();i++) {
+		if(!(SystemAtomGroups[i]->created)) SystemAtomGroups[i]->Commit();
 		SystemAtomGroups[i]->SyncAtomGroupMask();
 	}
 	
@@ -578,14 +583,13 @@ void MDSystem::ArrangeMessageSlots() {
 */
 
 void MDSystem::Initiate() {
-	stage=stage_create;
 	PreCreation();
     CreationFunction();
    	UnificateAtoms();
    	EnumerateAtoms();
 	AdjustSystem();
+	CreateGroup();
     PostCreation();
-    stage=stage_init;
 	InitGadgets();
 	ArrangeMessageSlots();
 	PushInfo("$ PeriodicBoundary "+as_string(PBoundary));
@@ -929,7 +933,6 @@ void MDSystem::SetArgument(int &argc, char** &argv) {
  */
 
 void MDSystem::RunKernel() {
-	stage=stage_run;
 	while(CheckRun()) {
 		Scheduler();
 		ExecuteConditioners(COND_PRE_INTEGRATION);
@@ -948,7 +951,6 @@ void MDSystem::RunKernel() {
 		Step++;
 		CheckInterruption();
 	}
-	stage=stage_finalize;
 }
 
 void MDSystem::RunNormal() {
@@ -1396,7 +1398,8 @@ AtomContainer* MDSystem::Import(string fname){
 	}
 	
 	if(p.exist("PeriodicBoundary")) {
-		PBoundary=p.int_value("PeriodicBoundary");
+		// leave it if it is already set!
+		SetBoundaryCondition(p.int_value("PeriodicBoundary"), false);
 	}
 	
 	if(!ia) {
@@ -1486,4 +1489,20 @@ void MDSystem::DeactivateGadget(string gname) {
 		blog("gadget ("+gname+","+g->get_type()+
 		     ") Deactivated step="+as_string(Step));
 	}
+}
+
+AtomContainer* MDSystem::SearchContainer(string name) {
+	if(name==get_name()) return this;
+	
+	// Atom group has priority...
+	for(int i=0;i<(int)SystemAtomGroups.size();i++)
+		if(name==SystemAtomGroups[i]->get_name())
+			return SystemAtomGroups[i];
+	
+	for(int i=0;i<(int)SystemAtoms.size();i++)
+		if(name==SystemAtoms[i]->get_name())
+			return SystemAtoms[i];
+	
+	die("can not find target atom '"+name+"'");
+	return NULL; // avoids warning..
 }

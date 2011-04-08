@@ -18,7 +18,7 @@ enum ForceFieldType {PointSource, LineSource, PlaneSource};
  * Not to be confused with CHARMS force field!
 */
 
-class TField: public Force_Conditioner {
+class TField: public ForceConditioner {
 	OMD_FLOAT ox,oy,oz;
 	OMD_FLOAT ax,ay,az;
 	OMD_FLOAT bx,by,bz;

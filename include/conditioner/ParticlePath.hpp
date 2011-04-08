@@ -17,7 +17,7 @@ using std::ifstream;
  * 
 */
 
-class ParticlePath: public Calc_Conditioner {	
+class ParticlePath: public CalcConditioner {	
 	int Index, NPath, CurrentPath, Interrupt;
 	OMD_FLOAT *x, *y, *z;
 	bool Circulate;

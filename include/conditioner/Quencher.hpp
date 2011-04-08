@@ -17,37 +17,79 @@
  * quencing period. The default values are 0.98 for quencing 
  * factor and 0 for period, which means that the system will be
  * quenched every loop.
+ *
+ * Parameters:
+ * - @e quench.factor (factor) : quenching factor between 0 to 1
+ * - @e quench.every (step) : the period of quenching in step
 */
 
-class Quencher:public Post_Conditioner {
+class Quencher:public PostConditioner {
 protected:
-	int Period, Step;
+	int Period;
 	OMD_FLOAT Factor;
+	bool minimize;
+	OMD_FLOAT last_pot;
 	
 public:
-	Quencher(OMD_FLOAT QFactor, int per=0) {
-		Factor=QFactor; Period=per; Step=0;
-		set_name("QUENCHER");
+	Quencher() {
+		set_name("QUENCH");
 		register_class(get_name());
+		Factor=-1.0;
+		Period=1;
+		minimize=false;
+	}
+
+	Quencher(string target, OMD_FLOAT quench_factor, int period=1) {
+		set_name("QUENCH");
+		register_class(get_name());
+		Factor=quench_factor;
+		Period=period;
+		TargetName=target;
+		minimize=false;
 	}
 	
-	void PrintInfo(ostream& ost) {
-		ost << "ID." << id << " " << Name << " -- quench factor=" 
-		    << Factor << "; period=" << Period << "steps\n";
-	}
+	void ReadParameter() {
+		// so... many quencher can be used...
+		string tag=lower_case(replace_char(get_name(),' ','_'));
+		SysParam->peek(tag+".factor", Factor);
+		SysParam->peek(tag+".every", Period);
+		SysParam->peek(tag+".minimize", minimize);
 		
-	void PostIntegration() {
-		if (Step>=Period) {
-			Step=0;
-			int na=Target->GetNAtom();
-			for (int i=0; i<na; i++) {
-				Target->Atoms(i).vx*=Factor;
-				Target->Atoms(i).vy*=Factor;
-				Target->Atoms(i).vz*=Factor;
-		 	}
-	 	} 
-	 	Step++;
+		assert(Factor>=0.0, 
+			   "the quench factor ("+get_name()+
+			   ".factor) must be defined in the parameter");
+
 	}
+
+	void PostIntegration() {
+		if (!(NCalls%Period)) {
+			int na=Target->GetNAtom();
+			if(minimize) {
+				if(last_pot<System->Potential) {
+					for (int i=0; i<na; i++) {
+						Atom* A=AtomPtr(i);
+						A->vx*=Factor;
+						A->vy*=Factor;
+						A->vz*=Factor;
+					}
+				}
+				last_pot=System->Potential;
+			} else {
+				for (int i=0; i<na; i++) {
+					Atom* A=AtomPtr(i);
+					A->vx*=Factor;
+					A->vy*=Factor;
+					A->vz*=Factor;
+				}				
+		 	}
+	 	}
+	}
+
+	void PrintInfo(ostream& ost) {
+		ost << "id." << id << " " << get_name() << " -- target="<<Target->get_name()
+		<< "; factor="<< Factor << "; every=" << Period << " steps\n";
+	}
+
 };
 
 #endif

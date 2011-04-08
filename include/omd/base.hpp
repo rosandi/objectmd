@@ -77,15 +77,6 @@ public:
 
 };
 
-enum stage_type {
-		stage_undefined,
-		stage_prepare, 
-		stage_create,
-		stage_init,
-		stage_run,
-		stage_finalize
-};
-
 /** 
  * @ingroup basestruct
  * @brief Base structure of an atom 

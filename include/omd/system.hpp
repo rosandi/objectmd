@@ -153,7 +153,8 @@ protected:
 	bool Enumerated;
 
     MDIterator* Iterator;
-
+	
+	string ParameterFilename;
 	string BinaryFilename;
 	string OutputDirectory;
 	
@@ -206,6 +207,7 @@ protected:
     virtual void CreateSystem();
     virtual void CreateGadget()=0;
     virtual void SystemSetting(){} // settings may be done via parameters
+	virtual void CreateGroup(){} // atom grouping, called after adjust_system/system_setting
 
 	// Default=Do nothing functions. reserved for user application.
 	virtual void PreCreation(){}
@@ -342,13 +344,18 @@ public:
 		
 	// react to this signal
 	void AcceptSignal(int signo);	
+	
+	// parameter filename. call only before run()
+	void SetParameterFile(string cfgfile) {
+		ParameterFilename=cfgfile;
+	}
 		
 	// output directory
-	virtual void SetOutputDirectory(const string outdir) {
+	void SetOutputDirectory(const string outdir) {
 		OutputDirectory.assign(outdir);
 	}
 	
-	virtual string GetOutputDirectory(){
+	string GetOutputDirectory(){
 		return OutputDirectory;
 	}
 	
@@ -361,12 +368,11 @@ public:
 	virtual MDGadget* SearchGadget(string name);
 	bool GadgetExist(MDGadget* gad);
 	
+	virtual AtomContainer* SearchContainer(string name);
 	virtual AtomContainer* Import(string fname);
 
 	int GetMode(){return Mode;}
-	
-	stage_type stage;
-	
+		
 	void ResetSimulationTime(){Step=0; ElapsedTime=0;}
 
 	/** sets MaxTime only when it is not already done previously **/

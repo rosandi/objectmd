@@ -32,7 +32,7 @@
  * 
 */
 
-class TempController: public Post_Conditioner {
+class TempController: public PostConditioner {
 	OMD_FLOAT TempSet, Tau;
 	ThermoDetector* temp_detector;
 

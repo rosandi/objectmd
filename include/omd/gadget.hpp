@@ -32,7 +32,10 @@
  * @brief Base class for all gadgets
  *
  * MDGadget is the root class of all the plugable classes in 
- * Object-MD. These classes is called gadgets.
+ * Object-MD. These classes is called gadgets. To every gadgets is assign a Target
+ * container. The access to atom structure (via Atoms()) is redirected to Target->Atoms().
+ * The target container is initialized in MDGadget::Init() by defining TargetName in the
+ * constructor or in ReadParameter().
  * 
  * Class type convention: lower-case, no space.
  * 

@@ -30,7 +30,7 @@
 
 // explain: table file format, pulse function file, unity
 
-class TTM_Homogen: public Pre_Conditioner, public ParallelGadget {
+class TTM_Homogen: public PreConditioner, public ParallelGadget {
 	
 	TableReader G;
 	TableReader Ce;

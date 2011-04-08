@@ -27,7 +27,7 @@
 
 // explain: table file format, pulse function file, unity
 
-class TTM_Homogen: public Force_Conditioner {
+class TTM_Homogen: public ForceConditioner {
 	
 	CommunicationHandler* Communicator;
 	string parfile;

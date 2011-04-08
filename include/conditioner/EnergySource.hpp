@@ -51,7 +51,7 @@
  
 **/
 
-class EnergySource: public Pre_Conditioner, public ParallelGadget {
+class EnergySource: public PreConditioner, public ParallelGadget {
 	int input_mode;
 	OMD_FLOAT e_tally; // total energy/atom...
 	OMD_FLOAT delta;

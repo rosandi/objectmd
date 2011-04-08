@@ -465,7 +465,7 @@ void MDSystemGrid::CreationFunction() {
 
 	LoadAtoms(); // all proc loads their own atoms, ThisProcAtomNumber is updated...
 
-	
+	for(int i=0;i<(int)SystemAtoms.size();i++) SystemAtoms[i]->set_id(i);
 	CreateGadget();
 	SyncEnvironment();
 }
@@ -521,7 +521,8 @@ void MDSystemGrid::DistributeContainers() {
 		SystemAtoms[(int)(a->tid)]->GetAtomStorage().IndexBook.push(i);
 
 		for(int k=0;k<ng;k++) {
-			if(a->gid&ing[k]) SystemAtomGroups[k]->GetAtomStorage().IndexBook.push(i);
+			if(a->gid&ing[k])
+				SystemAtomGroups[k]->GetAtomStorage().IndexBook.push(i);
 		}
 
 	}
@@ -586,7 +587,6 @@ void MDSystemGrid::AdjustSystem() { // MDSystem::AdjustSystem is invoked from Ro
 	Box=ProcInfo.Box;
 	TotalAtom=ProcInfo.TotalAtom;
 
-	// assign ThisProcAtoms
 	int na=GetNAtom();
 	SqrMaxVelocity=0.0;
 	for(int i=0;i<na;i++) {
