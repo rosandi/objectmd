@@ -54,7 +54,7 @@ bool VerletList::CheckParameter() {
 	if(RadiusTolerance<=0.0) {
 		warn("no radius tolerance for verlet list (verlet.radtole). Setting update period to 1");
 		RadiusTolerance=0.0;
-		UpdatePeriod=1.0;
+		UpdatePeriod=1;
 	}
 	return true;
 }
