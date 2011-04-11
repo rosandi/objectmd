@@ -55,7 +55,7 @@ bool VerletListFull::CheckParameter() {
 	if(RadiusTolerance<=0.0) {
 		warn("no radius tolerance for verlet list (verlet.radtole). Setting update period to 1");
 		RadiusTolerance=0.0;
-		UpdatePeriod=1.0;
+		UpdatePeriod=1;
 	}
 	return true;
 }
@@ -142,7 +142,7 @@ void VerletListFull::Update() {
 		MemRealloc(Link, na*sizeof(int));
 		MemRealloc(Neighbors, na*sizeof(NeighborList));
 		for(int i=AllocSize;i<na;i++) {
-			Neighbors[i].size=0.0;
+			Neighbors[i].size=0;
 			MemAlloc(Neighbors[i].list,nmean*sizeof(int));
 			MemAlloc(Neighbors[i].flag,nmean*sizeof(int));
 			memset(Neighbors[i].list,-1,nmean*sizeof(int));
@@ -246,8 +246,8 @@ void VerletListFull::PreIntegration() {
 	MemRealloc(Neighbors, AllocSize*sizeof(NeighborList));
 	
 	for(int i=0;i<AllocSize;i++) {
-		Neighbors[i].start=0.0;
-		Neighbors[i].end=0.0;
+		Neighbors[i].start=0;
+		Neighbors[i].end=0;
 		Neighbors[i].size=nmean;
 		MemAlloc(Neighbors[i].list, nmean*sizeof(int));
 		MemAlloc(Neighbors[i].flag, nmean*sizeof(int));
