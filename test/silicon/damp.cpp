@@ -20,7 +20,9 @@ class MyMDClass:public MDSystemGrid {
        AddAtomGroup("damp-area")
           ->SelectInverseBox(Box.x0+5.43, Box.x1-5.43, 
                              Box.y0+5.43, Box.y1-5.43,
-                             Box.z0+5.43, INFINITE);
+                             -INFINITE, INFINITE);
+//          ->Commit()
+//          ->DumpAtoms("damp-area-"+as_string(GetRank()), WM_NID);
     }
     
     void CreateGadget() {

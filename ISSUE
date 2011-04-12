@@ -1,10 +1,14 @@
 - LOP has problem with big crystal using VerletList.
+
 - TODO: for multi element simulation, potential calculation
   may have different cut_radius. consider using radius matrix!
   (i.e. cutsq[A][B] for atom type A and B)
+
 - CASE: using MDSystemGrid
   @CreateSystem: import crystal position, set temperature
   temperature is zeroed befor running!
++ SOLVED! Double call to creation function...
+
 
 ! Loop algorithm is changed.
   An iterator my provide two types of loops: half-loop and full-loop.
@@ -19,4 +23,12 @@
   of IterateFull() functions, unless it needs both to be called sequentially.
   Integrator calls Iterate() function. So the loop-mode may be 
   activate/deactivate by Iterator::Enable/DisableHalf/FullLoop().
+
+
+- @WAP: failed using 32 procs! 8 is OK. The problem comes from the atom
+  group distribution routine. Failed when group has no member! e.g. 
+  damped boundary -> procs @center has no boundary group member -> seg.fault!
+  To check: MDSystemGrid::DistributeContainers(), AtomKeeper::IndexBook,
+            AtomKeeper::AsignByIndex()
+
 

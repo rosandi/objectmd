@@ -199,7 +199,7 @@ public:
 	void reset() {iter=head;current=0;}
 
 	bool step()  {
-		if(!iter) return false;
+		if(iter==NULL) return false;
 		if(current>=length) return false;
 		iter=iter->next; current++;
 		return true;

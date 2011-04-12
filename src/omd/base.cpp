@@ -364,8 +364,8 @@ void AtomKeeper::Copy(AtomKeeper& ak) {
 
 void AtomKeeper::AssignByIndex(AtomKeeper& ak) {
 	int a;
-	Expand(IndexBook.length);
-	Clear();
+	Expand(IndexBook.length); Clear();
+	if(IndexBook.length==0) return;
 	IndexBook.reset();
 	while((a=IndexBook.fetch())>=0) Attach(ak[a]);
 }

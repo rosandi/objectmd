@@ -29,14 +29,13 @@
  * The integrator accepts a double parameter, which is the integration time step.
  */
 
-MDIntegrator::MDIntegrator(OMD_FLOAT time_step)
-{
+MDIntegrator::MDIntegrator(OMD_FLOAT time_step) {
 	Iterator = NULL;
 	ForcID=0; // Force kernel counter
 	TimeStep = time_step;
     MaxCutRadius  = 0.0;
-	register_class("INTEGRATOR");
-	set_name("VERLET_INTEGRATOR");
+	set_name("VERLET INTEGRATOR");
+	register_class(get_name());
     for (int i=0;i<MAXATOMTYPE;i++) 
     	for (int j=0;j<MAXATOMTYPE;j++) Forces[i][j]=NULL;
 }

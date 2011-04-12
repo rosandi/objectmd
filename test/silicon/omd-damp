@@ -4,7 +4,7 @@ monitor.filename damp.out
 monitor.sample 10
 boundary.periodic no
 
-time.max 10
+time.max 5.0
 time.step 0.001
 
 dump.sample 0.015

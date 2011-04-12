@@ -13,5 +13,5 @@ damp:
 	$(CXX) -g -o damp damp.cpp $(LIBS)
 
 clean:
-	rm -rf init.dat info.out  si.out output pomd quench \
+	rm -rf init.dat info.out  si.out output pomd quench damp \
 	$(EXE) mem.log run.log *.bin machine *.dSYM Data.* dump-*
