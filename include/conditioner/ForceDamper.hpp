@@ -36,7 +36,7 @@ public:
 	}
 
 	void ForceModifier() {
-		OMD_FLOAT na=Target->GetNAtom();
+		OMD_FLOAT na=GetNAtom();
 		for(int i=0;i<na;i++) {
 			Atoms(i).fx-=Factor*Atoms(i).vx;
 			Atoms(i).fy-=Factor*Atoms(i).vy;
