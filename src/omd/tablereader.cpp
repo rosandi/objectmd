@@ -137,7 +137,7 @@ void TableReader::open(string table_filename, string tablename) {
 	try{
 		open_omd(table_filename, tablename);
 	} catch(...){
-		throw "error reading potential table file";
+		die("error reading potential table file: "+tablename+"@"+table_filename);
 	}
 	ready=true;
 }

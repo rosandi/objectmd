@@ -262,6 +262,7 @@ void MDSystem::CreateSystem() {
 		string fname=param.string_value("import");
 		assert(file_exist(fname), "can not find file to import ("+fname+")");
 		blog("importing file "+fname);
+		if(param.peek("material", mat_file)) blog("setting material to "+mat_file);
 		Import(fname);
 
 	} else if(param.exist("load")) { // load from binary file
@@ -1403,10 +1404,15 @@ AtomContainer* MDSystem::Import(string fname){
 	}
 	
 	if(!ia) {
-		assert(p.exist("Material"), 
-		"can not find Material tag in import file ("+fname+
-		") nor material definition in the parameter list");
-		AddAtom(new AtomContainer(p.string_value("Material")))->Import(fname);
+		
+		if(mat_file=="") {
+			assert(p.exist("Material"), 
+				   "can not find Material tag in import file ("+fname+
+				   ") nor material definition in the parameter list");
+			mat_file=p.string_value("Material");
+		}
+		
+		AddAtom(new AtomContainer(mat_file))->Import(fname);
 	}
 
 	return this;

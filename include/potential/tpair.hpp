@@ -45,6 +45,7 @@ class TForcePair: public ForceKernel {
 			char sname[128];
 			set_name("TABLE PAIR FORCE");
 			register_class(get_name());
+			phi.set_name("READER@"+get_name());
 			tablefile=TableFile;
 		}
 		

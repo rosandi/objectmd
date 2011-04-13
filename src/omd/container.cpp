@@ -318,7 +318,7 @@ AtomContainer* AtomContainer::Import(string fname, int aid) {
 			if(sfl=="vy") ivy=i-idx;
 			if(sfl=="vz") ivz=i-idx;
 			if(sfl=="id") iid=i-idx;
-			if(sfl=="xid") ixid=i-idx;
+			if(sfl=="gid") ixid=i-idx;
 			if(sfl=="--") break;
 		}
 	}
@@ -464,7 +464,7 @@ AtomContainer* AtomContainer::DumpAtoms(AtomKeeper& ak,
 			if(mode&WM_POTENTIAL)f<<" pot";
 			if(mode&WM_VIRIAL)   f<<" vir";
 			if(mode&WM_TID)       f<<" id";
-			if(mode&WM_GID)      f<<" xid";
+			if(mode&WM_GID)      f<<" gid";
 			if(mode&WM_NID)      f<<" nid";
 								 f<<" --\n";
 		}

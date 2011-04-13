@@ -42,7 +42,7 @@ public:
 	}
 	
 	void Init(MDSystem *WorkSys) {
-		Pre_Conditioner::Init(WorkSys);
+		PreConditioner::Init(WorkSys);
 		ParallelGadget::Init(WorkSys);
 		assert(maxp>0.0, "maxpath is undefined! (parameter timestep.maxpath)");
 	}
