@@ -560,13 +560,14 @@ void MDSystemGrid::SyncData(int syncmode) {
     if(syncmode&SYNC_SPACE) {
         if(Step%CommRefreshPeriod) {
             Communicator->SendReceive(syncmode);
+            DistributeContainers();
         } else {
             Communicator->SendReceive(SYNC_POSITION);
             FlattenAtomBox();
-            DistributeContainers();
             UpdateRadiusTolerance();
             Communicator->DistributeAtomIndex();
             Communicator->SendReceive(syncmode);
+            DistributeContainers();
             Iterator->SetDirty();
         }
     } else {
