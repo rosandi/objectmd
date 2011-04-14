@@ -7,7 +7,8 @@
 - CASE: using MDSystemGrid
   @CreateSystem: import crystal position, set temperature
   temperature is zeroed befor running!
-+ SOLVED! Double call to creation function...
+
++ SOLVED! Double call to creation function... @AddAtoms()
 
 
 ! Loop algorithm is changed.
@@ -31,4 +32,6 @@
   To check: MDSystemGrid::DistributeContainers(), AtomKeeper::IndexBook,
             AtomKeeper::AsignByIndex()
 
++ SOLVED: @MDSystemGrid DistributeContainers() must be called after 
+  SendReceive() on SYND_SPACE.
 
