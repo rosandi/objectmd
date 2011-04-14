@@ -502,7 +502,7 @@ void MDSystemGrid::FlattenAtomBox() {
 void MDSystemGrid::DistributeContainers() {
 	int nc=SystemAtoms.size();
 	int ng=SystemAtomGroups.size();
-	int *ing=new int[ng];
+	int ing[ng];
 
 	for (int i=0;i<nc;i++) SystemAtoms[i]->GetAtomStorage().IndexBook.clear();
 	for (int i=0;i<ng;i++) {
