@@ -22,6 +22,8 @@
 
 OMD_FLOAT onethird;
 
+int nzz, nspl, nsw;
+
 StillingerWeber::StillingerWeber(string material) {
 	paramfile=material;
 	set_name("STILLINGER WEBER");
@@ -126,7 +128,7 @@ void StillingerWeber::ZBL(Atom& at, Atom& to,
 	OMD_FLOAT fr=((1.0/r+ze0)*fex[0]+
 				  (1.0/r+ze1)*fex[1]+
 				  (1.0/r+ze2)*fex[2]+
-				  (1.0/r+ze3)*fex[3])*zc/(r*r);
+				  (1.0/r+ze3)*fex[3])*zc/(r*r); // -del fpot
 	
 	// return force...
 	at.fx+=dx*fr;

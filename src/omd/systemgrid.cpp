@@ -611,7 +611,8 @@ void MDSystemGrid::UpdateRadiusTolerance() {
 
 void MDSystemGrid::InitGadgets() {
 	MDSystem::InitGadgets();
-
+	
+	// all the gadget has been initiated..
 	UpdateRadiusTolerance();
 	Iterator->SetDirty();
 	Iterator->SetUpdatePeriod(0); // controlled update by MDSystemGrid...

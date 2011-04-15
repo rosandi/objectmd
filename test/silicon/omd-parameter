@@ -12,7 +12,7 @@ monolayer 40 40 40
 
 boundary.periodic xy
 
-temperature 100
+#temperature 100
 
 monitor.filename si.out
 monitor.sample 10

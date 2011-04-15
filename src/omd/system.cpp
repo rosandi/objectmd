@@ -504,6 +504,8 @@ void MDSystem::InitGadgets() {
 		SystemAtomGroups[i]->SyncAtomGroupMask();
 	}
 	
+	MeasureKinetic(); // needed in some initializations
+	
 	// Search for the Iterator. Add if not found.
    	for (int i=0; i<(int)Conditioners.size(); i++) {
 		if(Conditioners[i]->type_of("iterator"))

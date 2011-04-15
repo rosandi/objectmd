@@ -100,7 +100,6 @@ public:
     }
 
 	virtual void Measure() {
-		if(System->Step%every) return;
 		if(GetRank()==ROOT){
 			RelPotential=System->Potential-System->BasePotential;
 			MechanicEnergy=System->Kinetic+System->Potential-System->BasePotential;
@@ -122,6 +121,10 @@ public:
 				
 			}
 		}
+	}
+	
+	virtual void Detect() {
+		if(!(System->Step%every)) Measure();
 	}
 	
 };
