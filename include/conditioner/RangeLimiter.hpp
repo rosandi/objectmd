@@ -49,13 +49,15 @@ public:
 	}
 			 
 	void PostIntegration() {
-		for(int i=0; i<GetNAtom(); i++) {			
-			if(Atoms(i).x<lW){SetActive(i,false);continue;}
-			if(Atoms(i).x>lE){SetActive(i,false);continue;}
-			if(Atoms(i).y<lS){SetActive(i,false);continue;}
-			if(Atoms(i).y>lN){SetActive(i,false);continue;}
-			if(Atoms(i).z<lB){SetActive(i,false);continue;}
-			if(Atoms(i).z>lT){SetActive(i,false);continue;}
+		int na=GetNAtom();
+		for(int i=0; i<na; i++) {
+			Atom* a=AtomPtr(i);
+			if(a->x<lW){SetActive(i,false);continue;}
+			if(a->x>lE){SetActive(i,false);continue;}
+			if(a->y<lS){SetActive(i,false);continue;}
+			if(a->y>lN){SetActive(i,false);continue;}
+			if(a->z<lB){SetActive(i,false);continue;}
+			if(a->z>lT){SetActive(i,false);continue;}
 		}
 	}
 };
