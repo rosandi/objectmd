@@ -21,6 +21,8 @@ class TrajectoryWatcher: public Detector, public ParallelGadget {
 	public:
 		
 		TrajectoryWatcher(string TargetAtom, string fname) {
+			set_name("TRAJECTORY WATCHER");
+			register_class(get_name());
 			TargetName=TargetAtom; gid=-1; filename=fname;
 		}
 
