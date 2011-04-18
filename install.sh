@@ -56,7 +56,7 @@ cat << endl > $CONF_FILE
 export OMD_HOME=$INSTALL_DIR
 export OMD_TABLE=\$OMD_HOME/tables
 export OMD_CLASS=\$OMD_HOME/include/class
-export OMD_LIBS="-I$OMD_HOME/include -L$OMD_HOME/lib -lomd-$(uname -m) -lomd_object-$(uname -m) -lm"
+export OMD_LIBS="-I\$OMD_HOME/include -L\$OMD_HOME/lib -lomd_object-$(uname -m) -lomd-$(uname -m) -lm"
 endl
 
 [[ ! -z $MPI_PATH ]] && echo "export OMD_MPI=$MPI_PATH" >> $CONF_FILE
