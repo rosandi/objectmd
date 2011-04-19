@@ -35,3 +35,6 @@
 + SOLVED: @MDSystemGrid DistributeContainers() must be called after 
   SendReceive() on SYND_SPACE.
 
+- Looks like there is a small problem in distributing atoms to compute-cells.
+  Disturbance appears @Si(100 110) running in 4 procs exacty in the cell boundary.
+  To check: ghosts, border, RadiusTolerance, data transfer between compute-neigh.
