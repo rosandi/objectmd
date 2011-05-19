@@ -1,0 +1,32 @@
+import atom.dat
+
+projectile 28.52 31.27 5.0
+projectile.offset 0 0
+projectile.theta 0.0
+projectile.phi 0.0
+projectile.energy 3000
+
+monitor.filename md.out
+monitor.sample 10
+boundary.periodic no
+
+time.max 3.0
+time.step 0.001
+
+dump.sample 0.01
+dump.field velocity+tid+nid
+
+comm.arch  2 2 1
+comm.refresh 5
+
+clamp.axis   xyz
+damping.factor 0.34328
+
+dir.output output
+
+timestep.maxpath 0.13
+timestep.max 1e-3
+timestep.update 5
+
+border.fix 1.0
+border.damp 3.0

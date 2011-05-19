@@ -17,4 +17,5 @@ runmpi: all
 clean:
 	rm -rf $(EXE) err me-* system-? true_cry hot cool nohup.* \
 	machine  mach-* md.out  pomd Data.??? init_data info.out \
-	*.log *.bin
+	*.log *.bin simulation_system_grid
+	

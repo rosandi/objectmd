@@ -1,0 +1,12 @@
+#!/bin/bash
+
+OMD_TABLE=../../tables
+
+make
+
+hostname > mach
+hostname >> mach
+hostname >> mach
+hostname >> mach
+
+$OMD_MPI/bin/mpirun -machinefile mach -np 4 ./main $@

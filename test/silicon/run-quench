@@ -1,0 +1,12 @@
+#!/bin/bash
+
+OMD_TABLE=../../tables
+
+make quench
+
+hostname > mach
+hostname >> mach
+hostname >> mach
+hostname >> mach
+
+mpirun -machinefile mach -np 4 ./quench $@
