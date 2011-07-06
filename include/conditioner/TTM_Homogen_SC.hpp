@@ -67,7 +67,7 @@ class TTM_Homogen: public PreConditioner, public ParallelGadget {
 	
 public:
 	
-	TTM_Homogen():Pre_Conditioner(){
+	TTM_Homogen():PreConditioner(){
 		set_name("Homogen two temperature model");
 		register_class("TWO_TEMPERATURE_MODEL");
 		electron_temperature=-1.0; // undefined...
