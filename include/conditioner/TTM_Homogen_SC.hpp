@@ -198,8 +198,8 @@ private:
 		// use constant volume!
 		
 		if(firstfd){
-			if(electron_temperature<=0.0) {
-				if(electron_energy<=0.0) electron_temperature=atomtemp;
+			if(electron_temperature<0.0) { // zero electron temperature is allowed!
+				if(electron_energy<0.0) electron_temperature=atomtemp;
 				else find_temperature(electron_energy);
 			}
 

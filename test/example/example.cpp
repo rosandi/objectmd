@@ -1,14 +1,14 @@
 #include <omd/system.hpp>
 #include <crystal/FCC111.hpp>
 #include <potential/team.hpp>
-#include <conditioner/NeighborCell.hpp>
+#include <conditioner/VerletList.hpp>
 #include <detector/ThermoDetector.hpp>
 #include <detector/SysMonitor.hpp>
 
 class MyMDClass:public MDSystem {
 
     void CreateSystem() {
-        AddAtom(new CrystalFCC111(30,20,10, "platinum"))
+        AddAtom(new CrystalFCC111(30,20,16, "platinum"))
            ->Create()
            ->SetTemperature(100.0)
            ->SetName("Crystal");
@@ -17,7 +17,7 @@ class MyMDClass:public MDSystem {
     void CreateGadget() {
         SetIntegrator(new MDIntegrator);
         AddForce(new TForceEAM("platinum"));
-        AddConditioner(new NeighborCell);
+        AddConditioner(new VerletList);
         AddDetector(new SysMonitor("md.out"));  
         AddDetector(new ThermoDetector(0.02));
     }

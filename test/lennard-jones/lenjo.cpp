@@ -15,20 +15,19 @@
 
 #include <iostream>
 #include <unistd.h>
-#include <omd/simgrid.h>
-#include <omd/tpair.h>
-#include <class/NeighborCell.hpp>
-#include <class/CrystalFCC100.hpp>
-#include <class/TempPressDetector.hpp>
-#include <class/StructureDetector.hpp>
-#include <class/SysMonitorGrid.hpp>
+#include <omd/systemgrid.hpp>
+#include <potential/tpair.hpp>
+#include <conditioner/VerletList.hpp>
+#include <crystal/FCC100.hpp>
+#include <detector/ThermoDetector.hpp>
+#include <detector/StructureDetector.hpp>
+#include <detector/SysMonitor.hpp>
 #include <fstream>
 
-class MySim:public SimSystemGrid {
-	
+class MySim:public MDSystemGrid {
 	
 	void CreateSystem() {
-		param.read(search_path("$OMD_MATERIAL", "argon"));
+		param.read(search_path("$OMD_TABLE", "def.argon"));
 		
 		AddAtom(new CrystalFCC100(16,16,16, "argon"))
 		->Create()
@@ -39,10 +38,10 @@ class MySim:public SimSystemGrid {
 	
 	void CreateGadget() {
 		SetIntegrator(new MDIntegrator);
-		AddForce(new TForcePair("lj-ar.tab"));
-		AddConditioner(new NeighborCell);		
-		AddDetector(new SysMonitorGrid("md.out"));
-		Detector* main_detector=new TempPressDetector(0.05,"Data");
+		AddForce(new TForcePair("argon.lj"));
+		AddConditioner(new VerletList);		
+		AddDetector(new SysMonitor);
+		Detector* main_detector=new ThermoDetector(0.05);
 		AddDetector(main_detector);
 		AddDetector(new StructureDetector)->Join(main_detector);
 		
@@ -62,11 +61,11 @@ class MySim:public SimSystemGrid {
 	}	
 
 public:
-	MySim(int& argc, char** &argv):SimSystemGrid(argc,argv){}
+	MySim(int& argc, char** &argv):MDSystemGrid(argc,argv){}
 };
 
-MD_MAIN_BEGIN
+int main(int argc, char* argv[]) {
 	MySim TheSim(argc,argv);
 	TheSim.SetClusterArch(2,1,1);
 	TheSim.Run();
-MD_MAIN_END
+}
