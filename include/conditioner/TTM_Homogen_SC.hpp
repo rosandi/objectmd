@@ -113,7 +113,7 @@ public:
 
 	// requires temperature and pressure detector
 	void Init(MDSystem* WorkSys) {
-		Pre_Conditioner::Init(WorkSys);
+		PreConditioner::Init(WorkSys);
 		ParallelGadget::Init(WorkSys);
 		
 		RegisterMessageSlot(new DataSlot("e_temp",2))
