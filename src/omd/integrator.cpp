@@ -94,9 +94,12 @@ void MDIntegrator::Init(MDSystem* WorkSys) {
 	}
 
 	// using one interaction force, all atoms has the same ID=0
-	if (ActForces.size()==1) { 
-		WorkSys->set_id(0); 
-		Forces[0][0]->SetAtomID(0, 0);
+	// if only one type of atoms and/or AddForce(ForceKernel*) is invoked
+	 if (ActForces.size()==1) {
+		 if(Forces[0][0]) {
+			 WorkSys->set_id(0); 
+			 Forces[0][0]->SetAtomID(0, 0);
+		 }
 	}
 	
 	MaxCutRadius=-1.0;

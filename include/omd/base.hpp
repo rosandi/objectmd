@@ -247,6 +247,7 @@ class MDClass:public MDToolkit {
 	
 protected:
 	int mem_alloc_cnt[3]; // free, alloc, realloc counter
+	string tag; // tag in parameter file
 	void LoadEnv();
 
 public:
@@ -283,7 +284,9 @@ public:
 	void SetOutside(int idx, bool a=true);	
 	void SetGhost(int idx, bool a=true);
 
-	virtual void PrintInfo(ostream& ost);	
+	virtual void PrintInfo(ostream& ost);
+	void SetTag(string tg){tag=tg;}
+	string mytag(string sub="");
 };
 
 

@@ -151,6 +151,7 @@ protected:
 	int DetectorID;
 	bool Unificated;
 	bool Enumerated;
+	bool stopped;
 
     MDIterator* Iterator;
 	
@@ -237,7 +238,10 @@ protected:
     virtual void BeforeFirstRun(){}
 	virtual void BeforeRun(){}
     virtual void AfterRun(){}
-	virtual bool CheckRun(){return((ElapsedTime<=MaxTime)&&(InterruptFlag==0));}
+	virtual bool CheckRun(){
+		if(stopped) return false;
+		return((ElapsedTime<=MaxTime)&&(InterruptFlag==0));
+	}
 	virtual void FirstRun();
 	virtual void RunKernel();
 
@@ -253,6 +257,7 @@ public:
 	
     virtual ~MDSystem();
     void SystemInit();
+	virtual void Init() {}; // reserved for user initialization (before Initiate())
 
     virtual void ReadParameter();
 	virtual int Run(int mode=NORMAL_MODE);
@@ -387,8 +392,13 @@ public:
 	virtual int GetLocalAtomNumber(){return GetNAtom();}
 	virtual int GetTotalAtomNumber(){return GetNAtom();}
 	
+	double GetBasePotential() {return BasePotential;}
 	void ActivateGadget(string gname);
 	void DeactivateGadget(string gname);
+	void Stop(){stopped=true;}
+	
+	// short cuts...
+	AtomContainer* AddAtom(string name, AtomContainer* Atm){return AddAtom(Atm)->SetName(name);}
 
 };
 

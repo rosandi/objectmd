@@ -25,6 +25,7 @@
 MDClass::MDClass() {
 	id=-1;
 	set_name("MDCLASS");
+	tag="";
 	mem_alloc_cnt[0]=mem_alloc_cnt[1]=mem_alloc_cnt[2]=0;
 	LoadEnv();
 }
@@ -111,6 +112,12 @@ void MDClass::SetOutside(int idx, bool a){
 void MDClass::SetGhost(int idx, bool a){
 	if(a)Atoms(idx).flag|=FLAG_GHOST;
 	else Atoms(idx).flag&=(~FLAG_GHOST);
+}
+
+string mytag(string sub) {
+	if(tag=="") tag=replace_char(lower_case(get_name()),' ','_');
+	if(sub=="") return tag;
+	return tag+"."+sub;
 }
 
 

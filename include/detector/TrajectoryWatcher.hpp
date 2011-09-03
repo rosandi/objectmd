@@ -8,75 +8,83 @@
 /**
  * @ingroup detector
  * @brief Watches one atom trajectory
+ *
+ * Parameters:
+ *   - watch.file filename : sets trajectory filename
+ *   - watch.index idx1+idx2+... : define atom indices to watch separated by + (plus)
+ *
+ * The tag "watch" may be altered using set_tag().
  */
 
 class TrajectoryWatcher: public Detector, public ParallelGadget {
 
 	ofstream fl;
 	string filename;
-	int gid;
-	int watchflag;
-	char st[256];
+	char st[4096];
+	int vindex;
 	
-	public:
-		
-		TrajectoryWatcher(string TargetAtom, string fname) {
-			set_name("TRAJECTORY WATCHER");
-			register_class(get_name());
-			TargetName=TargetAtom; gid=-1; filename=fname;
-		}
-
-		TrajectoryWatcher(int x_id, string fname) {
-			gid=x_id; filename=fname;
-		}
-		
-		~TrajectoryWatcher() {fl.close();}
-
-		void Init(MDSystem* WorkSys) {
-			Detector::Init(WorkSys);
-			ParallelGadget::Init(WorkSys);
-			
-			if(GetRank()==0)
-				fl.open(filename.c_str(), ios::trunc);
-			else
-				fl.open(filename.c_str(), ios::app);
-			
-			assert(fl.good(), "can not open file for reading "+filename);
+public:
 	
-			// only one atom!
-			watchflag=ClaimFlagBit();
-			
-			if(GetNAtom()) {
-				if(gid>=0) {
-					for(int i=0; i<GetNAtom(); i++)
-						if(Atoms(i).gid==gid){SetFlag(i, watchflag);break;}
-				} else {SetFlag(0, watchflag);}
+	TrajectoryWatcher(string TargetAtom, string fname) {
+		set_name("TRAJECTORY WATCHER");
+		SetTag("watch");
+		register_class(get_name());
+		TargetName=TargetAtom;
+		filename=fname;
+	}
+	
+	~TrajectoryWatcher() {fl.close();}
+	
+	void ReadParameter() {
+		SysParam->peek(mytag("file"),filename);
+		if(SysParam->exist(mytag("index"))) {
+			size_t na=GetNAtom();
+			std::istringstream ist(replace_char(param.string_value(mytag("index")), '+', ' '));
+			while(ist.good()) {
+				int i;
+				ist >> i;
+				if(i<na) vindex.push_back(i);
 			}
-
 		}
+	}
 
-		void Measure() {
-			// may be the container is empty.....
-			int na=GetNAtom();
-			int idx=0;
+	void Init(MDSystem* WorkSys) {
+		Detector::Init(WorkSys);
+		ParallelGadget::Init(WorkSys);
+		
+		if(GetRank()==0)
+			fl.open(filename.c_str(), std::ios::trunc);
+		else
+			fl.open(filename.c_str(), std::ios::app);
+		
+		assert(fl.good(), "can not open file for reading "+filename);
+		
+		if(vindex.size()==0) vindex.push_back(0);
+		for(size_t i=0; i<vindex.size();i++) {
+			if(vindex[i]>=Target->GetNAtom()) 
+				die("index out of range: "+as_string(idx)+
+			        " "+Target->get_name()+" has "+Target->GetNAtom()+" atoms");	
+		}
+	}
 
-			if(na>1) {
-				for(int i=0;i<na;i++) if(CheckFlag(i, watchflag)){idx=i;break;}
-			}
-
-			if(na){
-				Atom* a=AtomPtr(idx);
-				if((a->flag&watchflag)&&(a->flag&FLAG_ACTIVE)){					
-					sprintf(st, "%0.8f %0.8f %0.8f %0.8f %0.8f %0.8f %0.8f\n",
-							System->ElapsedTime, a->x, a->y, a->z, a->vx, a->vy, a->vz);
-					fl << st; fl.flush();
-				}
+	void Measure() {
+		// may be the container is empty.....
+		// consider parallel omd!
+		if(GetNAtom()==0) return;
+		
+		for(size_t i=0;i<vindex.size();i++) {
+			Atom* a=AtomPtr(vindex[i]);
+			if (a->flag&FLAG_ACTIVE) {					
+				sprintf(st, "%0.8f %0.8f %0.8f %0.8f %0.8f %0.8f %0.8f ",
+						System->ElapsedTime, a->x, a->y, a->z, a->vx, a->vy, a->vz);
 			}
 		}
 		
-		virtual void Detect() {
-			Measure();
-		}
+		fl << st << std::endl;
+		fl.flush();
+	}
+	
+	virtual void Detect() {Measure();}
 
 };
 

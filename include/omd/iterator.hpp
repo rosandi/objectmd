@@ -110,8 +110,6 @@ public:
 	 */
 
 	virtual void IterateHalf(MDGadget* IteratedClass) {
-
-		if(!half_loop) return;
 		if(dirty) Update();
 		looping_full=false; // FALSE -> half loop
 		
@@ -130,8 +128,6 @@ public:
 	 */
 	
 	virtual void IterateFull(MDGadget* IteratedClass) {
-
-		if(!full_loop) return;
 		if(dirty) Update();
 		looping_full=true; // doing full loop
 		

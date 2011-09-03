@@ -5,10 +5,12 @@
 #include <detector/ThermoDetector.hpp>
 #include <detector/SysMonitor.hpp>
 
+ofstream trjfl;
+
 class MyMDClass:public MDSystem {
 
     void CreateSystem() {
-        AddAtom(new CrystalFCC111(30,20,16, "platinum"))
+        AddAtom(new CrystalFCC111(30,20,10, "platinum"))
            ->Create()
            ->SetTemperature(100.0)
            ->SetName("Crystal");
@@ -27,6 +29,13 @@ class MyMDClass:public MDSystem {
         MaxTime=0.2;
         SetOutputDirectory("output");
     }
+// ------------     
+    void InlineFunction() {
+        trjfl << Atoms(0).x << " " << Atoms(0).y << " " << Atoms(0).z << " "
+              << Atoms(10).x << " " << Atoms(10).y << " " << Atoms(10).z
+              << std::endl;
+    }
+//-----------------------
 
     void BeforeRun() {
         DumpAtoms("init.dat");
@@ -37,6 +46,11 @@ class MyMDClass:public MDSystem {
 
 int main(int argc, char* argv[]) {
     MyMDClass TheSim;
+    
+    // buka file
+    trjfl.open("traj.dat");
     TheSim.SetArgument(argc,argv);
-    return TheSim.Run();
+    TheSim.Run();
+    trjfl.close();
+    return 0;
 }

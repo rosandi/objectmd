@@ -49,20 +49,21 @@ public:
 		MemFree(layer_population);
 	}
 	
+	void ReadParameter() {
+		imp=SysParam->double_value("boundary.nonref.impedance");
+		fconst=SysParam->double_value("boundary.nonref.forceconstant");
+		gridthick=SysParam->double_value("boundary.nonref.layerthick");
+	}
+	
 	void Init(MDSystem* WorkSys){
 		
-		assert(WorkSys->type_of("SIMULATION_SYSTEM_GRID"),
-			"this class requires SIMULATION_SYSTEM_GRID");
+		assert(WorkSys->type_of("SIMULATION SYSTEM GRID"),
+			"this class requires SIMULATION SYSTEM GRID");
 			
 		Conditioner::Init(WorkSys);
 		ParallelGadget::Init(WorkSys);
 
-		imp=SysParam->double_value("boundary.nonref.impedance");
-		fconst=SysParam->double_value("boundary.nonref.forceconstant");
-		gridthick=SysParam->double_value("boundary.nonref.layerthick");
-
 		// find the id of terminating-zone, put in tzid
-
 
 		tzflag=ClaimFlagBit();
 		top_force=ClaimAuxVariable(printforce, "ftop");
@@ -105,7 +106,6 @@ public:
             Atoms(i).aux[top_force]=0.0;
             Atoms(i).aux[bot_force]=0.0;
         }
-
 	}
 
 	void ForceModifier(){

@@ -33,6 +33,23 @@ public:
         Atoms(0).fx=Atoms(0).fy=Atoms(0).fz=0.0;
         created=true;
     }
+
+	FreeAtom(OMD_FLOAT x,  OMD_FLOAT y,  OMD_FLOAT z, 
+             OMD_FLOAT vx, OMD_FLOAT vy, OMD_FLOAT vz,
+             OMD_FLOAT mass, OMD_FLOAT num) // mass in amu
+    {                    
+        Allocate(1);
+        Atoms(0).x=x;
+        Atoms(0).y=y;
+        Atoms(0).z=z;
+        Atoms(0).vx=vx;
+        Atoms(0).vy=vy;
+        Atoms(0).vz=vz;
+        Atoms(0).fx=Atoms(0).fy=Atoms(0).fz=0.0;
+		SetMZ(mass,num);
+        created=true;
+    }
+	
 };
 
 #endif

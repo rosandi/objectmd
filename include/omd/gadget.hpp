@@ -201,7 +201,7 @@ public:
 
 	virtual void ReadParameter(){}
 	virtual bool CheckParameter(){return true;}
-
+	
 };
 
 #endif

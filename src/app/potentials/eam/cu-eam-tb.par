@@ -11,7 +11,9 @@ R_CUT   6.2
 # tight binding parameter
 PHI0    61368.69997943735500
 ALPHA   5.18601305724453
-G0      26.49875512904454
+# G0      26.49875512904454
+# @C Schaefer
+G0      24.499
 BETA    1.26044412051693
 
 # zbl coefficients

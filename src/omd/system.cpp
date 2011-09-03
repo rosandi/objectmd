@@ -65,6 +65,7 @@ void MDSystem::SystemInit(){
 	register_class(get_name());
 	Argc=NULL;Argv=NULL;
 	Unit=NULL;
+	stopped=false;
     Potential  = BasePotential =
     Virial     = Kinetic       = 
     Energy     = ElapsedTime   = 
@@ -149,9 +150,10 @@ int MDSystem::Run(int mode) {
 
 	ExitCode=EXIT_SUCCESS;
 	Mode=mode;
-
+		
 	try {
 		ReadParameter();
+		Init(); // user initialization
 		switch(Mode) {
 			case NORMAL_MODE: RunNormal(); break;
 			case CONTINUE_MODE: RunRestart(); break;
@@ -513,8 +515,9 @@ void MDSystem::InitGadgets() {
 	}
 	
 	if(!Iterator){
-		warn("using default iterator: MDIterator....");
+		warn("using default iterator: MDIterator, half-loop....");
 		AddConditioner(Iterator=new MDIterator());
+		Iterator->EnableHalfLoop();
 	}
 
 	if(!Integrator) {
@@ -886,8 +889,6 @@ void MDSystem::CheckBeforeRun() {
 
 	for (int i=0;i<(int)Detectors.size();i++)
 		assert(Detectors[i]->Check(), "detector not ready",Detectors[i]->get_name());
-
-	assert(GetNAtom()>1, "insufficient number of atom", as_string(GetNAtom()));
 
 	for(int i=0;i<(int)Detectors.size();i++){
 		if(OutputDirectory!="") {
