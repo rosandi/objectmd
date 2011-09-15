@@ -160,12 +160,12 @@ public:
 			nneig[at]++;
 			sumas[to]+=masat;
 			sumas[at]+=masto;
-			sumvx[to]+=masto*a->vx;
-			sumvy[to]+=masto*a->vy;
-			sumvz[to]+=masto*a->vz;                
-			sumvx[at]+=masat*b->vx;
-			sumvy[at]+=masat*b->vy;
-			sumvz[at]+=masat*b->vz;                
+			sumvx[to]+=masat*a->vx;
+			sumvy[to]+=masat*a->vy;
+			sumvz[to]+=masat*a->vz;                
+			sumvx[at]+=masto*b->vx;
+			sumvy[at]+=masto*b->vy;
+			sumvz[at]+=masto*b->vz;                
 			sumek[to]+=ek;
 			sumek[at]+=0.5*masto*(b->vx*b->vx+b->vy*b->vy+b->vz*b->vz);
 		}
