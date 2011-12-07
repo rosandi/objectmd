@@ -2,8 +2,11 @@
 #define _TRAJECTORY_WATCHER_HPP_
 
 #include <cstring>
+#include <vector>
 #include <omd/detector.hpp>
 #include <omd/paragadget.hpp>
+
+using std::vector;
 
 /**
  * @ingroup detector
@@ -21,7 +24,7 @@ class TrajectoryWatcher: public Detector, public ParallelGadget {
 	ofstream fl;
 	string filename;
 	char st[4096];
-	int vindex;
+	vector<int> vindex;
 	
 public:
 	
@@ -62,8 +65,8 @@ public:
 		if(vindex.size()==0) vindex.push_back(0);
 		for(size_t i=0; i<vindex.size();i++) {
 			if(vindex[i]>=Target->GetNAtom()) 
-				die("index out of range: "+as_string(idx)+
-			        " "+Target->get_name()+" has "+Target->GetNAtom()+" atoms");	
+				die("index out of range: "+as_string(vindex[i])+
+			        " "+Target->get_name()+" has "+as_string(Target->GetNAtom())+" atoms");	
 		}
 	}
 
