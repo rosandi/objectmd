@@ -114,7 +114,7 @@ void MDClass::SetGhost(int idx, bool a){
 	else Atoms(idx).flag&=(~FLAG_GHOST);
 }
 
-string mytag(string sub) {
+string MDClass::mytag(string sub) {
 	if(tag=="") tag=replace_char(lower_case(get_name()),' ','_');
 	if(sub=="") return tag;
 	return tag+"."+sub;
