@@ -88,6 +88,8 @@ protected:
 
 	int  LocalAtomNumber;
 	int CommRefreshPeriod;
+  double CommRadTol;
+  bool CommAbsoluteTol;
 	bool FirstSync;
 
 public:

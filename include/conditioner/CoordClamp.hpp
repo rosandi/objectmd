@@ -47,9 +47,9 @@ public:
 	void ForceModifier() {
 		int na=GetNAtom();
 		for (int i=0;i<na;i++) {
-			if (axis|CLAMP_X) Atoms(i).fx=Atoms(i).vx=0.0;
-			if (axis|CLAMP_Y) Atoms(i).fy=Atoms(i).vy=0.0;
-			if (axis|CLAMP_Z) Atoms(i).fz=Atoms(i).vz=0.0;
+			if (axis&CLAMP_X) Atoms(i).fx=Atoms(i).vx=0.0;
+			if (axis&CLAMP_Y) Atoms(i).fy=Atoms(i).vy=0.0;
+			if (axis&CLAMP_Z) Atoms(i).fz=Atoms(i).vz=0.0;
 		}
 	}
 	

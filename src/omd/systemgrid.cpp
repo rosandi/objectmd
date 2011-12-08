@@ -31,9 +31,9 @@ using std::ostringstream;
 // Border <- keeps the processor borders (ThisProcAtoms are within this Border)
 
 MDSystemGrid::MDSystemGrid(int &argc,char** &argv,int nx,int ny,int nz)
-              :MDSystem(argc,argv){
+:MDSystem(argc,argv){
 	set_name("SIMULATION_SYSTEM_GRID");
-    register_class(get_name());
+  register_class(get_name());
 	// -1 == no neighbor
 	for(int i=0;i<27;i++){
 		for(int j=0;j<MAXPROC;j++) ProcInfo.NeighborList[j][i]=-1;
@@ -42,6 +42,8 @@ MDSystemGrid::MDSystemGrid(int &argc,char** &argv,int nx,int ny,int nz)
 	ClusterNY=ny;
 	ClusterNZ=nz;
 	CommRefreshPeriod=-1;
+  CommRadTol=0.1;  // 10% of max. cut radius
+  CommAbsoluteTol=false;
 	Communicator=NULL;
 	FirstSync=true;
 	BinDirectory="pomd";
@@ -54,11 +56,13 @@ MDSystemGrid::MDSystemGrid(int &argc,char** &argv,int nx,int ny,int nz)
 
 MDSystemGrid::MDSystemGrid(){
 	set_name("SIMULATION_SYSTEM_GRID");
-    register_class(get_name());
-	// -1 == no neighbor
+  register_class(get_name());
+	
+  // -1 == no neighbor
 	for(int i=0;i<27;i++){
 		for(int j=0;j<MAXPROC;j++) ProcInfo.NeighborList[j][i]=-1;
 	}
+  
 	ClusterNX=ClusterNY=ClusterNZ=1;
 	CommRefreshPeriod=-1;
 	Communicator=NULL;
@@ -600,12 +604,13 @@ void MDSystemGrid::AdjustSystem() { // MDSystem::AdjustSystem is invoked from Ro
 
 }
 
+// FIXME! check radius tollerance vs. verlet...
 void MDSystemGrid::UpdateRadiusTolerance() {
 	OMD_FLOAT L;
 	if(CommRefreshPeriod<1) {L=0.0; CommRefreshPeriod=1;}
-	else L=sqrt(SqrMaxVelocity)*(CommRefreshPeriod)*Integrator->TimeStep;
-	L+=0.1*Integrator->MaxCutRadius; // add 10% cut radius
-	Communicator->SetRadiusTolerance(L);
+	else L=sqrt(SqrMaxVelocity)*(CommRefreshPeriod)*Integrator->TimeStep; 
+  L+=(CommAbsoluteTol)?CommRadTol:CommRadTol*Integrator->MaxCutRadius;
+  Communicator->SetRadiusTolerance(L);
 	Iterator->SetRadiusTolerance(L);
 }
 
@@ -848,6 +853,20 @@ void MDSystemGrid::PrintMessages(ostream& ost) {
 void MDSystemGrid::ReadParameter() {
 	MDSystem::ReadParameter();
 	param.peek("comm.refresh", CommRefreshPeriod);
+  
+  if(param.exist("comm.tolerance")) {
+    string str=param.string_value("comm.tolerance");
+    if(char_exist(str,'%')) {
+      // relative to cut radius
+      CommAbsoluteTol=false;
+      CommRadTol=as_double(replace_char(str,'%',0x0));
+    } else {
+      // absolute!
+      CommAbsoluteTol=true;
+      CommRadTol=as_double(str);
+    }
+  } else CommRadTol=0.1;
+     
 	if(param.exist("comm.arch")) {
 		int nx, ny, nz;
 		nx=param.int_value("comm.arch",0);

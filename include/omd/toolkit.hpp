@@ -199,6 +199,24 @@ public:
 		sprintf(st,"%lX",(long int)val);
 		return string(st);
 	}
+  
+  double as_double(string str) {
+    char st[256],*pt;
+    memset(st,0,256);
+    str.copy(st,256);
+    double retd=strtod(st,&pt);
+    if(pt==st) die("invalid double value: "+str);
+    return retd;
+  }
+  
+  int as_int(string str) {
+    char st[256],*pt;
+    memset(st,0,256);
+    str.copy(st,256);
+    int reti=strtol(st,&pt,10);
+    if(pt==st) die("invalid integer value: "+str);
+    return reti;    
+  }
 
 	string lower_case(string str){
 		for(int i=0;i<(int)str.size();i++)str[i]=tolower(str[i]);
@@ -211,7 +229,13 @@ public:
 		}
 		return str;		
 	}
-		
+  
+  bool char_exist(string str, char ch) {
+    for(int i=0;i<str.length();i++)
+      if(str[i]==ch) return true;
+    return false;
+  }
+
 	// class polling
 	bool type_of(string type) {
     	type=lower_case(type);
