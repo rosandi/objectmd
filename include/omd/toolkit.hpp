@@ -231,7 +231,8 @@ public:
 	}
   
   bool char_exist(string str, char ch) {
-    for(int i=0;i<str.length();i++)
+    // FIXME! use find...
+    for(int i=0;i<(int)str.length();i++)
       if(str[i]==ch) return true;
     return false;
   }
