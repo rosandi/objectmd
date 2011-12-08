@@ -3,6 +3,8 @@
 
 include config.make
 
+M_OMD_CXX=$(shell ./select-compiler)
+
 all: omd gadget
 #app
 

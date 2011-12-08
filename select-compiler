@@ -1,0 +1,5 @@
+#!/bin/bash
+USE=$(awk -v HH=$(hostname) '/#/{next}HH==$1{print $2;exit}' compiler-list)
+# default
+[[ -z $USE ]]&&USE=$(awk '$1=="*"{print $2}' compiler-list)
+echo $USE

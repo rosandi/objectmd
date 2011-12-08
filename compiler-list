@@ -1,0 +1,7 @@
+# format:
+#   hostname compiler 
+#   * --> default
+
+prefect              /stor/rosandi/mpi-x86_64/bin/mpic++
+head1.rhrk.uni-kl.de /opt/openmpi-myrinet_mx2g/bin/mpic++
+*                    /usr/bin/mpic++
