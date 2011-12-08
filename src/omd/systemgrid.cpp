@@ -860,6 +860,7 @@ void MDSystemGrid::ReadParameter() {
       // relative to cut radius
       CommAbsoluteTol=false;
       CommRadTol=as_double(replace_char(str,'%',0x0));
+      CommRadTol/=100.0;
     } else {
       // absolute!
       CommAbsoluteTol=true;
