@@ -1,5 +1,13 @@
 #!/bin/bash
-USE=$(awk -v HH=$(hostname) '/#/{next}HH==$1{print $2;exit}' compiler-list)
+# try hostname
+eval USE=$(awk '/#/{next}HH=="'$(hostname)'"{print $2;exit}' compiler-list)
+
+# try domainname
+[[ -z $USE ]]&&
+eval USE=$(awk '/#/{next}/^\*\.'$(domainname)'/{print $2;exit}' compiler-list)
+
 # default
-[[ -z $USE ]]&&USE=$(awk '$1=="*"{print $2}' compiler-list)
+[[ -z $USE ]]&&
+eval USE=$(awk '$1=="*"{print $2}' compiler-list)
+
 echo $USE
