@@ -67,11 +67,11 @@ void StillingerWeber::Init(MDSystem* WorkSys) {
 	CutRadius=alpha*sigma;
 	CutRadiusSqr=CutRadius*CutRadius;
 	c1 = bigA*eps*powerp*bigB*pow(sigma,powerp);
-    c2 = bigA*eps*powerq*pow(sigma,powerq);
+  c2 = bigA*eps*powerq*pow(sigma,powerq);
 	c3 = bigA*eps*bigB*pow(sigma,powerp+1.0);
 	c4 = bigA*eps*pow(sigma,powerq+1.0);
-    c5 = bigA*eps*bigB*pow(sigma,powerp);
-    c6 = bigA*eps*pow(sigma,powerq);
+  c5 = bigA*eps*bigB*pow(sigma,powerp);
+  c6 = bigA*eps*pow(sigma,powerq);
 	c7 = sigma*gamma;
 	c8 = lambda*eps;
 	c9 = 2.0*lambda*eps;
