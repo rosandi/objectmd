@@ -244,6 +244,21 @@ void MDSystem::ReadParameter() {
 			if(lower_case(st)=="virial") SetWriteMode(WM_VIRIAL);
 		}
 	}
+  
+  if(param.exist("log")) {
+    int loglev=0;
+		std::istringstream ist(replace_char(param.string_value("log"), '+', ' '));
+		while(ist.good()) {
+			string st;
+			ist >> st;
+			if(lower_case(st)=="memory") loglev|=LOGMEMORY;
+			if(lower_case(st)=="create") loglev|=LOGCREATE;
+			if(lower_case(st)=="destroy") loglev|=LOGDESTROY;
+			if(lower_case(st)=="info") loglev|=LOGINFO;
+			if(lower_case(st)=="warning") loglev|=LOGWARNING;
+		}
+    log_flagset(loglev);
+  }
 
 }
 
