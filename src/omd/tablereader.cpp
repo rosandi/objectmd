@@ -1,6 +1,6 @@
 /* omdlib
  ********************************************************
- *
+ *name
  * ObjectMD
  * Molecular Dynamics Class Library
  * Version 2.0 (2009)
@@ -24,9 +24,11 @@
 #include <cstdlib>
 #include <cfloat>
 #include <cmath>
-#include <omd/tablereader.hpp>
-#include <omd/paramhandler.hpp>
+#include "omdtool.h"
+#include "param.h"
+#include "treader.h"
 
+using namespace omd;
 using std::ifstream;
 using std::ofstream;
 using std::string;
@@ -34,12 +36,12 @@ using std::istringstream;
 
 // Calculate spline coeficients
 void TableReader::calculate_coef() {
-	OMD_FLOAT m;
+	double m;
 	int    n=n_data-2;
 	
-	OMD_FLOAT *b=new OMD_FLOAT[n];
-	OMD_FLOAT *d=new OMD_FLOAT[n];
-	OMD_FLOAT *S=new OMD_FLOAT[n_data];
+	double *b=new double[n];
+	double *d=new double[n];
+	double *S=new double[n_data];
 	
 	for (int i=1;i<n+1;i++) d[i-1]=coef[i+1].d-2.0*coef[i].d + coef[i-1].d; 
 	for (int i=1;i<n-1;i++) b[i]=4.0;
@@ -63,11 +65,9 @@ void TableReader::calculate_coef() {
 }
 
 TableReader::TableReader(string table_filename, string table_name) {
-	set_name("TABLE READER");
-	register_class(get_name());
 	roffset = 0.0;
 	coef=NULL;
-	tablename="";
+	name="";
 	if (table_filename!="") open(table_filename, table_name);
 	format=plain;
 	ready=allow_outrange_low=allow_outrange_hi=false;
@@ -76,19 +76,21 @@ TableReader::TableReader(string table_filename, string table_name) {
 
 void TableReader::allocate() {
 	coef = new CoefStruct[n_data];
-	for (int i=0; i<n_data; i++) coef[i].a=coef[i].b=coef[i].c=coef[i].d=0.0;
+	for (int i=0; i<n_data; i++)
+    coef[i].a=coef[i].b=coef[i].c=coef[i].d=0.0;
 }
 
 // open file and read table data
-void TableReader::open_omd(string table_filename, string table_name) {
+bool TableReader::open_omd(string table_filename, string table_name) {
 	
 	//---------initialization-------------			
 	string sformat("PLAIN");
 
 	filename.assign(table_filename);
-	tablename.assign(table_name);
-	
-	param.read_pseudo(table_filename, table_name);
+	name.assign(table_name);
+  
+	if(!param.read_pseudo(table_filename, table_name)) return false;
+  
 	n_data=param.int_value("NumberOfData");
 	allocate();
 	dr=param.double_value("Spacing");
@@ -107,53 +109,98 @@ void TableReader::open_omd(string table_filename, string table_name) {
 	
 	if(sformat=="PLAIN") format=plain;
 	else if(sformat=="RMULT") format=rmult;
-	else die("unsuported format "+sformat);
+	else throw string("unsuported format ")+sformat;
 
 	ifstream fl(filename.c_str());
-	assert(fl.good(), "error in reading data file", tablename);
+	if(!fl.good()) throw "error reading data file";
 	
 	int lnum=0;
 	char line[1024];
 	bool partfound=false;
-	string stag="#$"+tablename;
+	string stag="#$"+name;
 	
 	while(fl.good()) {
 		fl.getline(line, 1023); lnum++;
 		istringstream sstr(line); string s, ss; sstr>>s>>ss;
 		if(s==stag&&ss=="--") {partfound=true;break;}
 	}
-	assert(partfound, "can not find table "+tablename+"@"+filename);
-	blog("table '"+tablename+"' found at line "+as_string(lnum), LOGCREATE);
-
+	if(!partfound) 
+    throw string("can not find table ")+name+"@"+filename;
+	
 	for(int i=0;i<n_data;i++){
 		fl>>coef[i].d;
 	}
 
 	fl.close();	
 	calculate_coef();
+  return true;
+}
+
+// raw table containes x y tabulated value pair
+// with equispaced x.
+
+bool TableReader::open_raw(string table_filename) {
+  char line[2048];
+  int lnum=0;
+  double aold,xmin,delta=0.0;
+  vector<double> vco;
+  
+  ifstream fl(filename.c_str());
+  if(!fl.good()) throw "error reading data file";
+  while(fl.good()) {
+    double a,b;
+    fl.getline(line,2047);
+    istringstream ss(line);
+    
+    if(ss>>a>>b) {
+      if(vco.empty()) xmin=a;
+      else delta+=a-aold;
+      vco.push_back(b);
+      aold=a;
+    }
+    lnum++;
+  }
+  fl.close();
+  if(vco.empty()) return false;
+  
+  // transfer
+  name=table_filename.substr(0,table_filename.find('.'));
+  n_data=vco.size();
+  dr=delta/double(n_data-1);
+  roffset=xmin;
+  format=plain;
+  allow_outrange_low=false;
+  allow_outrange_hi=false;
+  
+  allocate();
+  for(int i=0;i<n_data;i++) coef[i].d=vco[i];
+  calculate_coef();
+  
+  return true;
 }
 
 void TableReader::open(string table_filename, string tablename) {
-	try{
-		open_omd(table_filename, tablename);
-	} catch(...){
-		die("error reading potential table file: "+tablename+"@"+table_filename);
-	}
+  
+  if(!open_omd(table_filename, tablename))
+    if(!open_raw(table_filename)) throw "failed loading table";
+  
 	ready=true;
 }
 
-TableReader::~TableReader() {delete[] coef;}
+TableReader::~TableReader() {
+  delete[] coef;
+}
 
-void TableReader::read(OMD_FLOAT r, OMD_FLOAT& val, OMD_FLOAT& dval) {
+void TableReader::read(double r, double& val, double& dval) {
 	
-	OMD_FLOAT rval=r-roffset;
+	double rval=r-roffset;
 	int    x = (int)(rval/dr);
-	OMD_FLOAT dx = rval-(OMD_FLOAT)x*dr;
+	double dx = rval-(double)x*dr;
 	
 	if (x>n_data-1) {
 		if(allow_outrange_hi) {val=dval=outrange_hi;return;}
 		else {
-			die("high limit exeeded in "+tablename+"@"+filename+" (read) "
+			die("high limit exeeded in "+name+"@"+filename+" (read) "
 				"index="+as_string(x)+" r="+as_string(r)+" delta="+as_string(dx)+
 				" low_limit="+as_string(min_range())+" hi_limit="+as_string(max_range()));
 		}
@@ -164,7 +211,7 @@ void TableReader::read(OMD_FLOAT r, OMD_FLOAT& val, OMD_FLOAT& dval) {
 			val=dval=outrange_low;
 			return;
 		} else {
-			die("low limit exeeded in "+tablename+"@"+filename+" (read) "
+			die("low limit exeeded in "+name+"@"+filename+" (read) "
 				"index="+as_string(x)+" r="+as_string(r)+" delta="+as_string(dx)+
 				" low_limit="+as_string(min_range())+" hi_limit="+as_string(max_range()));
 				
@@ -182,27 +229,17 @@ void TableReader::read(OMD_FLOAT r, OMD_FLOAT& val, OMD_FLOAT& dval) {
 	}
 }
 
-OMD_FLOAT TableReader::read(OMD_FLOAT r) {
+double TableReader::read(double r) {
 	
-	OMD_FLOAT rval=r-roffset;
+	double rval=r-roffset;
 	int x = (int)(rval/dr);
-	OMD_FLOAT dx = rval-(OMD_FLOAT)x*dr;
-/*
-	if(debug_flag) {
-		std::cerr << "table="<<tablename<<"@"<<filename<<";"
-		          << "r="<<r<<";"
-		          << "offset="<<roffset<<";"
-		          << "dr="<<dr<<";"
-		          << "rval="<<rval<<";"
-		          << "x="<<x<<";"
-		          << "dx="<<dx<<";\n";
-	}
-*/
+	double dx = rval-(double)x*dr;
+
 	if (x>n_data-1) {
 		if(allow_outrange_hi) {
 			return outrange_hi;
 		} else {
-			die("high limit exeeded in "+tablename+"@"+filename+" (read) "
+			die("high limit exeeded in "+name+"@"+filename+" (read) "
 				"index="+as_string(x)+" r="+as_string(r)+" delta="+as_string(dx)+
  				" low_limit="+as_string(min_range())+" hi_limit="+as_string(max_range()));
 
@@ -213,45 +250,37 @@ OMD_FLOAT TableReader::read(OMD_FLOAT r) {
 		if(allow_outrange_low) {
 			return outrange_low;
 		} else {
-			std::cerr << "die here...!!!!!!!!!!!!! "<<tablename<<"@"<<filename<<"\n";
-			die("low limit exeeded in "+tablename+"@"+filename+" (read) "
+			die("low limit exeeded in "+name+"@"+filename+" (read) "
 				"index="+as_string(x)+" r="+as_string(r)+" delta="+as_string(dx)+
 				" low_limit="+as_string(min_range())+" hi_limit="+as_string(max_range()));
-
 		}
 	}
 
 	if (x==n_data-1) {dx+=dr; x--;}
 	if (x==-1) {x=0;}
-	OMD_FLOAT val=(coef[x].d + dx*(coef[x].c + dx*(coef[x].b + dx*coef[x].a)));
+	double val=(coef[x].d + dx*(coef[x].c + dx*(coef[x].b + dx*coef[x].a)));
 	if(format==rmult) val/=r;
-
-/*	
-	if(debug_flag) {
-		std::cerr<<tablename<<"@"<<filename<<" returned="<<val<<"\n";
-	}
-*/
 	
 	return val;
 }
 
-OMD_FLOAT TableReader::dread(OMD_FLOAT r) {
-	OMD_FLOAT val, dval;
+double TableReader::dread(double r) {
+	double val, dval;
 	read(r, val, dval);
 	return dval;
 }
 
-OMD_FLOAT TableReader::dread2(OMD_FLOAT r) {
-	OMD_FLOAT rval=r-roffset;
+double TableReader::dread2(double r) {
+	double rval=r-roffset;
 	int x = (int)(rval/dr);
-	OMD_FLOAT dx = rval-(OMD_FLOAT)x*dr;
+	double dx = rval-(double)x*dr;
 	
 
 	if (x>n_data-1) {
 		if(allow_outrange_hi) {
 			return outrange_hi;
 		} else {
-			die("high limit exeeded in "+tablename+"@"+filename+" (dread2)"
+			die("high limit exeeded in "+name+"@"+filename+" (dread2)"
 				"index="+as_string(x)+" r="+as_string(r)+" delta="+as_string(dx)+
 				" low_limit="+as_string(min_range())+" hi_limit="+as_string(max_range()));
 
@@ -262,7 +291,7 @@ OMD_FLOAT TableReader::dread2(OMD_FLOAT r) {
 		if(allow_outrange_low) {
 			return outrange_low;
 		} else {
-			die("low limit exeeded in "+tablename+"@"+filename+" "
+			die("low limit exeeded in "+name+"@"+filename+" "
 				"index="+as_string(x)+" r="+as_string(r)+" delta="+as_string(dx)+
 				" low_limit="+as_string(min_range())+" hi_limit="+as_string(max_range()));
 		}
@@ -271,25 +300,32 @@ OMD_FLOAT TableReader::dread2(OMD_FLOAT r) {
 	if(x==n_data-1){dx+=dr; x--;}
 	if(x==-1)x=0;
 
-	OMD_FLOAT ddval=2.0*coef[x].b + 6.0*dx*coef[x].a;
+	double ddval=2.0*coef[x].b + 6.0*dx*coef[x].a;
 	
 	if(format==rmult) {
-		OMD_FLOAT dval=dread(r);
+		double dval=dread(r);
 		ddval=(ddval-2.0*dval)/r;
 	}
 
 	return ddval;
 }
 
-void TableReader::dump(string filename, int resolution) { 
-	OMD_FLOAT rmax=roffset+(OMD_FLOAT)(n_data-1)*dr;
-	OMD_FLOAT dx=rmax/(OMD_FLOAT)resolution;
-	ofstream ofl(filename.c_str());
-	assert(ofl.good(), "can not open file for writing", filename);
-	ofl << "# Table of value and its first derivative\n";
-	for (OMD_FLOAT x=roffset; x<=rmax; x+=dx) {
+void TableReader::dump(std::ostream& ofl, int resolution) { 
+	double rmax=roffset+(double)(n_data-1)*dr;
+	double dx=rmax/(double)resolution;
+  std::cerr<<" max="<<rmax<<" dr="<<dr<<" dx="<<dx<<std::endl;
+	ofl << "# Table of value first and second derivative\n";
+	for (double x=roffset; x<=rmax; x+=dx) {
 		ofl << x << ' ' << read(x) << ' ' << dread(x) << ' ' << dread2(x) << '\n';
 	}
+}
+
+void TableReader::dump(string filename, int resolution) { 
+	ofstream ofl(filename.c_str());
+  if(!ofl.good())
+    throw string("can not open file for writing ")+filename;
+  dump(ofl,resolution);
+  ofl.close();
 }
 
 void TableReader::dump_var() {

@@ -1,5 +1,8 @@
 #!/bin/bash
 # try hostname
+echo /usr/bin/mpic++
+exit
+
 eval USE=$(awk '/#/{next}$1=="'$(hostname)'"{print $2;exit}' compiler-list)
 
 # try domainname

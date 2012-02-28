@@ -25,7 +25,6 @@
 		4C760F101497E54C002C9E27 /* pt-eam-tb.par */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "pt-eam-tb.par"; sourceTree = "<group>"; };
 		4C760F111497E54C002C9E27 /* tab */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = tab; sourceTree = "<group>"; };
 		4C760F131497E54C002C9E27 /* atomden.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = atomden.dat; sourceTree = "<group>"; };
-		4C760F141497E54C002C9E27 /* cemal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cemal.cpp; sourceTree = "<group>"; };
 		4C760F151497E54C002C9E27 /* embeddfct.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = embeddfct.dat; sourceTree = "<group>"; };
 		4C760F161497E54C002C9E27 /* fmm-aluminum */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "fmm-aluminum"; sourceTree = "<group>"; };
 		4C760F171497E54C002C9E27 /* fmmea.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fmmea.cpp; sourceTree = "<group>"; };
@@ -132,6 +131,9 @@
 		4C760F871497E568002C9E27 /* parameter.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = parameter.txt; sourceTree = "<group>"; };
 		4C760F881497E568002C9E27 /* programflow.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = programflow.txt; sourceTree = "<group>"; };
 		4C760F891497E568002C9E27 /* sim_setting.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sim_setting.txt; sourceTree = "<group>"; };
+		4C91F15714F900C800B33F08 /* TTM_Diffusion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = TTM_Diffusion.hpp; sourceTree = "<group>"; };
+		4C91F15A14F9052F00B33F08 /* fdtd.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = fdtd.hpp; sourceTree = "<group>"; };
+		4C91F15B14F9060E00B33F08 /* fdtd.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fdtd.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -210,7 +212,6 @@
 			isa = PBXGroup;
 			children = (
 				4C760F131497E54C002C9E27 /* atomden.dat */,
-				4C760F141497E54C002C9E27 /* cemal.cpp */,
 				4C760F151497E54C002C9E27 /* embeddfct.dat */,
 				4C760F161497E54C002C9E27 /* fmm-aluminum */,
 				4C760F171497E54C002C9E27 /* fmmea.cpp */,
@@ -250,6 +251,7 @@
 		4C760F291497E54C002C9E27 /* omd */ = {
 			isa = PBXGroup;
 			children = (
+				4C91F15B14F9060E00B33F08 /* fdtd.cpp */,
 				4C760F2A1497E54C002C9E27 /* atomgroup.cpp */,
 				4C760F2B1497E54C002C9E27 /* base.cpp */,
 				4C760F2C1497E54C002C9E27 /* comhandler.cpp */,
@@ -268,6 +270,7 @@
 		4C760F351497E55C002C9E27 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				4C91F15914F9052F00B33F08 /* misc */,
 				4C760F361497E55C002C9E27 /* conditioner */,
 				4C760F471497E55C002C9E27 /* crystal */,
 				4C760F501497E55C002C9E27 /* detector */,
@@ -281,6 +284,7 @@
 		4C760F361497E55C002C9E27 /* conditioner */ = {
 			isa = PBXGroup;
 			children = (
+				4C91F15714F900C800B33F08 /* TTM_Diffusion.hpp */,
 				4C760F371497E55C002C9E27 /* CoordClamp.hpp */,
 				4C760F381497E55C002C9E27 /* DynamicTimeStep.hpp */,
 				4C760F391497E55C002C9E27 /* EnergySource.hpp */,
@@ -404,6 +408,14 @@
 				4C760F821497E568002C9E27 /* omd-abl.jpg */,
 			);
 			path = fig;
+			sourceTree = "<group>";
+		};
+		4C91F15914F9052F00B33F08 /* misc */ = {
+			isa = PBXGroup;
+			children = (
+				4C91F15A14F9052F00B33F08 /* fdtd.hpp */,
+			);
+			path = misc;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

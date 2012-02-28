@@ -21,40 +21,45 @@
 
 #ifndef _TABLE_READER_
 #define _TABLE_READER_
+#include "param.h"
 
-#include <omd/base.hpp>
+namespace omd {
 
-class TableReader:public MDToolkit {
-	// Coefficient a is the value it self
-	struct CoefStruct {OMD_FLOAT a, b, c, d;} *coef;
-	enum tabel_format {plain, rmult} format;
-	int	n_data;
-	bool allow_outrange_low;
-	bool allow_outrange_hi;
-	OMD_FLOAT outrange_low;
-	OMD_FLOAT outrange_hi;
-	OMD_FLOAT  dr, roffset;
-	void calculate_coef();
-	void allocate();
-	void open_omd(string, string);
-	bool ready;
+  class TableReader {
+    struct CoefStruct {double a, b, c, d;} *coef;
+    enum tabel_format {plain, rmult} format;
+    int	n_data;
+    bool allow_outrange_low;
+    bool allow_outrange_hi;
+    double outrange_low;
+    double outrange_hi;
+    double  dr, roffset;
+    void calculate_coef();
+    void allocate();
+    bool open_omd(string, string);
+    bool open_raw(string);  
+    bool ready;
 
-	public:
-		ParamHandler param;
-		string  filename;
-		string  tablename;
-		TableReader(string table_filename="", string table_name="");
-		~TableReader();
-		void   open(string table_filename, string table_name="");
-		OMD_FLOAT max_range() {return (roffset+(OMD_FLOAT)(n_data-1)*dr);}
-		OMD_FLOAT min_range() {return roffset;}
-		bool   is_ready() {return ready;}
-		OMD_FLOAT read(OMD_FLOAT r);
-		void   read(OMD_FLOAT r,OMD_FLOAT& val,OMD_FLOAT& dval);
-		OMD_FLOAT dread(OMD_FLOAT r);
-		OMD_FLOAT dread2(OMD_FLOAT r);
-		void   dump(string filename, int resolution=1000);
-		void   dump_var();
-};
+  public:
+    ParamHandler param;
+    string  filename;
+    string  name; //this table name may be replaced after loading file
+    TableReader(string table_filename="", string table_name="");
+    ~TableReader();
+    void   open(string table_filename, string table_name="");
+    double max_range() {return (roffset+(double)(n_data-1)*dr);}
+    double min_range() {return roffset;}
+    bool   is_ready() {return ready;}
+    void   rename(string newname){name=newname;}
+    double read(double r);
+    void   read(double r,double& val,double& dval);
+    double dread(double r);
+    double dread2(double r);
+    void   dump(string filename, int resolution=1000);
+    void   dump(std::ostream& ofl, int resolution=1000);
+    void   dump_var();
+  };
+  
+}
 
 #endif

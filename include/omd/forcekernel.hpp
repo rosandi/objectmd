@@ -99,7 +99,6 @@ public:
 
 		OMD_FLOAT fx=dx*fr,fy=dy*fr,fz=dz*fr;
 		OMD_FLOAT vir=(fx*dx+fy*dy+fz*dz);
-		vir*=0.5;
 		pot*=0.5;
 		at.virial+=vir;
 		to.virial+=vir;

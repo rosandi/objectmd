@@ -200,18 +200,18 @@ void MDIntegrator::IterationNode(int at, int to)
 */
 
 void MDIntegrator::Iterate() {
-	SyncData(SYNC_SPACE);
-    System->ExecuteConditioners(COND_PRE_CALCULATION);
-	int na=GetNAtom();
-	for(int i=0; i<na; i++){
-		Atom* a=AtomPtr(i);
-		a->fx=a->fy=a->fz=a->virial=a->potential=0.0;		
-	}
-	for(int i=0;i<(int)ActForces.size();i++) ActForces[i]->ClearAccumulators();
-	Iterator->Iterate(this);
-	for (int i=0; i<(int)ActForces.size(); i++) ActForces[i]->Correction();
-	SyncData(SYNC_FORCE);
-    System->ExecuteConditioners(COND_FORCE_MODIFIER);
+  SyncData(SYNC_SPACE);
+  System->ExecuteConditioners(COND_PRE_CALCULATION);
+  int na=GetNAtom();
+  for(int i=0; i<na; i++){
+    Atom* a=AtomPtr(i);
+    a->fx=a->fy=a->fz=a->virial=a->potential=0.0;		
+  }
+  for(int i=0;i<(int)ActForces.size();i++) ActForces[i]->ClearAccumulators();
+  Iterator->Iterate(this);
+  for (int i=0; i<(int)ActForces.size(); i++) ActForces[i]->Correction();
+  SyncData(SYNC_FORCE);
+  System->ExecuteConditioners(COND_FORCE_MODIFIER);
 }
 
 /**
@@ -238,7 +238,7 @@ void MDIntegrator::Integrate() {
 			a->x+=TimeStep*(a->vx);
         	a->y+=TimeStep*(a->vy);
         	a->z+=TimeStep*(a->vz);
-		}
+      }
     }
 	
 	// force iteration
