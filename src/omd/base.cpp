@@ -18,7 +18,10 @@
  *
 */
 
-#include <omd/base.hpp>
+#include <omd/base.h>
+#include <omd/omdtool.h>
+
+using namespace omd;
 
 //-------------------MD-CLASS----------------------//
 
@@ -59,7 +62,7 @@ void MDClass::mem_free(void*& ptr){
 
 void MDClass::mem_alloc(void*& ptr, size_t size){
 	void* p=NULL;p=malloc(size);mem_alloc_cnt[1]++;
-	assert(p, "memory allocation error... (malloc)", get_name());
+	mdassert(p, "memory allocation error... (malloc)", get_name());
 	ptr=p;logmem(p, size);
 }
 
@@ -70,7 +73,7 @@ void MDClass::mem_alloc(void*& ptr, size_t size){
 
 void MDClass::mem_realloc(void*& ptr, size_t size){
 	void *p=ptr;p=realloc(p, size);mem_alloc_cnt[2]++;
-	assert(p, "memory allocation error... (realloc)", get_name());
+	mdassert(p, "memory allocation error... (realloc)", get_name());
 	logmem(ptr,p,size);ptr=p;
 }
 
@@ -288,17 +291,17 @@ void AtomKeeper::ChangeType(KeeperType tp) {
  */
 
 void AtomKeeper::Expand(int sz){
-	assert(Type!=Clone, "attempt to expand a clone atom keeper");
+	mdassert(Type!=Clone, "attempt to expand a clone atom keeper");
 	int nold=NAtom;
 	
 	if(sz>NAlloc){ // reallocate storage
 		MemRealloc(AtomIndex, sizeof(Ptr)*sz);
-		assert(AtomIndex, "unable to reallocate atoms");
+		mdassert(AtomIndex, "unable to reallocate atoms");
 		// if storage: sync the atom index!
 		if(Type==Storage){
 			MemRealloc(AtomArray,sizeof(Atom)*sz);
 			Atom* a=AtomArray;
-			assert(AtomArray, "unable to reallocate atoms");
+			mdassert(AtomArray, "unable to reallocate atoms");
 			for(int i=0;i<sz;i++)AtomIndex[i].p=a++;
 			for(int i=nold;i<NAtom;i++)
 				{AtomArray[i].tid=-1;AtomArray[i].flag=0;}
@@ -359,7 +362,7 @@ void AtomKeeper::Attach(Atom* pa){
 }
 
 void AtomKeeper::Copy(AtomKeeper& ak) {
-	assert(Type==Storage, "attempt to copy to a non storage keeper");
+	mdassert(Type==Storage, "attempt to copy to a non storage keeper");
 	int na=ak.GetNAtom();
 	Expand(na);
 	if(ak.GetType()==Storage) {

@@ -5,8 +5,8 @@
 #include <cstdlib>
 #include <climits>
 #include <muParser/muParser.h>
-#include "omd/omdtool.h"
-#include "fdtd.h"
+#include <omd/omdtool.h>
+#include <misc/fdtd.h>
 // For 2D problems...
 
 using std::vector;

@@ -15,7 +15,7 @@
  *
 */
 
-#include <conditioner/VerletListFull.hpp>
+#include <conditioner/VerletListFull.h>
 
 using std::cerr;
 using std::ofstream;
@@ -64,7 +64,7 @@ void VerletListFull::Init(MDSystem* WorkSys) {
 	Conditioner::Init(WorkSys);
 	
 	if (System->PBoundary) {
-		assert(System->type_of("simulation_system_grid"), 
+		mdassert(System->type_of("simulation_system_grid"), 
 			   "MDSystemGrid is required for periodic boundary simulation");
 	}
 	

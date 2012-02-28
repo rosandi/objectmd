@@ -12,8 +12,9 @@ RANLIB = ranlib
 RM = rm
 MV = mv
 
-LIBOBJ = toolkit.o \
-	tablereader.o \
+LIBOBJ = omdtool.o toolkit.o \
+	treader.o \
+	param.o \
 	base.o \
 	container.o \
 	atomgroup.o \

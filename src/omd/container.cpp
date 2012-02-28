@@ -27,16 +27,18 @@
 #include <fstream>
 #include <sstream>
 #include <unistd.h>
-#include <omd/base.hpp>
-#include <omd/container.hpp>
-#include <omd/forcekernel.hpp>
-#include <omd/config.hpp>
+#include <omd/omdtool.h>
+#include <omd/base.h>
+#include <omd/container.h>
+#include <omd/forcekernel.h>
+#include <omd/config.h>
 
 using std::ios;
 using std::string;
 using std::ostream;
 using std::ifstream;
 using std::istringstream;
+using namespace omd;
 
 #define NOLEADINGSPACES(f) {\
 	while(f.peek()==' ' || f.peek()=='\t' || f.peek()=='\n')f.get();\
@@ -80,7 +82,7 @@ AtomContainer::AtomContainer(string material_file) {
  */
 
 AtomContainer* AtomContainer::ReadMaterial(string material_file) {
-	assert(material_file!="", "empty material file");
+	mdassert(material_file!="", "empty material file");
 	mat_file=material_file;
 	param.clear();
 	LoadEnv();
@@ -229,7 +231,7 @@ AtomContainer* AtomContainer::Combine(AtomContainer& a) {
 	if(a.M>0.0&&a.Z>0.0) {
 		if(Z<0||M<0){ // if not initialized yet
 			ReadMaterial(a.GetMaterialFile());
-		} else assert(a.M==M&&a.Z==Z, "attempt to combine different type of atom");
+		} else mdassert(a.M==M&&a.Z==Z, "attempt to combine different type of atom");
 	} else a.SetMZ(M,Z);
 
 	AtomStorage.Append(a.GetAtomStorage());
@@ -291,8 +293,8 @@ AtomContainer* AtomContainer::Import(string fname, int aid) {
 	
 	if(fname!="")filename=fname;
 	
-	assert(filename!="", "no file to import");
-	assert(file_exist(filename), "import file name "+filename+" not found");
+	mdassert(filename!="", "no file to import");
+	mdassert(file_exist(filename), "import file name "+filename+" not found");
 	
 	ParamHandler p;
 	p.read_pseudo(fname);
@@ -323,11 +325,11 @@ AtomContainer* AtomContainer::Import(string fname, int aid) {
 		}
 	}
 	
-	if(aid>=0) assert(iid>=0, "id field not found");
+	if(aid>=0) mdassert(iid>=0, "id field not found");
 
 	int it=0,lino=0;
 	ifstream posf(filename.c_str());	
-	assert(posf.good(), "failed to open file "+filename);
+	mdassert(posf.good(), "failed to open file "+filename);
 
 	vector<Atom> atom_register;
 
@@ -431,7 +433,7 @@ AtomContainer* AtomContainer::DumpAtoms(AtomKeeper& ak,
 	if(mode&WM_APPEND) f.open(fname.c_str(), ios::app);
 	else f.open(fname.c_str(), ios::trunc);
 	
-	assert(f.good(), "unable to create file "+fname);
+	mdassert(f.good(), "unable to create file "+fname);
 	
 	//-----Header stuff------//
 	// header printed only if not WM_BARE and not WM_APPEND
@@ -503,7 +505,7 @@ AtomContainer* AtomContainer::DumpAtoms(AtomKeeper& ak,
 	// gzip it!!
 	if (mode&WM_ZIP) {
 		string cmd("gzip "+fname);
-		assert(system(cmd.c_str())!=-1, "cannot execute gzip program...");
+		mdassert(system(cmd.c_str())!=-1, "cannot execute gzip program...");
 	}
 
 	return this;
@@ -555,7 +557,7 @@ AtomContainer* AtomContainer::Save(string binname, string mode) {
 
 	char cname[32];
 	
-	assert(fl, "cannot open file for writing "+binname);
+	mdassert(fl, "cannot open file for writing "+binname);
 	
 	memset(cname,0,32);
 	strcpy(cname,"$ATOMCONTAINER:");
@@ -579,10 +581,10 @@ AtomContainer* AtomContainer::Save(string binname, string mode) {
 
 	for(int i=0;i<na;i++) {
 		int dr=fwrite(&(Atoms(i)), sizeof(Atom), 1, fl);
-		assert(dr, "failure in writting file "+binname);
+		mdassert(dr, "failure in writting file "+binname);
 	}
 	
-	assert(!ferror(fl), "error writing to file "+binname);
+	mdassert(!ferror(fl), "error writing to file "+binname);
 	fclose(fl);
 
 	return this;
@@ -609,9 +611,9 @@ AtomContainer* AtomContainer::Load(string binname, string blockname) {
 	char cname[32];
 	
 	FILE* fl = fopen(binname.c_str(), "r");
-	assert(fl,"LOAD: can not open file '"+binname+"' for reading");
+	mdassert(fl,"LOAD: can not open file '"+binname+"' for reading");
 	if(blockname=="")blockname.assign(get_name());
-	assert(blockname!="", "undefined block name to read binary from "+binname);
+	mdassert(blockname!="", "undefined block name to read binary from "+binname);
 	
 	bool found=false;
 
@@ -633,7 +635,7 @@ AtomContainer* AtomContainer::Load(string binname, string blockname) {
 		fseek(fl, pos, SEEK_SET);
 	}
 
-	assert(found, "can not find atom data block '"+blockname+"' inside file '"+binname+"'");
+	mdassert(found, "can not find atom data block '"+blockname+"' inside file '"+binname+"'");
 	set_name(blockname);
 	param.clear();
 	string stake;
@@ -660,8 +662,8 @@ AtomContainer* AtomContainer::Load(string binname, string blockname) {
 	Allocate(na, false);
 	int dr=0;
 	for(int i=0;i<na;i++) dr+=fread(&(Atoms(i)), sizeof(Atom), 1, fl);
-	assert(dr==na, "Fail in reading file '"+binname+"'");
-	assert(!ferror(fl), "error loading file '"+binname+"'");
+	mdassert(dr==na, "Fail in reading file '"+binname+"'");
+	mdassert(!ferror(fl), "error loading file '"+binname+"'");
 	fclose(fl);
 	blog("Loaded: "+get_name()+"@"+binname, LOGCREATE);
 

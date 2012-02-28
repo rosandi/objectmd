@@ -28,13 +28,16 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <omd/system.hpp>
-#include <omd/gadget.hpp>
-#include <omd/integrator.hpp>
-#include <omd/iterator.hpp>
-#include <omd/conditioner.hpp>
-#include <omd/detector.hpp>
-#include <omd/dataslot.hpp>
+#include <omd/omdtool.h>
+#include <omd/system.h>
+#include <omd/gadget.h>
+#include <omd/integrator.h>
+#include <omd/iterator.h>
+#include <omd/conditioner.h>
+#include <omd/detector.h>
+#include <omd/dataslot.h>
+
+using namespace omd;
 
 //-----------SIGNAL-HANDLING------------------------//
 sig_atomic_t sig_int_accept=0;
@@ -177,7 +180,7 @@ void MDSystem::ReadParameter() {
 	
 	if(param.exist("--param")) {
 		ParameterFilename=param.string_value("--param");
-		assert(file_exist(ParameterFilename),
+		mdassert(file_exist(ParameterFilename),
 		       "can not find parameter file "+param.string_value("--param"));
 		blog("reading parameters from ("+ParameterFilename+")");
 		param.read(ParameterFilename);
@@ -277,7 +280,7 @@ void MDSystem::CreateSystem() {
 	if(param.exist("import")) { // import crystal
 
 		string fname=param.string_value("import");
-		assert(file_exist(fname), "can not find file to import ("+fname+")");
+		mdassert(file_exist(fname), "can not find file to import ("+fname+")");
 		blog("importing file "+fname);
 		if(param.peek("material", mat_file)) blog("setting material to "+mat_file);
 		Import(fname);
@@ -285,7 +288,7 @@ void MDSystem::CreateSystem() {
 	} else if(param.exist("load")) { // load from binary file
 
 		string fname=param.string_value("load");
-		assert(file_exist(fname), "can not find binary file to load ("+fname+")");
+		mdassert(file_exist(fname), "can not find binary file to load ("+fname+")");
 		blog("loading file "+fname);
 		LoadSimulation(fname);
 		EnumerateAtoms();
@@ -409,13 +412,13 @@ void MDSystem::UnificateAtoms() {
     int na=0;
     
     for (int i=0;i<(int)SystemAtoms.size();i++) na+=SystemAtoms[i]->GetNAtom();
-    assert(na>0, "no atom to simulate (NAtom=0)");
+    mdassert(na>0, "no atom to simulate (NAtom=0)");
    
     AtomStorage.Allocate(na);
     AtomStorage.Clear();
 
     for (int i=0;i<(int)SystemAtoms.size();i++) {
-    	assert(SystemAtoms[i]->M>0.0&&SystemAtoms[i]->Z>0.0,
+    	mdassert(SystemAtoms[i]->M>0.0&&SystemAtoms[i]->Z>0.0,
     	       "uninitialized atom properties (mass and number)",
     	       SystemAtoms[i]->get_name());
 
@@ -717,7 +720,7 @@ AtomContainer* MDSystem::Save(string fname, string mode) {
 void MDSystem::SaveSimulationConfig(string binfile) {
 	char cname[32];
 	FILE* fl = fopen(binfile.c_str(), "w");
-	assert(fl, "unable to create binary file to save simulation", binfile);
+	mdassert(fl, "unable to create binary file to save simulation", binfile);
 	
 	memset(cname,0,32);
 	sprintf(cname,"OMD (c) Y ROSANDI");
@@ -751,7 +754,7 @@ void MDSystem::SaveSimulationConfig(string binfile) {
 	sprintf(cname, "== END OF CONFIG HEADER ===");
 	fwrite(cname, sizeof(char), 32, fl);
 
-	assert(!ferror(fl), "error writing binary file");
+	mdassert(!ferror(fl), "error writing binary file");
 	fclose(fl);
 }
 
@@ -776,12 +779,12 @@ void MDSystem::LoadSimulation(string LoadFromFile) {
 	int NumCont;
 	int nresvar;
 	char cname[32];
-	assert(file_exist(LoadFromFile), "(LOAD) binary file doesn't exist: "+LoadFromFile);
+	mdassert(file_exist(LoadFromFile), "(LOAD) binary file doesn't exist: "+LoadFromFile);
 	FILE* fl = fopen(LoadFromFile.c_str(), "r");
-	assert(fl, "unable to read binary file", LoadFromFile);
+	mdassert(fl, "unable to read binary file", LoadFromFile);
 	
 	fread(cname, sizeof(char), 32, fl);
-	assert(string("OMD (c) Y ROSANDI")==cname,
+	mdassert(string("OMD (c) Y ROSANDI")==cname,
 	       "wrong binary file"+LoadFromFile);
 	       
 	fread(cname, sizeof(char), 32, fl);
@@ -808,7 +811,7 @@ void MDSystem::LoadSimulation(string LoadFromFile) {
 		AddAtom(new AtomContainer)->set_name(cname);
 	}
 
-	assert(!ferror(fl), "error loading binary file");
+	mdassert(!ferror(fl), "error loading binary file");
 	fclose(fl);
 
 	// Loads all atoms for each atom containers
@@ -893,17 +896,17 @@ void MDSystem::CheckBeforeRun() {
 	if(OutputDirectory!="") system(("mkdir -p "+OutputDirectory).c_str());
 	
 	if(get_type()=="simulation_system") {
-		assert(PBoundary==NONPERIODIC, "use MDSystemGrid for PERIODIC boundary simulation!!");
+		mdassert(PBoundary==NONPERIODIC, "use MDSystemGrid for PERIODIC boundary simulation!!");
 	}
 
 	// Check all gadgets
-	assert(Integrator->Check(), "force integrator is not ready");
+	mdassert(Integrator->Check(), "force integrator is not ready");
 
 	for (int i=0;i<(int)Conditioners.size();i++)
-		assert(Conditioners[i]->Check(), "conditioner not ready", Conditioners[i]->get_name());
+		mdassert(Conditioners[i]->Check(), "conditioner not ready", Conditioners[i]->get_name());
 
 	for (int i=0;i<(int)Detectors.size();i++)
-		assert(Detectors[i]->Check(), "detector not ready",Detectors[i]->get_name());
+		mdassert(Detectors[i]->Check(), "detector not ready",Detectors[i]->get_name());
 
 	for(int i=0;i<(int)Detectors.size();i++){
 		if(OutputDirectory!="") {
@@ -1148,7 +1151,7 @@ void MDSystem::BoundaryCorrectDistances(OMD_FLOAT& dx, OMD_FLOAT& dy, OMD_FLOAT&
 
 MDIntegrator* MDSystem::SetIntegrator(MDIntegrator* itg)
 {
-	assert(!Integrator,"attempt to reassign integrator");
+	mdassert(!Integrator,"attempt to reassign integrator");
    	itg->SetSystem(this);
    	itg->set_logger(this);
     itg->set_id(0);
@@ -1221,7 +1224,7 @@ AtomGroup* MDSystem::AddAtomGroup(string group_name) {
 
 void MDSystem::ChangeAtomID(int idx, int NewID) 
 {
-	assert(idx<GetNAtom(), 
+	mdassert(idx<GetNAtom(), 
 	       "changing atom id out of bound index="+as_string(idx)+
 	       " to id="+as_string(NewID));
 	Atoms(idx).tid=NewID;
@@ -1229,7 +1232,7 @@ void MDSystem::ChangeAtomID(int idx, int NewID)
 
 void MDSystem::ChangeAtomID(int start, int end, int NewID)
 {
-	assert(start>=0&&end<GetNAtom(),
+	mdassert(start>=0&&end<GetNAtom(),
 	       "changing atom id out of bound start="+as_string(start)+
 	       " end="+as_string(end)+" to id="+as_string(NewID));
 	for (int i=start;i<=end;i++) Atoms(i).tid=NewID;
@@ -1330,7 +1333,7 @@ int MDSystem::GetFlagBitMask(const char* usagecode) {
 		string sss("<");sss.append(usagecode);sss.append(">");
 		if(FlagUser[i].find(sss)!=string::npos){found=true;break;}
 	}
-	assert(found, "the 'flag-bit user' mark is not found", usagecode);
+	mdassert(found, "the 'flag-bit user' mark is not found", usagecode);
 	return (1<<i);
 }
 
@@ -1424,7 +1427,7 @@ AtomContainer* MDSystem::Import(string fname){
 	if(!ia) {
 		
 		if(mat_file=="") {
-			assert(p.exist("Material"), 
+			mdassert(p.exist("Material"), 
 				   "can not find Material tag in import file ("+fname+
 				   ") nor material definition in the parameter list");
 			mat_file=p.string_value("Material");

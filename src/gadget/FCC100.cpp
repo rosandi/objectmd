@@ -1,6 +1,6 @@
 //--------------FCC 110 Crystal------------------//
 
-#include <crystal/FCC100.hpp>
+#include <crystal/FCC100.h>
 
 /*
  This part of code is taken from impact code, AG Urbassek (Thomas J. Colla).
@@ -24,7 +24,7 @@ AtomContainer* FCC100::Create() {
 		  Count,
 		  i, j, k, l;
 
-	assert(xml&&yml&&zml, "crystal monolayers are not defined");
+	mdassert(xml&&yml&&zml, "crystal monolayers are not defined");
 
 	hlc=lattice_constant/2.;
   

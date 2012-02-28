@@ -19,13 +19,15 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <omd/gadget.hpp>
-#include <omd/systemgrid.hpp>
-#include <omd/comhandler.hpp>
-#include <omd/integrator.hpp>
-#include <omd/iterator.hpp>
+#include <omd/omdtool.h>
+#include <omd/gadget.h>
+#include <omd/systemgrid.h>
+#include <omd/comhandler.h>
+#include <omd/integrator.h>
+#include <omd/iterator.h>
 
 using std::ostringstream;
+using namespace omd;
 
 // ProcInfo.Box and Box <- keeps the simulation box
 // Border <- keeps the processor borders (ThisProcAtoms are within this Border)
@@ -344,11 +346,11 @@ bool MDSystemGrid::CheckArch() {
 		}
 	}
 
-	assert(ClusterNX*ClusterNY*ClusterNZ==(int)GetGridSize(),
+	mdassert(ClusterNX*ClusterNY*ClusterNZ==(int)GetGridSize(),
 	  "incompatible grid dimension: "+clusdim+
 	  " on "+as_string(GetGridSize())+" processor(s)");
 
-	assert(GetGridSize()<=MAXPROC,
+	mdassert(GetGridSize()<=MAXPROC,
 	  "this program is compiled with "+as_string(MAXPROC)+" maximum processors");
 
 	blog("grid size "+clusdim);

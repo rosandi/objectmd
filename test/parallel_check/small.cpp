@@ -13,15 +13,7 @@
  *
 */
 
-#include <omd/systemgrid.hpp>
-#include <potential/team.hpp>
-//#include <conditioner/NeighborCell.hpp>
-#include <conditioner/VerletList.hpp>
-//#include <conditioner/VerletListFull.hpp>
-#include <crystal/FCC.hpp>
-#include <detector/ThermoDetector.hpp>
-#include <detector/StructureDetector.hpp>
-#include <detector/SysMonitor.hpp>
+#include <omd.h>
 
 class MySim:public MDSystemGrid {
 	void CreateSystem() {

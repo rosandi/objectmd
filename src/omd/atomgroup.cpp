@@ -18,8 +18,11 @@
  *
 */
 
-#include <omd/atomgroup.hpp>
-#include <omd/system.hpp>
+#include <omd/atomgroup.h>
+#include <omd/system.h>
+#include <omd/omdtool.h>
+
+using namespace omd;
 
 AtomGroup::AtomGroup(string group_name, AtomContainer* ac, MDSystem* WorkSys) {
 	set_name(group_name);
@@ -86,7 +89,7 @@ AtomGroup* AtomGroup::Select(int* idx_array) {
 
 	while(*a>=0){
 
-		assert(*a<scratch_ak.GetNAtom(),
+		mdassert(*a<scratch_ak.GetNAtom(),
 				"index out of range while selecting atoms to group '"+
 				get_name()+"' index "+as_string(*a));
 

@@ -2,7 +2,4 @@
 #   hostname compiler 
 #   * --> default
 
-prefect              $HOME/mpi-x86_64/bin/mpic++
-head1.rhrk.uni-kl.de /opt/openmpi-myrinet_mx2g/bin/mpic++
-*.corvix.roam        /opt/ompi/bin/mpic++
-*                    /usr/bin/mpic++
+*              $HOME/mpi-x86_64/bin/mpic++

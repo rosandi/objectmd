@@ -1,16 +1,2 @@
 #!/bin/bash
-# try hostname
-echo /usr/bin/mpic++
-exit
-
-eval USE=$(awk '/#/{next}$1=="'$(hostname)'"{print $2;exit}' compiler-list)
-
-# try domainname
-[[ -z $USE ]]&&
-eval USE=$(awk '/#/{next}/^\*\.'$(domainname)'/{print $2;exit}' compiler-list)
-
-# default
-[[ -z $USE ]]&&
-eval USE=$(awk '$1=="*"{print $2}' compiler-list)
-
-echo $USE
+echo /opt/ompi/bin/mpic++

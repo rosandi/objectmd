@@ -16,9 +16,9 @@
  *
 */
 
-#include <omd/system.hpp>
-#include <conditioner/VerletListFull.hpp>
-#include <potential/sw.hpp>
+#include <omd/system.h>
+#include <conditioner/VerletListFull.h>
+#include <potential/sw.h>
 
 OMD_FLOAT onethird;
 
@@ -61,7 +61,7 @@ void StillingerWeber::Init(MDSystem* WorkSys) {
 	ForceKernel::Init(WorkSys);
 	
 	Verlet=dynamic_cast<VerletListFull*>(System->GetIterator());
-	assert(Verlet->type_of("verlet list full neighbor"), 
+	mdassert(Verlet->type_of("verlet list full neighbor"), 
 		   "StillingerWeber potential kernel needs (VERLET LIST FULL NEIGHBOR) iterator");
 
 	CutRadius=alpha*sigma;

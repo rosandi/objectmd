@@ -19,9 +19,12 @@
 */
 
 #include <cmath>
-#include <omd/integrator.hpp>
-#include <omd/iterator.hpp>
-#include <omd/system.hpp>
+#include <omd/omdtool.h>
+#include <omd/integrator.h>
+#include <omd/iterator.h>
+#include <omd/system.h>
+
+using namespace omd;
 
 //----------Integrator----------//
 
@@ -73,7 +76,7 @@ void MDIntegrator::PrintInfo(ostream& ost) {
 void MDIntegrator::Init(MDSystem* WorkSys) {	
     MDGadget::Init(WorkSys);
 
-	assert(ActForces.size()>0, "no defined force kernel");
+	mdassert(ActForces.size()>0, "no defined force kernel");
     NType = WorkSys->SystemAtoms.size();
 
 	// put forces into the kernel matrix
@@ -81,7 +84,7 @@ void MDIntegrator::Init(MDSystem* WorkSys) {
 		int from=ActForces[i]->AtomTypeA;
 		int to  =ActForces[i]->AtomTypeB;
 
-		assert(from<NType&&to<NType, "wrong atom IDs in the interaction force ("+
+		mdassert(from<NType&&to<NType, "wrong atom IDs in the interaction force ("+
 		       as_string(from)+","+as_string(to)+")");
 		
 		if(Forces[from][to]) die("interaction force for "+
@@ -109,7 +112,7 @@ void MDIntegrator::Init(MDSystem* WorkSys) {
 			MaxCutRadius=ActForces[i]->CutRadius;
 	}
 
-	assert(MaxCutRadius>0.0, "bad cut radius: "+as_string(MaxCutRadius));
+	mdassert(MaxCutRadius>0.0, "bad cut radius: "+as_string(MaxCutRadius));
 
 	// fetch parameters...
 	SysParam->peek("time.step", TimeStep);
@@ -164,7 +167,7 @@ bool MDIntegrator::Check() {
 MDIntegrator* MDIntegrator::AddForce(ForceKernel *forc) 
 {
 	int from=forc->AtomTypeA; int to=forc->AtomTypeB;
-	assert(from<MAXATOMTYPE&&to<MAXATOMTYPE, "MAXATOMTYPE exceeded");
+	mdassert(from<MAXATOMTYPE&&to<MAXATOMTYPE, "MAXATOMTYPE exceeded");
 	forc->set_id(ForcID++);
 	forc->SetUnit(Unit);
 	ActForces.push_back(forc);

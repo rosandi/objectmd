@@ -21,8 +21,11 @@
 #include <ctime>
 #include <sys/time.h>
 #include <mpi.h>
-#include <omd/systemgrid.hpp>
-#include <omd/comhandler.hpp>
+#include <omd/omdtool.h>
+#include <omd/systemgrid.h>
+#include <omd/comhandler.h>
+
+using namespace omd;
 
 // rubix offset:
 //   0->down_slab
@@ -117,14 +120,14 @@ void CommunicationHandler::Link(MDSystemGrid* s) {
 	System=s;
 
 	char hh[MPI_MAX_PROCESSOR_NAME];
-	assert(s->Argc&&s->Argv, "no valid arguments in the caller class");
+	mdassert(s->Argc&&s->Argv, "no valid arguments in the caller class");
 	MPI_Init(s->Argc,s->Argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &NProc);
 	MPI_Comm_rank(MPI_COMM_WORLD, &Rank);
 	MPI_Get_processor_name(hh, &ln);
 	int nreqp=s->ClusterNX*s->ClusterNY*s->ClusterNZ;
 	
-	assert(nreqp<=NProc,
+	mdassert(nreqp<=NProc,
 		   "failed to initiate sufficient number of processors: proc_required="+as_string(nreqp)+
 		   " MPI gives "+as_string(NProc)+" processor(s)");
 	

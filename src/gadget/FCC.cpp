@@ -1,6 +1,6 @@
 //----------------------Crystal FCC(111)----------------------//
 
-#include <crystal/FCC.hpp>
+#include <crystal/FCC.h>
 
 /*
  This function creates FCC(111) lattice. This
@@ -36,7 +36,7 @@ void FCC::Create111() {
     int     XMLayerPerUC, YMLayerPerUC, ZMLayerPerUC,
             XUCs, YUCs, ZUCs, Count, i, j, k, l;
 	
-	assert(xml&&yml&&zml, "crystal monolayers are not defined");
+	mdassert(xml&&yml&&zml, "crystal monolayers are not defined");
         
     XMLDist= lattice_constant*sqrt(6.)/12.;
     YMLDist= lattice_constant*sqrt(2.)/4.;
@@ -152,7 +152,7 @@ void FCC::Create100() {
 	Count,
 	i, j, k, l;
 	
-	assert(xml&&yml&&zml, "crystal monolayers are not defined");
+	mdassert(xml&&yml&&zml, "crystal monolayers are not defined");
 	
 	hlc=lattice_constant/2.;
 	

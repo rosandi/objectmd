@@ -2,8 +2,8 @@
 
 #include <cmath>
 #include <algorithm>
-#include <omd/iterator.hpp>
-#include <detector/StructureDetector.hpp>
+#include <omd/iterator.h>
+#include <detector/StructureDetector.h>
 
 #define STRUCT_NON 0.0
 #define STRUCT_FCC 1.0

@@ -18,13 +18,16 @@
 */
 
 #include <cmath>
-#include <omd/base.hpp>
-#include <omd/gadget.hpp>
-#include <omd/unit.hpp>
-#include <omd/detector.hpp>
-#include <omd/container.hpp>
-#include <omd/integrator.hpp>
-#include <omd/system.hpp>
+#include <omd/omdtool.h>
+#include <omd/base.h>
+#include <omd/gadget.h>
+#include <omd/unit.h>
+#include <omd/detector.h>
+#include <omd/container.h>
+#include <omd/integrator.h>
+#include <omd/system.h>
+
+using namespace omd;
 
 MDGadget::MDGadget() {
 	System= NULL;
@@ -98,7 +101,7 @@ void MDGadget::Init(MDSystem* WorkSys){
 	Iterator=WorkSys->GetIterator();
 	Integrator=WorkSys->GetIntegrator();
 	ReadParameter();
-	assert(CheckParameter(), "check parameter failed");
+	mdassert(CheckParameter(), "check parameter failed");
 	
 	if(Target==NULL){
 		string nst=lower_case(TargetName);
@@ -164,14 +167,14 @@ int MDGadget::IsActive(int Code) {
 }
 
 DataSlot* MDGadget::RegisterMessageSlot(DataSlot* slot) {
-	assert(System, "attempt to register slot before initialization");
+	mdassert(System, "attempt to register slot before initialization");
 	System->MessageSlots.push_back(slot);
 	return slot;
 }
 
 
 void MDGadget::RestartVariable(string tag, OMD_FLOAT &val){
-	assert(System, "attempt to read restart variable before initialization");
+	mdassert(System, "attempt to read restart variable before initialization");
 	DataSlot *m=NULL;
 
 	for(int i=0;i<(int)System->RestartVars.size();i++) {
@@ -190,7 +193,7 @@ void MDGadget::RestartVariable(string tag, OMD_FLOAT &val){
 }
 
 void MDGadget::RestartVariable(string tag, int &val){
-	assert(System, "attempt to read restart variable befor initialization");
+	mdassert(System, "attempt to read restart variable befor initialization");
 	DataSlot *m=NULL;
 
 	for(int i=0;i<(int)System->RestartVars.size();i++) {

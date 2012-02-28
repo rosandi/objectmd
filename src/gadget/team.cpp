@@ -19,9 +19,9 @@
 #include <fstream>
 #include <cstdio>
 #include <cstring>
-#include <omd/system.hpp>
-#include <omd/iterator.hpp>
-#include <potential/team.hpp>
+#include <omd/system.h>
+#include <omd/iterator.h>
+#include <potential/team.h>
 
 //--Electron-Density-------------------------------
 
@@ -43,7 +43,7 @@ TEmbedding::TEmbedding() {
 
 // for the same atom type 
 void TEmbedding::AddTable(int aid, string tabfile) {
-	assert(aid<MAX_ALLOWED_SPECIES, "attempt to insert table for atom.tid="+as_string(aid)+
+	mdassert(aid<MAX_ALLOWED_SPECIES, "attempt to insert table for atom.tid="+as_string(aid)+
 	       " "+as_string(MAX_ALLOWED_SPECIES)+" maximum allowed atom species exeeded!");
 	AtomID[aid][aid]=id_size;
 	embed[id_size  ].open(tabfile,"EMBED");
@@ -52,7 +52,7 @@ void TEmbedding::AddTable(int aid, string tabfile) {
 
 // for different atom type
 void TEmbedding::AddTable(int aid_at, int aid_to, string tabfile) {
-	assert(aid_at<MAX_ALLOWED_SPECIES&&aid_to<MAX_ALLOWED_SPECIES,
+	mdassert(aid_at<MAX_ALLOWED_SPECIES&&aid_to<MAX_ALLOWED_SPECIES,
 	       "attempt to insert table for atom.tid=("+as_string(aid_at)+","+as_string(aid_to)+
 	       ") "+as_string(MAX_ALLOWED_SPECIES)+" maximum allowed atom species exeeded!");
 
@@ -66,13 +66,13 @@ void TEmbedding::AddTable(int aid_at, int aid_to, string tabfile) {
 void TEmbedding::Init(MDSystem* WorkSys) {
 	Conditioner::Init(WorkSys);	
 	
-	assert(MAX_ALLOWED_SPECIES>=WorkSys->SystemAtoms.size(),
+	mdassert(MAX_ALLOWED_SPECIES>=WorkSys->SystemAtoms.size(),
 	       "atom type limit "+as_string(MAX_ALLOWED_SPECIES)+" exceeded");
 
 	// Claim one auxilary variable
 	ED_idx=ClaimAuxVariable();
 
-	assert(id_size>0, "uninitialized electron density table");	
+	mdassert(id_size>0, "uninitialized electron density table");	
 	for (int i=0; i<id_size; i++) CutRadius[i]=edens[i].max_range();
 }
 
