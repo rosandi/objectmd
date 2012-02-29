@@ -72,12 +72,12 @@ namespace omd {
 
 struct PackageVector {
 	int nid;
-	OMD_FLOAT x,y,z;
+	double x,y,z;
 };
 
 struct PackageScalar {
 	int nid;
-	OMD_FLOAT value;
+	double value;
 };
 
 struct PackageSpace {
@@ -85,8 +85,8 @@ struct PackageSpace {
     int gid;             ///< extended id, tagging, etc
     int nid;			   ///< enumerated id
     int flag;            ///< the status and multi-purpose flag
-    OMD_FLOAT x,   y,  z;
-    OMD_FLOAT vx, vy, vz;
+    double x,   y,  z;
+    double vx, vy, vz;
 };
 
 class CommunicationHandler:public MDClass {
@@ -108,8 +108,8 @@ class CommunicationHandler:public MDClass {
 	string Hostname;
 	bool opened;
 	int MirrorMask;
-	OMD_FLOAT TotalComtime;
-	OMD_FLOAT CellRadiusTolerance;
+	double TotalComtime;
+	double CellRadiusTolerance;
 
 	virtual void DistributeAtomIndexSlab(int slab);
 
@@ -126,8 +126,8 @@ public:
 
 	IndexList** GetRubix(){return NeigRubix;}
 
-	void   SetRadiusTolerance(OMD_FLOAT tole){CellRadiusTolerance=tole;}
-	OMD_FLOAT GetRadiusTolerance(){return CellRadiusTolerance;}
+	void   SetRadiusTolerance(double tole){CellRadiusTolerance=tole;}
+	double GetRadiusTolerance(){return CellRadiusTolerance;}
 
 	string GetHostname(){return Hostname;}
 
@@ -149,19 +149,19 @@ public:
 	virtual void   UnpackVelocity();	
 	virtual void   UnpackForce();
 	virtual void   UnpackAux(int aidx);
-	virtual bool   CheckCellShift(int b, OMD_FLOAT& xshift, OMD_FLOAT& yshift, OMD_FLOAT& zshift);
+	virtual bool   CheckCellShift(int b, double& xshift, double& yshift, double& zshift);
 	virtual void   SyncProcesses();
 	virtual void   Abort();
 
 	virtual int    RawSend(int toproc, void *data, int length);
 	virtual int    RawReceive(int fromproc, void* data, int length=DEFAULT_TRANSFER_LENGTH);
-	virtual void   RootReduceSUM(OMD_FLOAT*source,OMD_FLOAT*dest,int length);
+	virtual void   RootReduceSUM(double*source,double*dest,int length);
 	virtual int    TakeSUM(int a);
 	virtual int    TakeMAX(int a);
 	virtual int    TakeMIN(int a);
-	virtual OMD_FLOAT TakeSUM(OMD_FLOAT a);
-	virtual OMD_FLOAT TakeMAX(OMD_FLOAT a);
-	virtual OMD_FLOAT TakeMIN(OMD_FLOAT a);
+	virtual double TakeSUM(double a);
+	virtual double TakeMAX(double a);
+	virtual double TakeMIN(double a);
 	virtual void   Gather(void *idata, void *buffer, int length);
 	virtual void   AllGather(void *send, void *receive, int senlen, int reclen);
 	virtual void   Broadcast(void* a, int size);
