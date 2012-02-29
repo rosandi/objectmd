@@ -1,0 +1,8 @@
+dir.output output
+dir.binary pomd
+comm.arch  2 2 1
+comm.refresh 5
+dump.field nid
+boundary.periodic no
+time.max 10.0
+monitor.filename par.md
