@@ -269,6 +269,7 @@ public:
 	Conditioner* AddConditioner(Conditioner* Cond);
 	AtomContainer* AddAtom(AtomContainer* Atm);
 	AtomGroup* AddAtomGroup(string group_name);
+  void DeleteAtom(string name);
 	
 	class ForceKernel* AddForce(class ForceKernel* Force);
 	class ForceKernel* AddForce(class ForceKernel* Force, const char* from, const char* to);

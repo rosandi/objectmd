@@ -86,9 +86,9 @@ protected:
 
 public:	
 	bool created;
-    OMD_FLOAT   M;
-    OMD_FLOAT   Z;
-    OMD_FLOAT   Value;
+    double   M;
+    double   Z;
+    double   Value;
 	
 	SysBox   Box;
 	vector<string> StringInfo;
@@ -162,8 +162,8 @@ public:
 	virtual int GetNAtom(){return AtomStorage.GetNAtom();}
 
 	// calling compatibility...
-	virtual OMD_FLOAT GetMass(int idx){return M;}
-	virtual OMD_FLOAT GetZ(int idx){return Z;}
+	virtual double GetMass(int idx){return M;}
+	virtual double GetZ(int idx){return Z;}
 
 	/** Take the reference to the primitive atom keeper, AtomKeeper **/
 	virtual AtomKeeper& GetAtomStorage(){return AtomStorage;}
@@ -177,7 +177,7 @@ public:
 	
 	virtual AtomContainer* Create(){created=true; return this;}
 	
-    virtual AtomContainer* Import(string fname,int aid);
+  virtual AtomContainer* Import(string fname,int aid);
 	virtual AtomContainer* Import(string fname) {return Import(fname,-1);}
 	virtual AtomContainer* Import(string fname, string mat) {
 		AtomContainer* a=Import(fname);
@@ -204,8 +204,8 @@ public:
 	virtual AtomContainer* Save(string binname, string mode="w");
 	virtual AtomContainer* Load(string binname, string blockname="");
 	
-	AtomContainer*         Shift(OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz);
-	AtomContainer*         AddVelocity(OMD_FLOAT vx, OMD_FLOAT vy, OMD_FLOAT vz){
+	AtomContainer*         Shift(double dx, double dy, double dz);
+	AtomContainer*         AddVelocity(double vx, double vy, double vz){
 								for(int i=0;i<GetNAtom();i++){
 									Atoms(i).vx+=vx;
 									Atoms(i).vy+=vy;
@@ -214,10 +214,11 @@ public:
 								return this;
 							}
 
-	AtomContainer*         SetMZ(OMD_FLOAT mass, OMD_FLOAT za) {M=mass/NORMAL_AMU; Z=za; return this;}
+	AtomContainer*         SetMZ(double mass, double za) {M=mass/NORMAL_AMU; Z=za; return this;}
 	AtomContainer*         SetFilename(string fname) {filename.assign(fname);return this;}
-	AtomContainer*         SetKineticEnergy(OMD_FLOAT ek_per_atom);
-	AtomContainer*         SetTemperature(OMD_FLOAT temperature);
+	AtomContainer*         SetKineticEnergy(double ek_per_atom);
+	AtomContainer*         SetTemperature(double temperature);
+  AtomContainer*         SetVelocity(double,double,double);
 	bool                   CanImport() {return (filename!="" && filename!="-");}
 
 	virtual SysBox& CalcBox();

@@ -1214,6 +1214,16 @@ AtomContainer* MDSystem::AddAtom(AtomContainer* Atm) {
 	return Atm;
 }
 
+void MDSystem::DeleteAtom(string name) {
+  for(int i=0;i<(int)SystemAtoms.size();i++) {
+    if(SystemAtoms[i]->GetName()==name) {
+      delete SystemAtoms[i];
+      SystemAtoms.erase(SystemAtoms.begin()+i);
+      return;
+    }
+  }
+}
+
 AtomGroup* MDSystem::AddAtomGroup(string group_name) {
 	AtomGroup *ag=new AtomGroup(group_name, this, this);
 	ag->SetGroupMask(SystemAtomGroups.size());

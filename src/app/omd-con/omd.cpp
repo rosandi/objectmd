@@ -14,7 +14,19 @@
 using namespace omd;
 
 class simulation {
-  MDSystemGrid sim;
+  MDSystemGrid* sim;
+  
+  // commands.....
+#include "cmd_create.h"
+#include "cmd_shift.h"
+#include "cmd_temperature.h"
+#include "cmd_velocity.h"
+#include "cmd_integrator.h"
+#include "cmd_interaction.h"
+#include "cmd_group.h"
+#include "cmd_detect.h"
+#include "cmd_control.h"
+  
 public:
   
   bool parse(string cmd) {
@@ -38,25 +50,13 @@ public:
       
       try {
         if(cmd=="create") cmd_create(ss);
-        else if(cmd=="exit"||cmd=="quit"||cmd=="q") retval=0;
-        else if(cmd=="step") cmd_step(ss);
-        else if(cmd=="reset") cmd_reset(ss);
-        else if(cmd=="use") cmd_use(ss);
-        else if(cmd=="del"||cmd=="delete") cmd_del(ss);
-        else if(cmd=="set") cmd_set(ss);
-        else if(cmd=="fill") cmd_fill(ss);
-        else if(cmd=="buffer"||cmd=="buf") cmd_buffer(ss);
-        else if(cmd=="loop") cmd_loop(ss);
-        else if(cmd=="load") cmd_load(ss);
-        else if(cmd=="quiet") quiet=true;
-        else if(cmd=="verbose") quiet=false;
-        else if(cmd=="table") cmd_table(ss);
-        else if(cmd=="show") {ROOT(cmd_show(ss));}
-        else if(cmd=="plot") {ROOT(cmd_plot(ss));}
-        else if(cmd=="sleep") {ROOT(cmd_sleep(ss));}
-        else if(cmd=="dump") {ROOT(cmd_dump(ss));}
-        else if(cmd=="echo") {ROOT(cmd_echo(ss));}
-        else if(cmd=="ping") {ROOT(cmd_ping(ss));}
+        else if(cmd=="shift") cmd_shift(ss);
+        else if(cmd=="temperature") cmd_temperature(ss);
+        else if(cmd=="velocity") cmd_velocity(ss);
+        else if(cmd=="interaction") cmd_interaction(ss);
+        else if(cmd=="group") cmd_group(ss);
+        else if(cmd=="detect") cmd_detect(ss);
+        else if(cmd=="control") cmd_control(ss);
         else {
           if(me==0) sayer("undefined command: "+cmd);
           break;
@@ -67,7 +67,6 @@ public:
         loopbreak=true;
         break;
       } catch(...) {
-        std::cerr<<getpid()<<"unexpected too\n";
         sayer("undefined error");
         loading=false;
         loopbreak=true;

@@ -131,7 +131,7 @@ void AtomContainer::Release() {
  * dx, dy, and dz are the distance in the corresponding axis.
 */
 
-AtomContainer* AtomContainer::Shift(OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz)
+AtomContainer* AtomContainer::Shift(double dx, double dy, double dz)
 {
 	if(!created) Create();
     for(int i=0;i<GetNAtom();i++) {
@@ -172,7 +172,7 @@ void AtomContainer::Allocate(int na, bool clear, AtomKeeper::KeeperType type)
 */
 
 SysBox& AtomContainer::CalcBox(){
-	OMD_FLOAT MinX, MaxX, MinY, MaxY, MinZ, MaxZ;
+	double MinX, MaxX, MinY, MaxY, MinZ, MaxZ;
 	if(!created) Create();
 
 	int natom=GetNAtom();
@@ -342,9 +342,9 @@ AtomContainer* AtomContainer::Import(string fname, int aid) {
         lino++;
         if(stbuff[0]=='#') continue;
         
-		vector<OMD_FLOAT> vline;
+		vector<double> vline;
 		istringstream ist(stbuff);
-		OMD_FLOAT dd;
+		double dd;
 		Atom a;
 		a.tid=a.gid=0;a.flag=1; //active
 		a.x=a.y=a.z=a.vx=a.vy=a.vz=a.fx=a.fy=a.fz=0.0;
@@ -569,9 +569,9 @@ AtomContainer* AtomContainer::Save(string binname, string mode) {
 	WRITEST(param.raw_string(), fl);
 
 	fwrite(&id, sizeof(int), 1, fl);
-	fwrite(&M, sizeof(OMD_FLOAT), 1, fl);
-	fwrite(&Z, sizeof(OMD_FLOAT), 1, fl);
-	fwrite(&Value, sizeof(OMD_FLOAT), 1, fl);
+	fwrite(&M, sizeof(double), 1, fl);
+	fwrite(&Z, sizeof(double), 1, fl);
+	fwrite(&Value, sizeof(double), 1, fl);
 	fwrite(&posprec, sizeof(int), 1,fl);
 	fwrite(&valprec, sizeof(int), 1, fl);
 	fwrite(&write_mode, sizeof(int), 1, fl);
@@ -645,9 +645,9 @@ AtomContainer* AtomContainer::Load(string binname, string blockname) {
 	READST(stake, fl); param.assign(stake);
 
 	fread(&id, sizeof(int), 1, fl);
-	fread(&M, sizeof(OMD_FLOAT), 1, fl);
-	fread(&Z, sizeof(OMD_FLOAT), 1, fl);
-	fread(&Value, sizeof(OMD_FLOAT), 1, fl);
+	fread(&M, sizeof(double), 1, fl);
+	fread(&Z, sizeof(double), 1, fl);
+	fread(&Value, sizeof(double), 1, fl);
 	fread(&posprec, sizeof(int), 1,fl);
 	fread(&valprec, sizeof(int), 1, fl);
 	fread(&write_mode, sizeof(int), 1, fl);
@@ -680,7 +680,7 @@ AtomContainer* AtomContainer::Load(string binname, string blockname) {
  * 
  */
 
-AtomContainer* AtomContainer::SetKineticEnergy(OMD_FLOAT ek_per_atom) {
+AtomContainer* AtomContainer::SetKineticEnergy(double ek_per_atom) {
 	if(!created) Create();
 	int natom=GetNAtom();
 
@@ -696,12 +696,12 @@ AtomContainer* AtomContainer::SetKineticEnergy(OMD_FLOAT ek_per_atom) {
 	mdrseed();
 
 	// Give same energy, random direction
-	OMD_FLOAT svx=0.0,svy=0.0,svz=0.0;
+	double svx=0.0,svy=0.0,svz=0.0;
 	for(int i=0;i<natom;i++) {
-		OMD_FLOAT v=sqrt(2.0*ek_per_atom/GetMass(i));
-		OMD_FLOAT sx=mdrand()*v;
-		OMD_FLOAT sy=mdrand()*(v-sx);
-		OMD_FLOAT sz=v-(sx+sy);
+		double v=sqrt(2.0*ek_per_atom/GetMass(i));
+		double sx=mdrand()*v;
+		double sy=mdrand()*(v-sx);
+		double sz=v-(sx+sy);
 
 		svx+=(Atoms(i).vx=(mdrand()>0.5)?-sqrt(sx):sqrt(sx));
 		svy+=(Atoms(i).vy=(mdrand()>0.5)?-sqrt(sy):sqrt(sy));
@@ -709,9 +709,9 @@ AtomContainer* AtomContainer::SetKineticEnergy(OMD_FLOAT ek_per_atom) {
 
 	}
 	
-	svx/=(OMD_FLOAT)natom;
-	svy/=(OMD_FLOAT)natom;
-	svz/=(OMD_FLOAT)natom;
+	svx/=(double)natom;
+	svy/=(double)natom;
+	svz/=(double)natom;
 	
 	for(int i=0;i<natom;i++) {
 		Atoms(i).vx-=svx;
@@ -719,7 +719,7 @@ AtomContainer* AtomContainer::SetKineticEnergy(OMD_FLOAT ek_per_atom) {
 		Atoms(i).vz-=svz;
 	}
 
-	OMD_FLOAT checkek=0.0;
+	double checkek=0.0;
 	for(int i=0;i<natom;i++) {
 		checkek+=0.5*GetMass(i)*(
 			Atoms(i).vx*Atoms(i).vx+
@@ -727,7 +727,7 @@ AtomContainer* AtomContainer::SetKineticEnergy(OMD_FLOAT ek_per_atom) {
 			Atoms(i).vz*Atoms(i).vz);
 	}
 	
-	OMD_FLOAT fact=sqrt((ek_per_atom*(OMD_FLOAT)natom)/checkek);
+	double fact=sqrt((ek_per_atom*(double)natom)/checkek);
 	
 	for(int i=0;i<natom;i++) {
 		Atoms(i).vx*=fact;
@@ -749,6 +749,16 @@ AtomContainer* AtomContainer::SetKineticEnergy(OMD_FLOAT ek_per_atom) {
  * 
  */
 
-AtomContainer* AtomContainer::SetTemperature(OMD_FLOAT temperature) {
+AtomContainer* AtomContainer::SetTemperature(double temperature) {
     return SetKineticEnergy(3.0*temperature*MD_BOLTZMANN);
+}
+
+AtomContainer* AtomContainer::SetVelocity(double vx, double vy, double vz) {
+	if(!created) Create();
+  int natom=GetNAtom();
+	for(int i=0;i<natom;i++) {
+		Atoms(i).vx+=vx;
+		Atoms(i).vy+=vy;
+		Atoms(i).vz+=vz;
+	} 
 }
