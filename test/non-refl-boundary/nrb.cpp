@@ -18,41 +18,26 @@
 
 #define ALPHA  -0.0818
 #define FSTAT   0.1439
-
-#define TERMID 13
+#define ZML 2.0
 
 class MySim:public MDSystemGrid {
 	double lc;
 
 	void CreateSystem() {
-		FCC h("100",16,16,10, "aluminum");
-		h.Create()
-			->SetName("Al-heated")
-			->SetTemperature(1000.0);
-		
-		FCC c("110",16,16,118, "aluminum");
-		c.Create()
-			->SetName("Al-cool")
-			->Shift(0.0,0.0,-5.0*lc);
-
-		FCC b("110",16,16,4, "aluminum");
-		b.Create()
-			->SetName("terzone")
-			->Shift(0.0,0.0,-64.0*lc)
-			->SetXID(TERMID);
-		
-		AddAtom(new AtomContainer)
-			->Combine(h)
-			->Combine(c)
-			->Combine(b)
-			->SetName("Target");
-			
+		AddAtom(new FCC("100",16,16,132, "aluminum"))->SetName("Target");    
 	}
+  
+  void CreateGroup() {
+    AddAtomGroup("heated")
+      ->SelectGT(0.0,0.0,Box.z1-10.0*ZML)
+      ->SetTemperature(1000.0);
+    AddAtomGroup("nrb")->SelectLT(DBL_MAX,DBL_MAX,Box.z0+4.0*ZML);
+  }
 
 	void CreateGadget() {
 		SetIntegrator(new MDIntegrator);
 
-		NonReflecting* noref=new NonReflecting(ALPHA, FSTAT, TERMID, lc/2.0, true);
+		NonReflecting* noref=new NonReflecting;
 		AddForce(new TForceEAM("aluminum"))->SetEvaluator(noref);
 
 		AddConditioner(new VerletList);

@@ -14,8 +14,6 @@ class NonReflecting: public Conditioner, private ParallelGadget {
 	double gridthick;
 	
 	int    n_layer;
-	int    tzid;
-	int    tzflag;
 	int    bot_force;
 	int    top_force;
 	bool   printforce;
@@ -26,22 +24,9 @@ class NonReflecting: public Conditioner, private ParallelGadget {
   
 public:
   
-	NonReflecting(
-                double impedance,
-                double force_constant,
-                int    terminating_zone_id,
-                double grid_layer_thickness,
-                bool print_force=false)
-	{
-		imp=impedance;
-		fconst=force_constant;
-		tzid=terminating_zone_id;
-		gridthick=grid_layer_thickness;
-		printforce=print_force;
-		
+	NonReflecting() {
 		set_name("NON REFLECTING BOUNDARY (z bottom)");
-		register_class("non_reflecting_boundary");
-		
+		register_class("non_reflecting_boundary");		
 		SetConditionerType(COND_PRE_CALCULATION|COND_FORCE_MODIFIER);
 		evaluating=false;
 	}
@@ -52,11 +37,12 @@ public:
 	}
 	
 	void ReadParameter() {
-		imp=SysParam->double_value("boundary.nonref.impedance");
-		fconst=SysParam->double_value("boundary.nonref.forceconstant");
-		gridthick=SysParam->double_value("boundary.nonref.layerthick");
+    TargetName=SysParam->string_value("boundary.nrb.target");
+		imp=SysParam->double_value("boundary.nrb.impedance");
+		fconst=SysParam->double_value("boundary.nrb.force");
+		gridthick=SysParam->double_value("boundary.nrb.layer");
 	}
-	
+  	
 	void Init(MDSystem* WorkSys){
 		
 		mdassert(WorkSys->type_of("SIMULATION SYSTEM GRID"),
@@ -65,18 +51,15 @@ public:
 		Conditioner::Init(WorkSys);
 		ParallelGadget::Init(WorkSys);
     
-		// find the id of terminating-zone, put in tzid
-    
-		tzflag=ClaimFlagBit();
 		top_force=ClaimAuxVariable(printforce, "ftop");
 		bot_force=ClaimAuxVariable(printforce, "fbot");
+    ter_layer=ClaimAuxVariable(false,"termlayer");
 		
 		double zmax=-DBL_MAX, zmin=DBL_MAX;
+
 		for(int i=0;i<GetNAtom(); i++) {   
-			if(Atoms(i).group_of(tzid)) {
-				if(zmax<Atoms(i).z)zmax=Atoms(i).z;
-				if(zmin>Atoms(i).z)zmin=Atoms(i).z;
-			}
+      if(zmax<Atoms(i).z)zmax=Atoms(i).z;
+      if(zmin>Atoms(i).z)zmin=Atoms(i).z;
 		}
 		
 		zmax=TakeMAX(zmax);
@@ -89,15 +72,10 @@ public:
 		MemAlloc(layer_population, sizeof(int)*n_layer);
 		
 		for(int i=0;i<GetNAtom(); i++) {
-      if(Atoms(i).z<=termzone) {
-        
         int ly=(int)floor((Atoms(i).z-System->Box.z0)/gridthick);
         if(ly<0)ly=0;
         if(ly>=n_layer)ly=n_layer-1;
-        Atoms(i).xid=ly;
-        SetFlag(i, tzflag);
-        
-      } else UnsetFlag(i, tzflag);
+        Atoms(i).aux[ter_layer]=(double)ly;
     }
     
 	}
@@ -112,33 +90,41 @@ public:
   
 	void ForceModifier(){
     if(!evaluating) die("not evaluating force!");
+    
     int na=GetNAtom();
-    vector<int> blist[n_layer];
+    
     for(int i=0;i<n_layer;i++) {
       force_layer_average[i]=0.0;
       layer_population[i]=0;
     }
     
     for(int i=0;i<na;i++) {
-      Atom* a=AtomPtr(i);
-      if(a->flag&tzflag){
-        
-        if(a->xid<0||a->xid>=n_layer)
-          die("wrong member of terminating zone "+
-              as_string(a->xid)+" index="+as_string(i));
-        
-        blist[a->xid].push_back(i);
-        force_layer_average[a->xid]+=(a->aux[top_force]+imp*a->vz+fconst);
-        layer_population[a->xid]++;
-        
-      }
+      
+      Atom* a=AtomPtr(i); 
+      int nl=(int)a->aux[ter_layer];
+      force_layer_average[nl]+=(a->aux[top_force]+imp*a->vz+fconst);
+      layer_population[nl]++;
+    
     }
     
-    for(int l=0;l<n_layer;l++) {
-      double favg=force_layer_average[l]/(double)layer_population[l];
-      for(int i=0;i<blist[l].size();i++) {
-        Atoms(blist[l].at(i)).fz=favg;
-      }
+    // reduce average...
+    double* dtmp=new double[n_layer];
+    int* itmp=new int[n_layer];
+    
+    MPI_Allreduce(force_layer_average,dtmp,n_layer,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+    MPI_Allreduce(layer_population,itmp,n_layer,MPI_INT,MPI_SUM,MPI_COMM_WORLD);
+    memcpy(force_layer_average,dtmp,n_layer*sizeof(double));
+    memcpy(layer_population,itmp,n_layer*sizeof(int));
+    
+    delete[] dtmp;
+    delete[] itmp;
+
+    for(int i=0;i<n_layer;i++)
+      force_layer_average[i]/=layer_population[i];
+    
+    for(int i=0;i<na;i++) {
+      Atom* a=AtomPtr(i);
+      a->fz=force_layer_average[(int)a->aux[ter_layer]];
     }
     
   }
@@ -147,7 +133,8 @@ public:
   (Atom &a, Atom &b, double dx, double dy, double dz, double fr, double pot)
 	{
 		evaluating=true;
-		
+// TODO:		if(!(Target->Member(a) || Target->Member(b))) return;
+    
 		if(a.z<=b.z) {
       a.aux[top_force]+=fr*dz;
       b.aux[bot_force]-=fr*dz;

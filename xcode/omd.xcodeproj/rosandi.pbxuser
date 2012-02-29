@@ -4,6 +4,7 @@
 		activeBuildConfigurationName = Debug;
 		activeTarget = D28A88AD04BDD90700651E21 /* omd */;
 		addToTargets = (
+			D28A88AD04BDD90700651E21 /* omd */,
 		);
 		codeSenseManager = 4C2505F91497DB6800780B70 /* Code sense */;
 		perUserDictionary = {
@@ -146,10 +147,17 @@
 	};
 	4C760F2A1497E54C002C9E27 /* atomgroup.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {605, 3107}}";
-			sepNavSelRange = "{0, 0}";
-			sepNavVisRange = "{0, 698}";
+			sepNavIntBoundsRect = "{{0, 0}, {684, 3146}}";
+			sepNavSelRange = "{5685, 0}";
+			sepNavVisRange = "{4535, 1156}";
 			sepNavWindowFrame = "{{15, 0}, {760, 778}}";
+		};
+	};
+	4C760F2B1497E54C002C9E27 /* base.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {591, 5447}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1090}";
 		};
 	};
 	4C760F2C1497E54C002C9E27 /* comhandler.cpp */ = {
@@ -164,6 +172,13 @@
 			sepNavIntBoundsRect = "{{0, 0}, {605, 10283}}";
 			sepNavSelRange = "{1738, 0}";
 			sepNavVisRange = "{1460, 864}";
+		};
+	};
+	4C760F2E1497E54C002C9E27 /* gadget.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {628, 2600}}";
+			sepNavSelRange = "{2575, 0}";
+			sepNavVisRange = "{1888, 1521}";
 		};
 	};
 	4C760F2F1497E54C002C9E27 /* integrator.cpp */ = {
@@ -182,16 +197,17 @@
 	};
 	4C760F311497E54C002C9E27 /* system.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {701, 20124}}";
-			sepNavSelRange = "{41158, 0}";
-			sepNavVisRange = "{39546, 1612}";
+			sepNavIntBoundsRect = "{{0, 0}, {761, 19942}}";
+			sepNavSelRange = "{33083, 0}";
+			sepNavVisRange = "{32358, 1373}";
+			sepNavWindowFrame = "{{188, 849}, {760, 1025}}";
 		};
 	};
 	4C760F321497E54C002C9E27 /* systemgrid.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {635, 11531}}";
+			sepNavIntBoundsRect = "{{0, 0}, {635, 11609}}";
 			sepNavSelRange = "{9847, 0}";
-			sepNavVisRange = "{9407, 946}";
+			sepNavVisRange = "{9232, 1315}";
 		};
 	};
 	4C760F341497E54C002C9E27 /* toolkit.cpp */ = {
@@ -260,16 +276,23 @@
 		fRef = 4C760F311497E54C002C9E27 /* system.cpp */;
 		name = "system.cpp: 1547";
 		rLen = 0;
-		rLoc = 41158;
+		rLoc = 41154;
 		rType = 0;
 		vrLen = 1612;
 		vrLoc = 39546;
 	};
+	4C82F93A14FE64BA0027BF5C /* omdtool.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {591, 2054}}";
+			sepNavSelRange = "{3076, 0}";
+			sepNavVisRange = "{2078, 1164}";
+		};
+	};
 	4C86023C14FD19D900F6D500 /* omd.cpp */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {605, 1365}}";
-			sepNavSelRange = "{1462, 0}";
-			sepNavVisRange = "{0, 634}";
+			sepNavIntBoundsRect = "{{0, 0}, {701, 897}}";
+			sepNavSelRange = "{365, 0}";
+			sepNavVisRange = "{0, 1144}";
 			sepNavWindowFrame = "{{230, 738}, {760, 1025}}";
 		};
 	};
@@ -365,6 +388,20 @@
 		vrLen = 1346;
 		vrLoc = 0;
 	};
+	4CCD1BC514FD760200E27319 /* CoordClamp.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {621, 832}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{431, 1025}";
+		};
+	};
+	4CCD1BCB14FD760200E27319 /* NonReflecting.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {704, 1872}}";
+			sepNavSelRange = "{984, 0}";
+			sepNavVisRange = "{1719, 1660}";
+		};
+	};
 	4CCD1BD514FD760200E27319 /* VerletListFull.h */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {684, 1248}}";
@@ -409,10 +446,17 @@
 	};
 	4CCD1BEB14FD760200E27319 /* atomgroup.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {701, 949}}";
-			sepNavSelRange = "{0, 0}";
-			sepNavVisRange = "{485, 1826}";
+			sepNavIntBoundsRect = "{{0, 0}, {591, 1014}}";
+			sepNavSelRange = "{1883, 0}";
+			sepNavVisRange = "{622, 1591}";
 			sepNavWindowFrame = "{{538, 0}, {760, 778}}";
+		};
+	};
+	4CCD1BEC14FD760200E27319 /* base.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {649, 5187}}";
+			sepNavSelRange = "{10454, 14}";
+			sepNavVisRange = "{2868, 1453}";
 		};
 	};
 	4CCD1BED14FD760200E27319 /* comhandler.h */ = {
@@ -422,11 +466,25 @@
 			sepNavVisRange = "{2551, 775}";
 		};
 	};
+	4CCD1BEE14FD760200E27319 /* conditioner.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {628, 1612}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1329}";
+		};
+	};
 	4CCD1BF014FD760200E27319 /* container.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {740, 3185}}";
-			sepNavSelRange = "{7701, 0}";
-			sepNavVisRange = "{6533, 1460}";
+			sepNavIntBoundsRect = "{{0, 0}, {754, 3120}}";
+			sepNavSelRange = "{8308, 0}";
+			sepNavVisRange = "{6628, 2037}";
+		};
+	};
+	4CCD1BF514FD760200E27319 /* gadget.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {600, 2782}}";
+			sepNavSelRange = "{5112, 0}";
+			sepNavVisRange = "{3244, 1674}";
 		};
 	};
 	4CCD1BF614FD760200E27319 /* integrator.h */ = {
@@ -438,9 +496,9 @@
 	};
 	4CCD1BFA14FD760200E27319 /* system.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {831, 5356}}";
-			sepNavSelRange = "{11639, 0}";
-			sepNavVisRange = "{10956, 1428}";
+			sepNavIntBoundsRect = "{{0, 0}, {831, 5343}}";
+			sepNavSelRange = "{6414, 0}";
+			sepNavVisRange = "{5130, 957}";
 			sepNavWindowFrame = "{{71, 0}, {760, 778}}";
 		};
 	};
@@ -451,11 +509,18 @@
 			sepNavVisRange = "{2059, 860}";
 		};
 	};
+	4CCD1BFC14FD760200E27319 /* toolkit.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {635, 2444}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 919}";
+		};
+	};
 	4CCD1BFF14FD760200E27319 /* omd.h */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {605, 676}}";
+			sepNavIntBoundsRect = "{{0, 0}, {591, 650}}";
 			sepNavSelRange = "{0, 0}";
-			sepNavVisRange = "{0, 871}";
+			sepNavVisRange = "{0, 1258}";
 		};
 	};
 	4CCD1C0514FD760200E27319 /* team.h */ = {
@@ -473,6 +538,12 @@
 		};
 	};
 	4CCD1C0B14FD7B7100E27319 /* cmd_create.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = cmd_create.h;
+		path = "/Users/rosandi/mnt/prefect_stor/rosandi/Programs/ObjectMD/current/src/app/omd-con/cmd_create.h";
+		sourceTree = "<absolute>";
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {591, 1183}}";
 			sepNavSelRange = "{1691, 0}";
@@ -480,6 +551,12 @@
 		};
 	};
 	4CCD1C0F14FD839A00E27319 /* cmd_shift.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = cmd_shift.h;
+		path = "/Users/rosandi/mnt/prefect_stor/rosandi/Programs/ObjectMD/current/src/app/omd-con/cmd_shift.h";
+		sourceTree = "<absolute>";
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {605, 394}}";
 			sepNavSelRange = "{291, 0}";
@@ -487,13 +564,25 @@
 		};
 	};
 	4CCD1C1014FD876E00E27319 /* cmd_temperature.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = cmd_temperature.h;
+		path = "/Users/rosandi/mnt/prefect_stor/rosandi/Programs/ObjectMD/current/src/app/omd-con/cmd_temperature.h";
+		sourceTree = "<absolute>";
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {605, 394}}";
+			sepNavIntBoundsRect = "{{0, 0}, {591, 615}}";
 			sepNavSelRange = "{276, 0}";
 			sepNavVisRange = "{0, 321}";
 		};
 	};
 	4CCD1C1114FD8A0800E27319 /* cmd_velocity.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = cmd_velocity.h;
+		path = "/Users/rosandi/mnt/prefect_stor/rosandi/Programs/ObjectMD/current/src/app/omd-con/cmd_velocity.h";
+		sourceTree = "<absolute>";
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {605, 394}}";
 			sepNavSelRange = "{267, 0}";
@@ -501,6 +590,12 @@
 		};
 	};
 	4CCD1C1214FD8D0100E27319 /* cmd_interaction.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = cmd_interaction.h;
+		path = "/Users/rosandi/mnt/prefect_stor/rosandi/Programs/ObjectMD/current/src/app/omd-con/cmd_interaction.h";
+		sourceTree = "<absolute>";
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {605, 530}}";
 			sepNavSelRange = "{480, 0}";
@@ -508,6 +603,12 @@
 		};
 	};
 	4CCD1C1414FD949000E27319 /* cmd_group.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = cmd_group.h;
+		path = "/Users/rosandi/mnt/prefect_stor/rosandi/Programs/ObjectMD/current/src/app/omd-con/cmd_group.h";
+		sourceTree = "<absolute>";
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {605, 1118}}";
 			sepNavSelRange = "{1728, 0}";
@@ -515,6 +616,12 @@
 		};
 	};
 	4CCD1C1714FD9AC100E27319 /* cmd_detect.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = cmd_detect.h;
+		path = "/Users/rosandi/mnt/prefect_stor/rosandi/Programs/ObjectMD/current/src/app/omd-con/cmd_detect.h";
+		sourceTree = "<absolute>";
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {605, 413}}";
 			sepNavSelRange = "{176, 0}";
@@ -522,6 +629,12 @@
 		};
 	};
 	4CCD1C1814FD9B0500E27319 /* cmd_control.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = cmd_control.h;
+		path = "/Users/rosandi/mnt/prefect_stor/rosandi/Programs/ObjectMD/current/src/app/omd-con/cmd_control.h";
+		sourceTree = "<absolute>";
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {605, 413}}";
 			sepNavSelRange = "{178, 0}";
@@ -677,7 +790,7 @@
 		fRef = 4CCD1BF014FD760200E27319 /* container.h */;
 		name = "container.h: 236";
 		rLen = 0;
-		rLoc = 7701;
+		rLoc = 8245;
 		rType = 0;
 		vrLen = 1460;
 		vrLoc = 6533;
@@ -797,7 +910,7 @@
 		fRef = 4C760F311497E54C002C9E27 /* system.cpp */;
 		name = "system.cpp: 1226";
 		rLen = 0;
-		rLoc = 32864;
+		rLoc = 32860;
 		rType = 0;
 		vrLen = 743;
 		vrLoc = 32411;

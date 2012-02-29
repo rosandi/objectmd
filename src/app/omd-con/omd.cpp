@@ -1,104 +1,114 @@
-// console program for ObjectMD
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <sstream>
-#include <cstdlib>
-// #include <muParser/muParser.h>
-#include <mpi.h>
-#include <omd/systemgrid.h>
-#include <omd/omdtool.h>
-#include <omd/param.h>
-#include <omd/piper.h>
+/* app
+ ************************************************
+ * Object-MD
+ * Object Oriented Molecular Dynamics Program
+ * 
+ * (c)Yudi Rosandi, 2005
+ *
+ * Version 2.0 (10.11.08)
+ *
+ * Project started on July 2005.
+ *
+ ************************************************
+ *
+ */
 
-using namespace omd;
+#include <omd.hpp>
 
-class simulation {
-  MDSystemGrid* sim;
+class MySim:public MDSystemGrid {
   
-  // commands.....
-#include "cmd_create.h"
-#include "cmd_shift.h"
-#include "cmd_temperature.h"
-#include "cmd_velocity.h"
-#include "cmd_integrator.h"
-#include "cmd_interaction.h"
-#include "cmd_group.h"
-#include "cmd_detect.h"
-#include "cmd_control.h"
-  
-public:
-  
-  bool parse(string cmd) {
-    bool retval=true;
-    int sep;
-    vector<string> cmds;
-    int pcmt=cmdpar.find('#');
-    if(pcmt!=cmdpar.npos) cmdpar.erase(pcmt,cmdpar.npos);
-    
-    do {
-      sep=cmdpar.find(";");
-      cmds.push_back(cmdpar.substr(0,sep));
-      cmdpar.erase(0,sep+1);
-    } while(sep!=cmdpar.npos);
-    
-    for(int n=0;n<(int)cmds.size();n++) {
-      if(looplevel) cmds[n]=string("loop ")+cmds[n];
-      istringstream ss(cmds[n]);
-      string cmd;
-      if(!(ss>>cmd)) continue;
+	void CreateSystem() {
+    if(param.exist("atom:")) {
+      istringstream ss("atom:", "end");
       
-      try {
-        if(cmd=="create") cmd_create(ss);
-        else if(cmd=="shift") cmd_shift(ss);
-        else if(cmd=="temperature") cmd_temperature(ss);
-        else if(cmd=="velocity") cmd_velocity(ss);
-        else if(cmd=="interaction") cmd_interaction(ss);
-        else if(cmd=="group") cmd_group(ss);
-        else if(cmd=="detect") cmd_detect(ss);
-        else if(cmd=="control") cmd_control(ss);
-        else {
-          if(me==0) sayer("undefined command: "+cmd);
-          break;
+      while(ss.good()) {
+        string snm, crys;
+        mdassert(ss>>snm>>crys,"invalid atom definition: "+ss.str());
+        
+        if(crys=="fcc") {
+          string ori,mat;
+          double xm,ym,zm;
+          mdassert(ss>>ori>>xm>>ym>>zm>>mat, "invalid creation options: "+ss.str());
+          AddAtom(new FCC(ori,xm,ym,zm,mat))->SetName(snm);
         }
-      } catch(const char* sterr) {
-        sayer(sterr);
-        loading=false;
-        loopbreak=true;
-        break;
-      } catch(...) {
-        sayer("undefined error");
-        loading=false;
-        loopbreak=true;
-        break;
+        
+        else die("not implemented yet");
       }
-      
     }
+	}
+  
+  void CreateGroup() {
     
-    return retval;
-  }
-  
-  void inputline() {
-    bool run=true;
-    while(run) {
-      char sline[2048];
-      if(me==0) {
-        std::cin.getline(sline,2047);
-        if(std::cin.eof()) sprintf(sline,"exit");
+    if(param.exist("group:")) {
+      istringstream ss("group:","end");
+      
+      while(ss.good()) {
+        string snm, alg;
+        mdassert(ss>>snm>>alg,"invalid group options: "+ss.str());
+        AtomGroup* AG=AddAtomGroup(snm);
+        
+        if(alg=="box") {
+          double x0,x1,y0,y1,z0,z1;
+          assert(ss>>x0>>y0>>z0>>x1>>y1>>z1, "invalid group box region");
+          AG->SelectBox(x0,x1,y0,y1,z0,z1);
+        }
+        
+        else if(alg=="ibox") {
+          double x0,x1,y0,y1,z0,z1;
+          assert(ss>>x0>>y0>>z0>>x1>>y1>>z1, "invalid group box region");
+          AG->SelectBoxInverse(x0,x1,y0,y1,z0,z1);
+        }
+        
+        else if(alg=="gt") {
+          double x0,y0,z0;
+          assert(ss>>x0>>y0>>z0, "invalid coordinate");
+          AG->SelectGT(x0,y0,z0);
+        }
+
+        else if(alg=="ge") {
+          double x0,y0,z0;
+          assert(ss>>x0>>y0>>z0, "invalid coordinate");
+          AG->SelectGE(x0,y0,z0);
+        }        
+        
+        else if(alg=="lt") {
+          double x0,y0,z0;
+          assert(ss>>x0>>y0>>z0, "invalid coordinate");
+          AG->SelectLT(x0,y0,z0);
+        }  
+        
+        else if(alg=="le") {
+          double x0,y0,z0;
+          assert(ss>>x0>>y0>>z0, "invalid coordinate");
+          AG->SelectLE(x0,y0,z0);
+        }
+
       }
-      MPI_Barrier(MPI_COMM_WORLD);
-      MPI_Bcast(sline,2048,MPI_CHAR,0,MPI_COMM_WORLD);
-      run=parse(sline);
     }
   }
   
+	void CreateGadget() {
+    if(!param.exist("integrator")) SetIntegrator(new MDIntegrator);
+    
+		NonReflecting* noref=new NonReflecting;
+		AddForce(new TForceEAM("aluminum"))->SetEvaluator(noref);
+    
+		AddConditioner(new VerletList);
+		AddConditioner(noref);
+    
+		AddDetector(new SysMonitor("md.out"));
+		AddDetector(new ThermoDetector(0.05));
+	}
+  
+	void BeforeRun() {
+		PrintInfo("info.out");
+		DumpAtoms("init_data");
+	}
   
 };
 
-
 int main(int argc, char* argv[]) {
-  
-  
-
-  return 0;
+	MySim TheSim;
+	TheSim.SetArgument(argc,argv);
+	return TheSim.Run();
 }

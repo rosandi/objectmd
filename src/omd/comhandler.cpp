@@ -51,7 +51,7 @@ CommunicationHandler::CommunicationHandler(){
 		RecvNumber[i]=0;
 		NeigRubix[i]=new IndexList;
 	}
-
+  
 	set_name("CommunicationHandler:MPI");
 	register_class("communication_handler");
 	TotalComtime=0.0;
@@ -61,7 +61,7 @@ CommunicationHandler::CommunicationHandler(){
 
 CommunicationHandler::~CommunicationHandler() {
 	if(!opened) return;
-
+  
 	for(int i=0;i<27;i++) {
 		disable_log(LOGWARNING);
 		MemFree(SpaceSendBuffer[i]);
@@ -72,26 +72,26 @@ CommunicationHandler::~CommunicationHandler() {
 		MemFree(ScalarRecvBuffer[i]);
 		enable_log(LOGWARNING);
 	}
-
+  
 	char st[DEFAULT_TRANSFER_LENGTH];
-
+  
 	std::cerr.flush();	
 	std::cerr << std::fixed << std::setprecision(4);
 	
 	if(GetRank()==ROOT){
 		if(!System->param.exist("--silent"))
-		std::cerr << "\n(Root) Waiting for child processes to finish\n"
-				  << "[\n ElapsedTime: " << System->ElapsedTime
-				  << "\n Step: " << System->Step << "\n]\n";
+      std::cerr << "\n(Root) Waiting for child processes to finish\n"
+      << "[\n ElapsedTime: " << System->ElapsedTime
+      << "\n Step: " << System->Step << "\n]\n";
 	}
 	
 	SyncProcesses();
-	OMD_FLOAT walltime=TakeMAX(System->SimWallTime);
-	OMD_FLOAT comtime=TakeMAX(TotalComtime);
+	double walltime=TakeMAX(System->SimWallTime);
+	double comtime=TakeMAX(TotalComtime);
 	string tmsg("walltime: ");
 	tmsg.append(as_string(walltime)+
-				" commtime: "+as_string(comtime)+" ("+as_string(comtime/walltime)+") (seconds)");
-
+              " commtime: "+as_string(comtime)+" ("+as_string(comtime/walltime)+") (seconds)");
+  
 	if(GetRank()==ROOT) {
 		for(int r=1;r<NProc;r++) {
 			RawReceive(r,st,DEFAULT_TRANSFER_LENGTH);
@@ -100,7 +100,7 @@ CommunicationHandler::~CommunicationHandler() {
 		}
 		if(!System->param.exist("--silent")) {
 			std::cerr << "Simulation walltime: " << walltime << " seconds\n"
-					  << "Communication time: " << comtime << " seconds\n";
+      << "Communication time: " << comtime << " seconds\n";
 			System->PrintTime(std::cerr);
 		}
 	} else {
@@ -116,9 +116,9 @@ CommunicationHandler::~CommunicationHandler() {
 
 void CommunicationHandler::Link(MDSystemGrid* s) {
 	int ln;
-
+  
 	System=s;
-
+  
 	char hh[MPI_MAX_PROCESSOR_NAME];
 	mdassert(s->Argc&&s->Argv, "no valid arguments in the caller class");
 	MPI_Init(s->Argc,s->Argv);
@@ -128,8 +128,8 @@ void CommunicationHandler::Link(MDSystemGrid* s) {
 	int nreqp=s->ClusterNX*s->ClusterNY*s->ClusterNZ;
 	
 	mdassert(nreqp<=NProc,
-		   "failed to initiate sufficient number of processors: proc_required="+as_string(nreqp)+
-		   " MPI gives "+as_string(NProc)+" processor(s)");
+           "failed to initiate sufficient number of processors: proc_required="+as_string(nreqp)+
+           " MPI gives "+as_string(NProc)+" processor(s)");
 	
 	Hostname.assign(hh);
 	opened=true;
@@ -154,7 +154,7 @@ int CommunicationHandler::RawReceive(int fromproc, void* data, int length){
 	
 }
 
-void CommunicationHandler::RootReduceSUM(OMD_FLOAT*source, OMD_FLOAT*dest, int length){
+void CommunicationHandler::RootReduceSUM(double*source, double*dest, int length){
 	MPI_Reduce(source,dest,length,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
 }
 
@@ -203,7 +203,7 @@ void CommunicationHandler::PreparePositionBuffers(){
 		}			
 	}
 }
-		
+
 void CommunicationHandler::PrepareVelocityBuffers(){
 	for(int i=0;i<27;i++){
 		int na=NeigRubix[i]->length;
@@ -267,10 +267,10 @@ void CommunicationHandler::CollectSendRecvNumber() {
 	MPI_Status  stat[54];
 	MPI_Request req[54];
 	int nreq=0;
-
+  
 	memset(SendNumber,0,27*sizeof(int));
 	memset(RecvNumber,0,27*sizeof(int));
-
+  
 	for(int i=0;i<27;i++){
 		int proc=System->GetNeighborRank(i);
 		if(i==MYSELF||proc<0)continue;
@@ -278,72 +278,72 @@ void CommunicationHandler::CollectSendRecvNumber() {
 		MPI_Send_init(&SendNumber[i],1,MPI_INT,proc,SIZETAG+(26-i),MPI_COMM_WORLD,&req[nreq++]);
 		MPI_Recv_init(&RecvNumber[i],1,MPI_INT,proc,SIZETAG+i,MPI_COMM_WORLD, &req[nreq++]);
 	}
-
+  
 	MPI_Startall(nreq, req);
 	MPI_Waitall(nreq,req,stat);
 	// FIXME! check statuses here
 }
 
 
-bool CommunicationHandler::CheckCellShift(int b, OMD_FLOAT& xshift,OMD_FLOAT& yshift, OMD_FLOAT& zshift) {
+bool CommunicationHandler::CheckCellShift(int b, double& xshift,double& yshift, double& zshift) {
 	int rank=GetRank();
 	// my grid coordinate
 	int mx=System->ProcInfo.CellX[rank];
 	int my=System->ProcInfo.CellY[rank];
 	int mz=System->ProcInfo.CellZ[rank];
-
+  
 	// neigboring cell coordinate relative to the current cell
 	int nx=b%3;
 	int ny=(b/3)%3;
 	int nz=(b/9)%3;
-
+  
 	bool do_shift=false;
-
+  
 	// this occurs only in periodic boundary condition,
 	// wraps on a single processor
 	if(System->GetNeighborRank(b)==rank) {
-
+    
 		xshift=(nx==0)?(-System->ProcInfo.Box.lx):((nx==2)?System->ProcInfo.Box.lx:0.0);
 		yshift=(ny==0)?(-System->ProcInfo.Box.ly):((ny==2)?System->ProcInfo.Box.ly:0.0);
 		zshift=(nz==0)?(-System->ProcInfo.Box.lz):((nz==2)?System->ProcInfo.Box.lz:0.0);
 		do_shift=true;
-
+    
 	} else {
-
+    
 		// this happens only if PERIODIC_X|Y|Z
 		// otherwise neighbor rank b < 0...
-
+    
 		if(mx==0&&nx==0)
 		{xshift=-System->ProcInfo.Box.lx; do_shift=true;}
 		else if((mx==(int)System->ClusterNX-1)&&(nx==2))
 		{xshift=System->ProcInfo.Box.lx; do_shift=true;}
 		else xshift=0.0;
-
+    
 		if(my==0&&ny==0)
 		{yshift=-System->ProcInfo.Box.ly;do_shift=true;}
 		else if((my==(int)System->ClusterNY-1)&&(ny==2))
 		{yshift=System->ProcInfo.Box.ly;do_shift=true;}
 		else yshift=0.0;
-
+    
 		if(mz==0&&nz==0)
 		{zshift=-System->ProcInfo.Box.lz;do_shift=true;}
 		else if((mz==(int)System->ClusterNZ-1)&&(nz==2))
 		{zshift=System->ProcInfo.Box.lz;do_shift=true;}
 		else zshift=0.0;
-
+    
 	}
-
+  
 	return do_shift;
 }
 
 void CommunicationHandler::UnpackSpace() {
 	int newna=System->LocalAtomNumber;
-	OMD_FLOAT xshift, yshift, zshift;
+	double xshift, yshift, zshift;
 	System->AtomStorage.Cut(System->LocalAtomNumber);
-
+  
 	// appending all received atoms from other procs...
 	for(int b=0;b<27;b++) {
-
+    
 		if(System->GetNeighborRank(b)<0||b==MYSELF||RecvNumber[b]==0) continue;
 		
 		if(CheckCellShift(b,xshift,yshift,zshift)) {
@@ -353,10 +353,10 @@ void CommunicationHandler::UnpackSpace() {
 				SpaceRecvBuffer[b][c].z+=zshift;
 			}
 		}
-
+    
 		PackageSpace* X=SpaceRecvBuffer[b];
 		System->AtomStorage.Expand(newna+RecvNumber[b]);
-
+    
 		for(int c=0;c<RecvNumber[b];c++) {
 			Atom* A=System->AtomPtr(c+newna);
 			A->tid=X->tid;
@@ -379,11 +379,11 @@ void CommunicationHandler::UnpackSpace() {
 void CommunicationHandler::UnpackPosition() {
 	int oldna=System->LocalAtomNumber;
 	int newna=System->LocalAtomNumber;
-	OMD_FLOAT xshift, yshift, zshift;
+	double xshift, yshift, zshift;
 	
 	for(int b=0;b<27;b++) {
 		if(System->GetNeighborRank(b)<0||b==MYSELF||RecvNumber[b]==0) continue;
-
+    
 		if(CheckCellShift(b,xshift,yshift,zshift)){
 			for(int c=0;c<RecvNumber[b];c++){
 				VectorRecvBuffer[b][c].x+=xshift;
@@ -399,8 +399,8 @@ void CommunicationHandler::UnpackPosition() {
 			
 			if(A->nid!=X->nid)
 				die("unpacking position: atoms structure is non-contiguous! attempt to assign nid="+
-					as_string(A->nid)+" with nid="+as_string(X->nid));
-
+            as_string(A->nid)+" with nid="+as_string(X->nid));
+      
 			A->x=X->x;
 			A->y=X->y;
 			A->z=X->z;
@@ -408,9 +408,9 @@ void CommunicationHandler::UnpackPosition() {
 		}
 		oldna=newna;
 	}
-
+  
 	if(newna!=GetNAtom()) die("unpacking force: missing/additional atoms total after received="+
-							  as_string(newna)+" number of atoms="+as_string(GetNAtom()));
+                            as_string(newna)+" number of atoms="+as_string(GetNAtom()));
 }
 
 void CommunicationHandler::UnpackVelocity() {
@@ -429,7 +429,7 @@ void CommunicationHandler::UnpackVelocity() {
 			
 			if(A->nid!=X->nid)
 				die("unpacking velocity: atoms structure is non-contiguous! attempt to assign nid="+
-					as_string(A->nid)+" with nid="+as_string(X->nid));
+            as_string(A->nid)+" with nid="+as_string(X->nid));
 			
 			A->vx=X->x;
 			A->vy=X->y;
@@ -440,12 +440,12 @@ void CommunicationHandler::UnpackVelocity() {
 	}
 	
 	if(newna!=GetNAtom()) die("unpacking force: missing/additional atoms total after received="+
-							  as_string(newna)+" number of atoms="+as_string(GetNAtom()));
+                            as_string(newna)+" number of atoms="+as_string(GetNAtom()));
 	
 }
 
 void CommunicationHandler::UnpackForce() {
-
+  
 	int oldna=System->LocalAtomNumber;
 	int newna=System->LocalAtomNumber;
 	
@@ -461,7 +461,7 @@ void CommunicationHandler::UnpackForce() {
 			
 			if(A->nid!=X->nid)
 				die("unpacking force: atoms structure is non-contiguous! attempt to assign nid="+
-					as_string(A->nid)+" with nid="+as_string(X->nid));
+            as_string(A->nid)+" with nid="+as_string(X->nid));
 			
 			A->fx=X->x;
 			A->fy=X->y;
@@ -472,40 +472,40 @@ void CommunicationHandler::UnpackForce() {
 	}
 	
 	if(newna!=GetNAtom()) die("unpacking force: missing/additional atoms total after received="+
-							  as_string(newna)+" number of atoms="+as_string(GetNAtom()));
+                            as_string(newna)+" number of atoms="+as_string(GetNAtom()));
 	
 }
 
 void CommunicationHandler::UnpackAux(int aidx) {
-
+  
 	int oldna=System->LocalAtomNumber;
 	int newna=System->LocalAtomNumber;
-
+  
 	// appending all received atoms from other procs...
 	for(int b=0;b<27;b++) {
-
+    
 		if(System->GetNeighborRank(b)<0||b==MYSELF||RecvNumber[b]==0) continue;
-
+    
 		newna+=RecvNumber[b];
 		PackageScalar* X=ScalarRecvBuffer[b];
 		for(int c=0;c<RecvNumber[b];c++) {
 			Atom* A=System->AtomPtr(c+oldna);
-
+      
 			if(A->nid!=X->nid)
 				die("unpacking aux["+as_string(aidx)+
 						"]: atoms structure is non-contiguous! attempt to assign nid="+
 						as_string(A->nid)+" with nid="+as_string(X->nid));
-
+      
 			A->aux[aidx]=X->value;
 			X++;
 		}
-
+    
 		oldna=newna;
 	}
-
+  
 	if(newna!=GetNAtom()) die("unpacking aux["+as_string(aidx)+"] missing/additional atoms total after received="+
-			as_string(newna)+" number of atoms="+as_string(GetNAtom()));
-
+                            as_string(newna)+" number of atoms="+as_string(GetNAtom()));
+  
 }
 
 void CommunicationHandler::SendReceiveData(void* sendpack[], void* recvpack[], int unitlength){
@@ -517,59 +517,59 @@ void CommunicationHandler::SendReceiveData(void* sendpack[], void* recvpack[], i
 		if((i==MYSELF)||(System->GetNeighborRank(i)<0||RecvNumber[i]<=0))continue;
 		MemRealloc(recvpack[i], RecvNumber[i]*unitlength);
 	}
-
+  
 	for(int i=0;i<27;i++){
 		int proc=System->GetNeighborRank(i);
 		if(i==MYSELF||proc<0)continue;
 		
 		if(SendNumber[i]) MPI_Send_init(sendpack[i],SendNumber[i]*unitlength,
-		                       MPI_CHAR,proc,DATATAG+(26-i),
-		                       MPI_COMM_WORLD,&req[nreq++]);
-
+                                    MPI_CHAR,proc,DATATAG+(26-i),
+                                    MPI_COMM_WORLD,&req[nreq++]);
+    
 		if(RecvNumber[i]) MPI_Recv_init(recvpack[i],RecvNumber[i]*unitlength,
-		                       MPI_CHAR,proc,DATATAG+i,
-	        	               MPI_COMM_WORLD, &req[nreq++]);
-
+                                    MPI_CHAR,proc,DATATAG+i,
+                                    MPI_COMM_WORLD, &req[nreq++]);
+    
 	}
-
+  
 	MPI_Startall(nreq,req);
 	MPI_Waitall(nreq,req,stat);
 	for(int i=0;i<nreq;i++) MPI_Request_free(&req[i]);
-
+  
 }
 
 void CommunicationHandler::SendReceive(int mode){
 	timeval tstart, tend;
 	gettimeofday(&tstart,NULL);
-
+  
 	SyncProcesses();
 	CollectSendRecvNumber();
-
+  
 	if(mode&SYNC_SPACE) {
 		PrepareSpaceBuffers();
 		SendReceiveData((void**) SpaceSendBuffer, 
-						(void**) SpaceRecvBuffer, sizeof(PackageSpace));
+                    (void**) SpaceRecvBuffer, sizeof(PackageSpace));
 		UnpackSpace();
 	}
 	
 	if(mode&SYNC_POSITION) { 
 		PreparePositionBuffers();
 		SendReceiveData((void**) VectorSendBuffer, 
-						(void**) VectorRecvBuffer, sizeof(PackageVector));
+                    (void**) VectorRecvBuffer, sizeof(PackageVector));
 		UnpackPosition();
 	}
 	
 	if(mode&SYNC_VELOCITY) {
 		PrepareVelocityBuffers();
 		SendReceiveData((void**) VectorSendBuffer, 
-						(void**) VectorRecvBuffer, sizeof(PackageVector));
+                    (void**) VectorRecvBuffer, sizeof(PackageVector));
 		UnpackVelocity();
 	}
-		
+  
 	if(mode&SYNC_FORCE) {
 		PrepareForceBuffers();
 		SendReceiveData((void**) VectorSendBuffer, 
-						(void**) VectorRecvBuffer, sizeof(PackageVector));
+                    (void**) VectorRecvBuffer, sizeof(PackageVector));
 		UnpackForce();
 	}
 	
@@ -577,12 +577,12 @@ void CommunicationHandler::SendReceive(int mode){
 		int aidx=mode&0x00FF;
 		PrepareAuxBuffers(aidx);
 		SendReceiveData((void**)   ScalarSendBuffer, 
-						(void**)   ScalarRecvBuffer, sizeof(PackageScalar));
+                    (void**)   ScalarRecvBuffer, sizeof(PackageScalar));
 		UnpackAux(aidx);
 	}
-
+  
 	gettimeofday(&tend,NULL);
-	TotalComtime+=(OMD_FLOAT)((tend.tv_sec-tstart.tv_sec)+1e-6*(tend.tv_usec-tstart.tv_usec));
+	TotalComtime+=(double)((tend.tv_sec-tstart.tv_sec)+1e-6*(tend.tv_usec-tstart.tv_usec));
 }
 
 int CommunicationHandler::TakeSUM(int a){
@@ -604,20 +604,20 @@ int CommunicationHandler::TakeMIN(int a){
 }
 
 
-OMD_FLOAT CommunicationHandler::TakeSUM(OMD_FLOAT a){
-	OMD_FLOAT mv;
+double CommunicationHandler::TakeSUM(double a){
+	double mv;
 	MPI_Allreduce(&a,&mv,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
 	return mv;
 }
 
-OMD_FLOAT CommunicationHandler::TakeMAX(OMD_FLOAT a){
-	OMD_FLOAT mv;
+double CommunicationHandler::TakeMAX(double a){
+	double mv;
 	MPI_Allreduce(&a,&mv,1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
 	return mv;
 }
 
-OMD_FLOAT CommunicationHandler::TakeMIN(OMD_FLOAT a){
-	OMD_FLOAT mv;
+double CommunicationHandler::TakeMIN(double a){
+	double mv;
 	MPI_Allreduce(&a,&mv,1,MPI_DOUBLE,MPI_MIN,MPI_COMM_WORLD);
 	return mv;
 }
@@ -645,12 +645,12 @@ void CommunicationHandler::Abort() {
 }
 
 void CommunicationHandler::DistributeAtomIndexSlab(int slab) {
-
+  
 	int center=slab+4, south=slab+1, north=slab+7, west=slab+3, east=slab+5;
 	if(System->GetNeighborRank(center)<0) return;
-
-	OMD_FLOAT rcut=System->GetMaxCutRadius()+CellRadiusTolerance;
-
+  
+	double rcut=System->GetMaxCutRadius()+CellRadiusTolerance;
+  
 	if(
 	   (rcut>System->ProcInfo.LCellX && System->ClusterNX>1) ||
 	   (rcut>System->ProcInfo.LCellY && System->ClusterNY>1) || 
@@ -658,100 +658,100 @@ void CommunicationHandler::DistributeAtomIndexSlab(int slab) {
 	   )
 		
 		die("processor cell size is too small cell=("+
-			as_string(System->ProcInfo.LCellX)+","+
-			as_string(System->ProcInfo.LCellY)+","+
-			as_string(System->ProcInfo.LCellZ)+") border radius="+
-			as_string(rcut)+" (tol="+as_string(CellRadiusTolerance)+")");
-
+        as_string(System->ProcInfo.LCellX)+","+
+        as_string(System->ProcInfo.LCellY)+","+
+        as_string(System->ProcInfo.LCellZ)+") border radius="+
+        as_string(rcut)+" (tol="+as_string(CellRadiusTolerance)+")");
+  
 	
 	int na=System->GetLocalAtomNumber();
 	SysBox Border=System->GetCellBorder();
-
+  
 	switch(slab) {
-	case BottomSlab:
-
-		for(int i=0;i<na;i++)
-			if(Atoms(i).z<(Border.z0+rcut)) NeigRubix[center]->push(i);
-
-		break;
-
-	case MidSlab:
-
-		for(int i=0;i<na;i++) NeigRubix[center]->push(i);
-
-		break;
-
-	case TopSlab:
-
-		for(int i=0;i<na;i++)
-			if(Atoms(i).z>(Border.z1-rcut)) NeigRubix[center]->push(i);
-
-		break;
+    case BottomSlab:
+      
+      for(int i=0;i<na;i++)
+        if(Atoms(i).z<(Border.z0+rcut)) NeigRubix[center]->push(i);
+      
+      break;
+      
+    case MidSlab:
+      
+      for(int i=0;i<na;i++) NeigRubix[center]->push(i);
+      
+      break;
+      
+    case TopSlab:
+      
+      for(int i=0;i<na;i++)
+        if(Atoms(i).z>(Border.z1-rcut)) NeigRubix[center]->push(i);
+      
+      break;
 	}
-
+  
 	na=NeigRubix[center]->length;
 	int a;
-
+  
 	if(System->GetNeighborRank(west)>=0) {
 		NeigRubix[center]->reset();
 		while((a=NeigRubix[center]->fetch())>=0) {
 			if(Atoms(a).x<(Border.x0+rcut)) NeigRubix[west]->push(a);
 		}
 	}
-
+  
 	if(System->GetNeighborRank(east)>=0) {
 		NeigRubix[center]->reset();
 		while((a=NeigRubix[center]->fetch())>=0) {
 			if(Atoms(a).x>(Border.x1-rcut)) NeigRubix[east]->push(a);
 		}
 	}
-
+  
 	if(System->GetNeighborRank(south)>=0) {
 		NeigRubix[center]->reset();
 		while((a=NeigRubix[center]->fetch())>=0) {
 			if(Atoms(a).y<(Border.y0+rcut)) NeigRubix[south]->push(a);
 		}
 	}
-
+  
 	if(System->GetNeighborRank(north)>=0) {
 		NeigRubix[center]->reset();
 		while((a=NeigRubix[center]->fetch())>=0) {
 			if(Atoms(a).y>(Border.y1-rcut)) NeigRubix[north]->push(a);
 		}
 	}
-
+  
 	na=NeigRubix[south]->length;
-
+  
 	if(System->GetNeighborRank(south-1)>=0) {
 		NeigRubix[south]->reset();
 		while((a=NeigRubix[south]->fetch())>=0) {
 			if(Atoms(a).x<(Border.x0+rcut)) NeigRubix[south-1]->push(a);
 		}
 	}
-
+  
 	if(System->GetNeighborRank(south+1)>=0) {
 		NeigRubix[south]->reset();
 		while((a=NeigRubix[south]->fetch())>=0) {
 			if(Atoms(a).x>(Border.x1-rcut)) NeigRubix[south+1]->push(a);
 		}
 	}
-
+  
 	na=NeigRubix[north]->length;
-
+  
 	if(System->GetNeighborRank(north-1)>=0) {
 		NeigRubix[north]->reset();
 		while((a=NeigRubix[north]->fetch())>=0) {
 			if(Atoms(a).x<(Border.x0+rcut)) NeigRubix[north-1]->push(a);
 		}
 	}
-
+  
 	if(System->GetNeighborRank(north+1)>=0) {
 		NeigRubix[north]->reset();
 		while((a=NeigRubix[north]->fetch())>=0) {
 			if(Atoms(a).x>(Border.x1-rcut)) NeigRubix[north+1]->push(a);
 		}
 	}
-
+  
 }
 
 

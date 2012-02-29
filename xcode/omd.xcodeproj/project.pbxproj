@@ -51,6 +51,10 @@
 		4C760F871497E568002C9E27 /* parameter.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = parameter.txt; sourceTree = "<group>"; };
 		4C760F881497E568002C9E27 /* programflow.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = programflow.txt; sourceTree = "<group>"; };
 		4C760F891497E568002C9E27 /* sim_setting.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sim_setting.txt; sourceTree = "<group>"; };
+		4C82F93914FE64A70027BF5C /* omdtool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = omdtool.h; sourceTree = "<group>"; };
+		4C82F93A14FE64BA0027BF5C /* omdtool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = omdtool.cpp; sourceTree = "<group>"; };
+		4C82F93B14FE64BA0027BF5C /* param.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = param.cpp; sourceTree = "<group>"; };
+		4C82F93C14FE64BA0027BF5C /* treader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = treader.cpp; sourceTree = "<group>"; };
 		4C86022814FD19D800F6D500 /* fmmea.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fmmea.cpp; sourceTree = "<group>"; };
 		4C86022A14FD19D800F6D500 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		4C86022B14FD19D800F6D500 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
@@ -123,14 +127,6 @@
 		4CCD1C0614FD760200E27319 /* tersoff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tersoff.h; sourceTree = "<group>"; };
 		4CCD1C0714FD760200E27319 /* tpair.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tpair.h; sourceTree = "<group>"; };
 		4CCD1C0814FD760200E27319 /* zbl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zbl.h; sourceTree = "<group>"; };
-		4CCD1C0B14FD7B7100E27319 /* cmd_create.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_create.h; sourceTree = "<group>"; };
-		4CCD1C0F14FD839A00E27319 /* cmd_shift.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_shift.h; sourceTree = "<group>"; };
-		4CCD1C1014FD876E00E27319 /* cmd_temperature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_temperature.h; sourceTree = "<group>"; };
-		4CCD1C1114FD8A0800E27319 /* cmd_velocity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_velocity.h; sourceTree = "<group>"; };
-		4CCD1C1214FD8D0100E27319 /* cmd_interaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_interaction.h; sourceTree = "<group>"; };
-		4CCD1C1414FD949000E27319 /* cmd_group.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_group.h; sourceTree = "<group>"; };
-		4CCD1C1714FD9AC100E27319 /* cmd_detect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_detect.h; sourceTree = "<group>"; };
-		4CCD1C1814FD9B0500E27319 /* cmd_control.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmd_control.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -190,6 +186,9 @@
 		4C760F291497E54C002C9E27 /* omd */ = {
 			isa = PBXGroup;
 			children = (
+				4C82F93A14FE64BA0027BF5C /* omdtool.cpp */,
+				4C82F93B14FE64BA0027BF5C /* param.cpp */,
+				4C82F93C14FE64BA0027BF5C /* treader.cpp */,
 				4C91F15B14F9060E00B33F08 /* fdtd.cpp */,
 				4C760F2A1497E54C002C9E27 /* atomgroup.cpp */,
 				4C760F2B1497E54C002C9E27 /* base.cpp */,
@@ -288,14 +287,6 @@
 		4C86023B14FD19D900F6D500 /* omd-con */ = {
 			isa = PBXGroup;
 			children = (
-				4CCD1C1814FD9B0500E27319 /* cmd_control.h */,
-				4CCD1C1714FD9AC100E27319 /* cmd_detect.h */,
-				4CCD1C1414FD949000E27319 /* cmd_group.h */,
-				4CCD1C1214FD8D0100E27319 /* cmd_interaction.h */,
-				4CCD1C1114FD8A0800E27319 /* cmd_velocity.h */,
-				4CCD1C1014FD876E00E27319 /* cmd_temperature.h */,
-				4CCD1C0F14FD839A00E27319 /* cmd_shift.h */,
-				4CCD1C0B14FD7B7100E27319 /* cmd_create.h */,
 				4C86023C14FD19D900F6D500 /* omd.cpp */,
 			);
 			path = "omd-con";
@@ -381,6 +372,7 @@
 		4CCD1BEA14FD760200E27319 /* omd */ = {
 			isa = PBXGroup;
 			children = (
+				4C82F93914FE64A70027BF5C /* omdtool.h */,
 				4CCD1BEB14FD760200E27319 /* atomgroup.h */,
 				4CCD1BEC14FD760200E27319 /* base.h */,
 				4CCD1BED14FD760200E27319 /* comhandler.h */,

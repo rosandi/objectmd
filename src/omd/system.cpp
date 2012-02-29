@@ -607,14 +607,14 @@ void MDSystem::ArrangeMessageSlots() {
 */
 
 void MDSystem::Initiate() {
-	PreCreation();
-    CreationFunction();
-   	UnificateAtoms();
-   	EnumerateAtoms();
-	AdjustSystem();
-	CreateGroup();
-    PostCreation();
-	InitGadgets();
+  PreCreation();
+  CreationFunction();
+  UnificateAtoms();
+  EnumerateAtoms();
+  AdjustSystem();
+  CreateGroup();
+  PostCreation();
+  InitGadgets();
 	ArrangeMessageSlots();
 	PushInfo("$ PeriodicBoundary "+as_string(PBoundary));
 	
