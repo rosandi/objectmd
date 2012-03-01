@@ -1,0 +1,49 @@
+#mode.static
+
+var:
+  lc 4.032
+end
+
+create:
+  target fcc 100 16 16 132 aluminum
+end
+
+group:
+  hot gt -inf -inf {z1-5*lc}
+  nrb lt inf inf {z0+2*lc}
+end
+
+interaction:
+  target target eam.aluminum
+end
+
+cond:
+  verlet
+end
+
+detect:
+  monitor
+  thermo
+end
+
+prerun:
+  dump target data.dat
+  dump hot hot.dat
+  dump nrb nrb.dat
+  info info.out
+#  quit
+end
+
+#
+# from here equation can not be used
+# normal omd parameter setting
+#
+
+dir.output output
+dir.binary pomd
+comm.arch  1 1 1
+comm.refresh 5
+dump.field nid
+boundary.periodic no
+time.max 0.5
+monitor.filename par.md
