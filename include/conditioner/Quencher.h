@@ -42,7 +42,7 @@ public:
 	}
 
 	Quencher(string target, double quench_factor, int period=1) {
-		set_name("QUENCH");
+		set_name("quench");
 		register_class(get_name());
 		Factor=quench_factor;
 		Period=period;

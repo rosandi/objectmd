@@ -33,6 +33,7 @@ using namespace omd;
 ParamHandler::ParamHandler() {
   prefix.assign("");
   pseu_code.assign("#$");
+  parser==NULL;
 }
 
 ParamHandler::ParamHandler(string fpar){
@@ -189,27 +190,13 @@ void ParamHandler::remove_pair(string p) {
 }
 
 double ParamHandler::double_value(int idx) {
-  double retd=0.0;
-  if(idx<(int)spar.size()){
-    char st[256],*pt;
-    memset(st,0,256);
-    spar[idx].copy(st,256);
-    retd=strtod(st,&pt);
-    if(pt==st) throw "paramhandler: conversion to double failed";
-  } else throw "paramhandler: conversion out of range";
-  return retd;
+  if(idx>(int)spar.size()) throw "param: out of range";  
+  return as_double(spar[idx],parser);
 }
 
 int ParamHandler::int_value(int idx){
-  int reti=0;
-  if(idx<(int)spar.size()){
-    char st[256],*pt;
-    memset(st,0,256);
-    spar[idx+1].copy(st,256);
-    reti=strtol(st,&pt,10);
-    if(pt==st)throw "conversion to integer failed";
-  } else throw "out of range";
-  return reti;
+  if(idx>=(int)spar.size()) throw "param: out of range";
+  return as_int(spar[idx],parser);
 }
 
 string ParamHandler::string_value(int idx){
@@ -239,47 +226,16 @@ string ParamHandler::lower_string_value(string p){
 
 double ParamHandler::double_value(string p, int index) {
   if(!exist(p)) throw (string("parameter ")+p+" doesn't exist").c_str();
-  int idx=index_of(p)+index;
-  
-  if(idx<(int)spar.size()-1){
-    char st[256],*pt;
-    memset(st,0,256);
-    spar[idx+1].copy(st,256);
-    double retd=strtod(st,&pt);
-    if(pt==st)
-      throw (string("invalid double value for parameter ")+
-             spar[idx]+": "+st).c_str();
-    return retd;
-  }
-  
-  string msg=string("double value required for parameter ");
-  
-  if (index==0) msg.append(spar[idx]);
-  else msg.append(spar[idx]+"(array)");
-  throw (msg.c_str());
-  
+  int idx=index_of(p)+index+1;
+  if(idx>=(int)spar.size()) throw "no parameter value found";
+  return(as_double(spar[idx],parser));
 }
 
 int ParamHandler::int_value(string p, int index){
   if(!exist(p)) throw (string("parameter ")+p+" doesn't exist").c_str();
-  int idx=index_of(p)+index;
-  
-  if(idx<(int)spar.size()-1){
-    char st[256],*pt;
-    memset(st,0,256);
-    spar[idx+1].copy(st,256);
-    int reti=strtol(st,&pt,10);
-    if(pt==st)
-      throw (string("invalid integer value for parameter ")+
-             spar[idx]+": "+st).c_str();
-    return reti;
-  }
-  
-  string msg=string("integer value required for parameter ");
-  
-  if (index==0) msg.append(spar[idx]);
-  else msg.append(spar[idx]+"(array)");
-  throw (msg.c_str());
+  int idx=index_of(p)+index+1;
+  if(idx>=(int)spar.size()) throw "no parameter value found";
+  return(as_int(spar[idx],parser));
 }
 
 // -- peek if exist, otherwise don't touch the variable

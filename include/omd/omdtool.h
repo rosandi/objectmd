@@ -34,8 +34,8 @@ namespace omd {
   string as_string(int val, const char* format=NULL);
   string as_string(double val, const char* format=NULL);
   string as_string(void* val);
-  int    as_int(string);
-  double as_double(string);
+  int    as_int(string,void* parser=NULL);
+  double as_double(string, void* parser=NULL);
   string lower_case(string str);
   string trim(string str);
   string replace_char(string str, char cold, char cnew);

@@ -29,6 +29,10 @@
 #include <cmath>
 #include <ctype.h>
 
+#ifdef OMD_WITH_MUPARSER
+#include <muParser.h>
+#endif
+
 using std::string;
 using std::vector;
 
@@ -38,6 +42,13 @@ class ParamHandler {
 	vector<string> spar;
 	string prefix;
 	string pseu_code;
+  
+#ifdef OMD_WITH_MUPARSER
+  mu::Parser* parser;
+#else
+  void* parser;
+#endif
+  
 public:
 	ParamHandler();
 	ParamHandler(string fpar);
@@ -82,6 +93,11 @@ public:
 	string raw_string();
 	string raw_string(string p, string ends="--");
 	void set_pair(string p, string val);
+  
+#ifdef OMD_WITH_MUPARSER
+  void SetParset(mu::Parser* pars){parser=pars;}
+#endif
+  
 };
 
 }

@@ -21,8 +21,8 @@ using std::istringstream;
 
 class Projectile:public AtomContainer {
 	public:
-	Projectile(string mat, double tx, double ty, double h,
-               double theta, double phi, double energy)
+	Projectile(double tx, double ty, double h,
+               double theta, double phi, double energy, string mat)
 	:AtomContainer(mat) {
 
 		Allocate(1);		

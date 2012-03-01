@@ -30,22 +30,9 @@ class MySim:public MDSystemGrid {
   double eval(string equ) {
     equ=trim(equ);
     if(equ.empty()) return 0.0;
-    
-    if(equ[0]=='{') { // write equation between {}
-      equ=remove_char(equ,"{ }");
-      try {
-        parser.SetExpr(equ);
-        return parser.Eval();
-      } catch (mu::Parser::exception_type &e){
-        std::cout << e.GetMsg() << std::endl;
-        throw "equation parsing error";        
-      }
-    }
-    
-    return as_double(equ);
-    
+    return as_double(equ,(void*)(&parser));
   }
-    
+
 	void CreateSystem() {
     if(param.exist("create:")) {
       istringstream ss(param.raw_string("create:", "end"));
@@ -59,6 +46,60 @@ class MySim:public MDSystemGrid {
           mdassert(ss>>ori>>xm>>ym>>zm>>mat, "invalid creation options: "+ss.str());
           blog("create: "+snm+" "+crys);
           AddAtom(new FCC(ori,eval(xm),eval(ym),eval(zm),mat))->SetName(snm);
+        }
+        
+        else if(crys=="bcc") {
+          string ori,mat;
+          string xm,ym,zm;
+          mdassert(ss>>ori>>xm>>ym>>zm>>mat, "invalid creation options: "+ss.str());
+          blog("create: "+snm+" "+crys);
+          AddAtom(new BCC(ori,eval(xm),eval(ym),eval(zm),mat))->SetName(snm);
+        }
+        
+        else if(crys=="diamond") {
+          string ori,mat;
+          string xm,ym,zm;
+          mdassert(ss>>ori>>xm>>ym>>zm>>mat, "invalid creation options: "+ss.str());
+          blog("create: "+snm+" "+crys);
+          AddAtom(new Diamond(ori,eval(xm),eval(ym),eval(zm),mat))->SetName(snm);
+        }        
+        
+        else if(crys=="projectile") {
+          string x,y,z,th,ph,eng,mat;
+          mdassert(ss>>x>>y>>z>>th>>ph>>eng>>mat, "invalid projectile options: "+ss.str());
+          blog("create:"+snm+" "+crys);
+          AddAtom(new Projectile(eval(x),eval(y),eval(z),eval(th),eval(ph),eval(eng),mat))
+            ->SetName(snm);
+        }
+        
+        else if(crys=="atom") {
+          string x,y,z,vx,vy,vz,mat;
+          mdassert(ss>>x>>y>>z>>vx>>vy>>vz>>mat, "invalid projectile options: "+ss.str());
+          blog("create:"+snm+" "+crys);
+          AddAtom(new FreeAtom(eval(x),eval(y),eval(z),eval(vx),eval(vy),eval(vz),mat))
+            ->SetName(snm);
+        }
+        
+        else if(crys=="read") {
+          string fnm,isbin;
+          ss>>fnm>>isbin;
+          mdassert(file_exist(fnm), "file not found");
+          if(isbin=="binary") {
+            string block; ss>>block;
+            AddAtom(new AtomContainer)->Load(fnm,block)->SetName(snm);
+          } else {
+            AddAtom(new AtomContainer)->Import(fnm)->SetName(snm);
+          }
+        }
+        
+        else if(crys=="combine") {
+          string cnm;
+          AtomContainer* A=new AtomContainer;
+          while(ss>>cnm) {
+            A->Combine(*(SearchContainer(cnm)));
+            DeleteContainer(cnm);
+          }
+          AddAtom(A);
         }
         
         else die("not implemented yet: "+crys);
@@ -110,7 +151,9 @@ class MySim:public MDSystemGrid {
           mdassert(ss>>x0>>y0>>z0, "invalid coordinate");
           AG->SelectLE(eval(x0),eval(y0),eval(z0));
         }
-
+        
+        else die("unimplemented grouping algorithm: "+alg);
+        
       }
     }
   }
@@ -212,6 +255,7 @@ class MySim:public MDSystemGrid {
         else if(cnm=="source") AddConditioner(new EnergySource)->set_name(dnm);
         else if(cnm=="damp") AddConditioner(new ForceDamper)->set_name(dnm);
         else if(cnm=="nrb") AddConditioner(new NonReflecting)->set_name(dnm);
+        else if(cnm=="quench") AddConditioner(new Quencher)->set_name(dnm);
         else die("conditioner not yet enabled: "+cnm);
         
       }
@@ -308,6 +352,7 @@ class MySim:public MDSystemGrid {
 public:
   MySim(int &argc, char** &argv) {
     SetArgument(argc,argv);
+    param.SetParser(parser);
     parser.DefineConst("Pi",M_PI);
     parser.DefineConst("kb",8.6173324E-5); // eV/K
     parser.DefineVar("x0",&Box.x0);

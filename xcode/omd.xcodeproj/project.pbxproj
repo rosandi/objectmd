@@ -81,12 +81,10 @@
 		4CCD1BD314FD760200E27319 /* TTM_Homogen_SC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTM_Homogen_SC.h; sourceTree = "<group>"; };
 		4CCD1BD414FD760200E27319 /* VerletList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VerletList.h; sourceTree = "<group>"; };
 		4CCD1BD514FD760200E27319 /* VerletListFull.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VerletListFull.h; sourceTree = "<group>"; };
-		4CCD1BD714FD760200E27319 /* BCC100.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCC100.h; sourceTree = "<group>"; };
+		4CCD1BD714FD760200E27319 /* BCC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCC.h; sourceTree = "<group>"; };
 		4CCD1BD814FD760200E27319 /* Crystalline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Crystalline.h; sourceTree = "<group>"; };
 		4CCD1BD914FD760200E27319 /* Diamond.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Diamond.h; sourceTree = "<group>"; };
 		4CCD1BDA14FD760200E27319 /* FCC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FCC.h; sourceTree = "<group>"; };
-		4CCD1BDB14FD760200E27319 /* FCC100.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FCC100.h; sourceTree = "<group>"; };
-		4CCD1BDC14FD760200E27319 /* FCC111.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FCC111.h; sourceTree = "<group>"; };
 		4CCD1BDD14FD760200E27319 /* FreeAtom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FreeAtom.h; sourceTree = "<group>"; };
 		4CCD1BDE14FD760200E27319 /* Projectile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Projectile.h; sourceTree = "<group>"; };
 		4CCD1BE014FD760200E27319 /* DataDumper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataDumper.h; sourceTree = "<group>"; };
@@ -334,12 +332,10 @@
 		4CCD1BD614FD760200E27319 /* crystal */ = {
 			isa = PBXGroup;
 			children = (
-				4CCD1BD714FD760200E27319 /* BCC100.h */,
+				4CCD1BD714FD760200E27319 /* BCC.h */,
 				4CCD1BD814FD760200E27319 /* Crystalline.h */,
 				4CCD1BD914FD760200E27319 /* Diamond.h */,
 				4CCD1BDA14FD760200E27319 /* FCC.h */,
-				4CCD1BDB14FD760200E27319 /* FCC100.h */,
-				4CCD1BDC14FD760200E27319 /* FCC111.h */,
 				4CCD1BDD14FD760200E27319 /* FreeAtom.h */,
 				4CCD1BDE14FD760200E27319 /* Projectile.h */,
 			);

@@ -29,6 +29,9 @@
 #include <unistd.h>
 #include <string>
 #include <sstream>
+#ifdef OMD_WITH_MUPARSER
+#include <muParser.h>
+#endif
 #include <omd/omdtool.h>
 
 using std::string;
@@ -85,20 +88,39 @@ namespace omd {
     return string(st);
   }
   
-  int as_int(string val) {
+  int as_int(string val, void* parser) {
     int ii;
-    istringstream ss(val);
-    if(!(ss>>ii)) throw (string("conversion error: ")+val).c_str();
+#ifdef OMD_WITH_MUPARSER
+    if(val[0]=='{') {
+      mu::Parser* pars=dynamic_cast<mu::Parser*>parser;
+      val=remove_char(val,"{ }");
+      pars->SetExpr(val);
+      ii=(int)pars->Eval();
+    } else 
+#endif
+    {
+      istringstream ss(val);
+      if(!(ss>>ii)) throw (string("conversion error: ")+val).c_str();
+    }
     return ii;
   }
   
-  // FIXME! use muparser??
-  double as_double(string val) {
+  double as_double(string val, void* parser) {
     double dd;
-    istringstream ss(val);
-    if(val=="inf") return DBL_MAX;
-    if(val=="-inf") return -DBL_MAX;
-    if(!(ss>>dd)) throw (string("conversion error: ")+val).c_str();
+#ifdef OMD_WITH_MUPARSER
+    if(val[0]=='{') {
+      mu::Parser* pars=dynamic_cast<mu::Parser*>parser;
+      val=remove_char(val,"{ }");
+      pars->SetExpr(val);
+      dd=pars->Eval();
+    } else 
+#endif
+    {
+      istringstream ss(val);
+      if(val=="inf") return DBL_MAX;
+      if(val=="-inf") return -DBL_MAX;
+      if(!(ss>>dd)) throw (string("conversion error: ")+val).c_str();
+    }
     return dd;
   }
   

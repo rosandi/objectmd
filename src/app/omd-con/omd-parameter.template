@@ -1,13 +1,23 @@
-# why not like this:
-# can be read directly by paramhandler
+# only example
 
-create: 
+var:
+  lc 4.08
+end
+
+create:
+  # name type
   target fcc 100 16 16 132 aluminum
+  bulk fcc 100 16 16 132 aluninum
+  ion projectile 10 10 10 83 0 3000 argon
+  mob 10 10 -20 0 0 100 platinum
+  last read final.dat
+  preparat read cry.dat binary blockname
+  combine twotarget target bulk ...
 end
 
 group:
-  hot gt 0 0 {x0-10*zml}
-  nrb lt inf inf {x0+4*zml}
+  hot gt -inf -inf {x0-10*lc}
+  nrb lt inf inf {x0+4*lc}
 end
 
 modify:
