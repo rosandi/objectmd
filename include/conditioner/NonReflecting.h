@@ -25,7 +25,7 @@ class NonReflecting: public Conditioner, private ParallelGadget {
 public:
   
 	NonReflecting() {
-		set_name("NON REFLECTING BOUNDARY (z bottom)");
+		set_name("boundary.nrb");
 		register_class("non_reflecting_boundary");		
 		SetConditionerType(COND_PRE_CALCULATION|COND_FORCE_MODIFIER);
 		evaluating=false;
@@ -81,10 +81,12 @@ public:
 	}
 	
 	void PreCalculation(){
-		int na=GetNAtom();   
+    // to all system atoms...
+		int na=System->GetNAtom();   
     for(int i=0; i<na; i++){
-      Atoms(i).aux[top_force]=0.0;
-      Atoms(i).aux[bot_force]=0.0;
+      Atom* A=System->AtomPtr(i);
+      a->aux[top_force]=0.0;
+      a->aux[bot_force]=0.0;
     }
 	}
   
@@ -133,7 +135,7 @@ public:
   (Atom &a, Atom &b, double dx, double dy, double dz, double fr, double pot)
 	{
 		evaluating=true;
-// TODO:		if(!(Target->Member(a) || Target->Member(b))) return;
+    if(!(Target->Member(a) || Target->Member(b))) return;
     
 		if(a.z<=b.z) {
       a.aux[top_force]+=fr*dz;

@@ -30,7 +30,7 @@ public:
 
 	// maxpath is typically 10% lattice constant
 	DynamicTimeStep(double maxpath=-1.0, double max_time_step=0.001, int update_period=5) {
-		set_name("DYNAMIC TIME STEP");
+		set_name("dyndt");
 		register_class(get_name());
 		maxp=maxpath;
 		maxdt=max_time_step;

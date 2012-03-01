@@ -69,7 +69,7 @@ class EnergySource: public PreConditioner, public ParallelGadget {
 	
 public:
 	EnergySource() {
-		set_name("ENERGY SOURCE");
+		set_name("source");
 		register_class(get_name());
 		firstcall=true;
 		e_tally=0.0;

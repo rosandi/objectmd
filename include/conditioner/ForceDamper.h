@@ -26,15 +26,15 @@ class ForceDamper:public ForceConditioner {
 	
 public:		
 
-	ForceDamper(string target) {
-		set_name("DAMPING");
+	ForceDamper() {
+		set_name("damp");
 		register_class(get_name());
-		TargetName=target;
 	}
 
 	void ReadParameter() {
 		string par=lower_case(replace_char(get_name(),' ','_'));
 		Factor=SysParam->double_value(par+".factor");
+    TargetName=SysParam->string_value(par+".target");
 	}
 
 	void ForceModifier() {

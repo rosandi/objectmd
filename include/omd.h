@@ -34,6 +34,7 @@
 #include <conditioner/TempController.h>
 #include <conditioner/VerletList.h>
 #include <conditioner/VerletListFull.h>
+#include <conditioner/NonReflecting.h>
 
 // detector
 #include <detector/DataDumper.h>

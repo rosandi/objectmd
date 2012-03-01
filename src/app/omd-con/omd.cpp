@@ -19,7 +19,7 @@ class MySim:public MDSystemGrid {
   
 	void CreateSystem() {
     if(param.exist("atom:")) {
-      istringstream ss("atom:", "end");
+      istringstream ss(param.raw_string("atom:", "end"));
       
       while(ss.good()) {
         string snm, crys;
@@ -40,7 +40,7 @@ class MySim:public MDSystemGrid {
   void CreateGroup() {
     
     if(param.exist("group:")) {
-      istringstream ss("group:","end");
+      istringstream ss(param.raw_string("group:","end"));
       
       while(ss.good()) {
         string snm, alg;
@@ -56,7 +56,7 @@ class MySim:public MDSystemGrid {
         else if(alg=="ibox") {
           double x0,x1,y0,y1,z0,z1;
           assert(ss>>x0>>y0>>z0>>x1>>y1>>z1, "invalid group box region");
-          AG->SelectBoxInverse(x0,x1,y0,y1,z0,z1);
+          AG->SelectInverseBox(x0,x1,y0,y1,z0,z1);
         }
         
         else if(alg=="gt") {
@@ -87,22 +87,152 @@ class MySim:public MDSystemGrid {
     }
   }
   
+  void PostCreation() {
+    if(param.exist("modify:")) {
+      istringstream ss(param.raw_string("modify:","end"));
+      
+      while(ss.good()) {
+        string snm,op;
+        mdassert(ss>>snm>>op,"invalid modify options: "+ss.str());
+        
+        if(op=="temperature") {
+          double tempe;
+          mdassert(ss>>tempe, "temperature value required");
+          SearchContainer(snm)->SetTemperature(tempe);
+        }
+        
+        else if(op=="velocity") {
+          double vx,xy,xz;
+          mdassert(ss>>vx>>vy>>vz, "velocity vector required");
+          SearchContainer(snm)->SetVelocity(vx,xy,xz);
+        }
+        
+        else if(op=="kinetic") {
+          double kine;
+          mdassert(ss>>tempe, "kinetic energy required");
+          SearchContainer(snm)->SetKinetic(kine);
+          
+        }
+        
+        else if(op=="shift") {
+          double sx,sy,sz;
+          mdassert(ss>>sx>>sy>>sz, "shift distances required");
+          SearchContainer(snm)->Shift(sx,sy,sz);          
+        }
+        
+        else die("operation not implemented: "+op);
+      }
+      
+    }
+  }
+  
 	void CreateGadget() {
-    if(!param.exist("integrator")) SetIntegrator(new MDIntegrator);
+    vector evaluator;
+    vector evalforce;
     
-		NonReflecting* noref=new NonReflecting;
-		AddForce(new TForceEAM("aluminum"))->SetEvaluator(noref);
+    SetIntegrator(new MDIntegrator);
     
-		AddConditioner(new VerletList);
-		AddConditioner(noref);
+    if(param.exist("interaction:")) {
+      istringstream ss(param.raw_string("interaction:"));
+      
+      while(ss.good()) {
+        string a,b,sty,fty,eval;
+        ForceKernel* FF;
+        
+        mdassert(ss>>a>>b>>sty, "invalid interaction options: "+ss.str());
+        int dot=sty.find('.');
+        mdassert(dot!=sty.npos, "can not define interaction type: "+sty);
+        
+        fty=sty.substr(0,dot);
+        sty.erase(0,dot+1);
+        
+        if(fty=="eam") FF==new TForceEAM(sty);
+        else if(fty=="pair") FF=new TForcePair(sty);
+        else if(fty=="sw") FF=new StillingerWeber(sty);
+        
+        else die("interaction type not implemented: "+fty);
+        
+        AddForce(FF,a,b);
+        
+        // check if this force wants to be evaluated
+        if(ss>>eval) {
+          if(eval=="eval") {
+            ss>>eval;
+            evaluator.push_back(eval);
+            evalforce.push_back(FF);
+          }
+        }
+        
+      }
+    }
     
-		AddDetector(new SysMonitor("md.out"));
-		AddDetector(new ThermoDetector(0.05));
+    if(param.exist("cond:")) {
+      istringstream ss(param.raw_string("cond:","end"));
+      
+      while(ss.good()) {
+        string cnm;
+        mdassert(ss>>cnm, "invalid conditioner option");
+        
+        if(cnm=="verlet") AddConditioner(new VerletList);
+        else if(cnm=="verlet.full") AddConditioner(new VerletListFull);
+        else if(cnm=="clamp") AddConditioner(new CoordClamp);
+        else if(cnm=="dyndt") AddConditioner(new DynamicTimeStep);
+        else if(cnm=="source") AddConditioner(new EnergySource);
+        else if(cnm=="damp") AddConditioner(new ForceDamper);
+        else if(cnm=="boundary.nrb") AddConditioner(new NonReflecting);
+        else die("conditioner not yet enabled: "+cnm);
+        
+      }
+    }
+        
+    if(param.exist("detect:")) {
+      istringstream ss(param.raw_string("detect:","end"));
+      
+      while(ss.good()) {
+        string dnm;
+        mdassert(ss>>dnm, "invalid detector options: "+ss.str());
+        
+        if(cnm=="monitor") AddDetector(new SysMonitor);
+        else if(cnm=="thermo") AddDetector(new ThermoDetector);
+        
+        else die("detector not yet enabled: "+cnm);
+        
+      }
+
+    }
+    
+    // set all evaluators
+    for(int i=0;i<(int)evalforce.size();i++) {
+      evalforce[i]->SetEvaluator(SearchGadget(evaluator[i]));
+    }
+    
+    
 	}
   
 	void BeforeRun() {
-		PrintInfo("info.out");
-		DumpAtoms("init_data");
+    if(param.exist("prerun:")) {
+      istringstream ss(param.raw_string("prerun:","end"));
+      
+      while(ss.good()) {
+        string cmd;
+        if(!(ss>>cmd)) break;
+        
+        if(cmd=="dump") {
+          string cnm,fnm;
+          ss>>cnm>>fnm;
+          SearchContainer(cnm)->DumpAtoms(fnm);
+        }
+        
+        else if(cmd=="info") {
+          string fnm;
+          assert(ss>>fnm, "filename required");
+          PrintInfo(fnm);
+        }
+        
+        else die("command not implemented: "+cmd);
+      }
+                       
+    }
 	}
   
 };

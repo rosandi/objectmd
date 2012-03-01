@@ -149,7 +149,7 @@ public:
 
 	virtual void   Correction() {}
 	ForceKernel*   SetAtomID(int a, int b) {AtomTypeA=a; AtomTypeB=b; return this;}
-	ForceKernel*   SetEvaluator(Conditioner* feval){force_eval=feval; return this;}
+	ForceKernel*   SetEvaluator(MDGadget* feval){force_eval=feval; return this;}
 
 	bool CheckAtomID(int a, int b) {
 		// commutative...

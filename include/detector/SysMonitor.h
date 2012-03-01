@@ -31,7 +31,7 @@ using std::string;
 **/
 
 class SysMonitor:public Detector, public ParallelGadget {
-
+  
 	ofstream fout;
 	bool     usefile;
 	bool     usescreen;
@@ -42,63 +42,63 @@ class SysMonitor:public Detector, public ParallelGadget {
 	double   MechanicEnergy;
 	
 public:
-
-    SysMonitor(string fn="md.out", bool oneline=false) {
-                  	
-		set_name("SYSTEM_MONITOR_GRID");
-		register_class("SYSTEM_MONITOR");
+  
+  SysMonitor(string fn="md.out", bool oneline=false) {
+    
+		set_name("monitor");
+		register_class("monitor");
 		usefile=true;
 		every=1;
 		SetFilename(fn);
 		firsttime=true;
 	}
-	        
-    virtual ~SysMonitor() {
-    	if(GetRank()==0&&usefile) fout.close();
+  
+  virtual ~SysMonitor() {
+    if(GetRank()==0&&usefile) fout.close();
 	}
 	
 	void ReadParameter() {
 		SysParam->peek("monitor.filename", Filename);
-	    if(SysParam->exist("monitor.nofile")) usefile=false;
+    if(SysParam->exist("monitor.nofile")) usefile=false;
 		SysParam->peek("monitor.sample", every);
 		if(every<1) every=1;
 	}
+  
+  void Init(MDSystem* WorkSys) {
+    Detector::Init(WorkSys);
+    ParallelGadget::Init(WorkSys);
     
-    void Init(MDSystem* WorkSys) {
-    	Detector::Init(WorkSys);
-    	ParallelGadget::Init(WorkSys);
-
-	    if(GetRank()==ROOT) {
-	    	if(usefile)fout.open(GetFilename().c_str(), ios::trunc);
-
-	    	RegisterMessageSlot(new DataSlot("@",0))
-	    		->SetFormat("%d")
-				->SetData(System->Step);
-
-	    	RegisterMessageSlot(new DataSlot("t",0))
-	    		->SetFormat("%0.3E")
-				->SetData(System->ElapsedTime);
+    if(GetRank()==ROOT) {
+      if(usefile)fout.open(GetFilename().c_str(), ios::trunc);
+      
+      RegisterMessageSlot(new DataSlot("@",0))
+      ->SetFormat("%d")
+      ->SetData(System->Step);
+      
+      RegisterMessageSlot(new DataSlot("t",0))
+      ->SetFormat("%0.3E")
+      ->SetData(System->ElapsedTime);
 			
-	    	RegisterMessageSlot(new DataSlot("dt",0))
-	    		->SetFormat("%0.3E")
-				->SetData(System->Integrator->TimeStep);
-	    	
+      RegisterMessageSlot(new DataSlot("dt",0))
+      ->SetFormat("%0.3E")
+      ->SetData(System->Integrator->TimeStep);
+      
 			RegisterMessageSlot(new DataSlot("Ek",0))
-	    		->SetFormat("%0.5E")
-	    		->SetData(System->Kinetic);
-
-	    	RegisterMessageSlot(new DataSlot("Ep",0))
-	    		->SetFormat("%0.5E")
-	    		->SetData(RelPotential);
-
-	    	RegisterMessageSlot(new DataSlot("E",0))
-	    		->SetFormat("%0.5E")
-	    		->SetData(MechanicEnergy);
-
+      ->SetFormat("%0.5E")
+      ->SetData(System->Kinetic);
+      
+      RegisterMessageSlot(new DataSlot("Ep",0))
+      ->SetFormat("%0.5E")
+      ->SetData(RelPotential);
+      
+      RegisterMessageSlot(new DataSlot("E",0))
+      ->SetFormat("%0.5E")
+      ->SetData(MechanicEnergy);
+      
 		}
-
-    }
-
+    
+  }
+  
 	virtual void Measure() {
 		if(GetRank()==ROOT){
 			RelPotential=System->Potential-System->BasePotential;
@@ -113,10 +113,10 @@ public:
 					fout << '\n';
 					firsttime=false;
 				}
-	    		for(int i=0;i<nslot;i++)
-	    			fout << System->MessageSlots[i]->AsString() << " ";
-	    			
-    			fout << '\n';
+        for(int i=0;i<nslot;i++)
+          fout << System->MessageSlots[i]->AsString() << " ";
+        
+        fout << '\n';
 				fout.flush();
 				
 			}

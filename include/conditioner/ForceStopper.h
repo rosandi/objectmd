@@ -22,7 +22,7 @@ public:
 	            double dS, double dN, 
 	            double dB, double dT)
 	{
-		set_name("FORCE STOPPER");
+		set_name("freeze");
 		if(TargetAtom!=""||TargetAtom!="all")TargetName=TargetAtom; 
 		dWest=dW;dEast=dE; 
 		dSouth=dS;dNorth=dN; 

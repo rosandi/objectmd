@@ -136,64 +136,64 @@ class MDIterator;
  * On creation, the file "omd-parameter" is loaded if exist.
 */
 
-class MDSystem:public AtomContainer {
-
-protected:
-	friend class MDGadget;
-
-	int FlagBitUsed;     /**<the mask of used flag bit**/
-	int AuxVariableUsed; /**<the bit mask of used variables**/
+  class MDSystem:public AtomContainer {
+    
+  protected:
+    friend class MDGadget;
+    
+    int FlagBitUsed;     /**<the mask of used flag bit**/
+    int AuxVariableUsed; /**<the bit mask of used variables**/
     int  InterruptFlag;   /**<system interrupt flag**/
-
-	int Mode; /**<the running mode: NORMAL_MODE|CONTINUE_MODE|TEST_MODE**/
-
-	int AtomID;
-	int GroupID;
-	int ConditionerID;
-	int DetectorID;
-	bool Unificated;
-	bool Enumerated;
-	bool stopped;
-
+    
+    int Mode; /**<the running mode: NORMAL_MODE|CONTINUE_MODE|TEST_MODE**/
+    
+    int AtomID;
+    int GroupID;
+    int ConditionerID;
+    int DetectorID;
+    bool Unificated;
+    bool Enumerated;
+    bool stopped;
+    
     MDIterator* Iterator;
-	
-	string ParameterFilename;
-	string BinaryFilename;
-	string OutputDirectory;
-	
-public:
-
-	bool silent_mode;
-	int  print_every;
-
+    
+    string ParameterFilename;
+    string BinaryFilename;
+    string OutputDirectory;
+    
+  public:
+    
+    bool silent_mode;
+    int  print_every;
+    
     int* Argc;
     char*** Argv;
     int  ExitCode;
     
-	vector<string>  AuxUser;
-	vector<string> SAuxFormat;
-	vector<string>  AuxNameTag;
-	vector<string>  FlagUser;
-	
-	bool PrintableAux[MAXAUXVAR];
-	char** AuxFormat;
-
-	MDUnit* Unit;
-
+    vector<string>  AuxUser;
+    vector<string> SAuxFormat;
+    vector<string>  AuxNameTag;
+    vector<string>  FlagUser;
+    
+    bool PrintableAux[MAXAUXVAR];
+    char** AuxFormat;
+    
+    MDUnit* Unit;
+    
     MDIntegrator*          Integrator;
     vector<Conditioner*>   Conditioners;
     vector<Detector*>      Detectors;
     vector<AtomContainer*> SystemAtoms;
     vector<AtomGroup*>     SystemAtomGroups;
-	vector<DataSlot*>      MessageSlots;
-	vector<DataSlot*>      RestartVars;
-
-	time_t    SimBeginTime, SimEndTime;
-	double    SimWallTime; 
-
+    vector<DataSlot*>      MessageSlots;
+    vector<DataSlot*>      RestartVars;
+    
+    time_t    SimBeginTime, SimEndTime;
+    double    SimWallTime; 
+    
     int      PBoundary;
-	int    TotalAtom;
-	
+    int    TotalAtom;
+    
     double Energy;
     double Kinetic;
     double Virial;
@@ -203,208 +203,208 @@ public:
     int Step;
     double ElapsedTime;
     double MaxTime;
-	double SqrMaxVelocity;
-
-protected:
-
+    double SqrMaxVelocity;
+    
+  protected:
+    
     virtual void CreateSystem();
     virtual void CreateGadget()=0;
     virtual void SystemSetting(){} // settings may be done via parameters
-	virtual void CreateGroup(){} // atom grouping, called after adjust_system/system_setting
-
-	// Default=Do nothing functions. reserved for user application.
-	virtual void PreCreation(){}
+    virtual void CreateGroup(){} // atom grouping, called after adjust_system/system_setting
+    
+    // Default=Do nothing functions. reserved for user application.
+    virtual void PreCreation(){}
     virtual void PostCreation(){}
     virtual bool ConfirmResume(){return true;}
-	virtual void Scheduler(){}
-	virtual void InlineFunction(){}
-	
-	// interrupt signal handlers
-	virtual void OnInterruptTERM();
-	virtual void OnInterruptINT();
-	virtual void OnInterruptUSR1();
-	virtual void OnInterruptUSR2();
-	virtual void CheckInterruption();
-	
-	// Normal functions
-	virtual void CreationFunction();
+    virtual void Scheduler(){}
+    virtual void InlineFunction(){}
+    
+    // interrupt signal handlers
+    virtual void OnInterruptTERM();
+    virtual void OnInterruptINT();
+    virtual void OnInterruptUSR1();
+    virtual void OnInterruptUSR2();
+    virtual void CheckInterruption();
+    
+    // Normal functions
+    virtual void CreationFunction();
     virtual void AdjustSystem();
     virtual void EnumerateAtoms(bool redo=false);
     virtual void UnificateAtoms();
-	virtual void Initiate();
-	virtual void InitGadgets();
-	virtual void PrintMessages(ostream& ost);
-	virtual SysBox& CalcBox();
-
-	virtual void CheckBeforeRun();
+    virtual void Initiate();
+    virtual void InitGadgets();
+    virtual void PrintMessages(ostream& ost);
+    virtual SysBox& CalcBox();
+    
+    virtual void CheckBeforeRun();
     virtual void BeforeFirstRun(){}
-	virtual void BeforeRun(){}
+    virtual void BeforeRun(){}
     virtual void AfterRun(){}
-	virtual bool CheckRun(){
-		if(stopped) return false;
-		return((ElapsedTime<=MaxTime)&&(InterruptFlag==0));
-	}
-	virtual void FirstRun();
-	virtual void RunKernel();
-
-// run modes
-	virtual void RunNormal();
-	virtual void RunRestart();
-	virtual void RunStatic();
-
-public:      
-
-	MDSystem(int &argc, char** &argv);
-	MDSystem();
-	
+    virtual bool CheckRun(){
+      if(stopped) return false;
+      return((ElapsedTime<=MaxTime)&&(InterruptFlag==0));
+    }
+    virtual void FirstRun();
+    virtual void RunKernel();
+    
+    // run modes
+    virtual void RunNormal();
+    virtual void RunRestart();
+    virtual void RunStatic();
+    
+  public:      
+    
+    MDSystem(int &argc, char** &argv);
+    MDSystem();
+    
     virtual ~MDSystem();
     void SystemInit();
-	virtual void Init() {}; // reserved for user initialization (before Initiate())
-
+    virtual void Init() {}; // reserved for user initialization (before Initiate())
+    
     virtual void ReadParameter();
-	virtual int Run(int mode=NORMAL_MODE);
-
-	MDIntegrator* SetIntegrator(MDIntegrator* itg);
-	Detector* AddDetector(Detector* Detc);
-	Conditioner* AddConditioner(Conditioner* Cond);
-	AtomContainer* AddAtom(AtomContainer* Atm);
-	AtomGroup* AddAtomGroup(string group_name);
-	
-	class ForceKernel* AddForce(class ForceKernel* Force);
-	class ForceKernel* AddForce(class ForceKernel* Force, const char* from, const char* to);
-
-	class ForceKernel* AddForce(class ForceKernel* Force, const char* target){
-		return AddForce(Force, target, target);
-	}
-	
-	void InsertDataHeader(ofstream& fl) {} // Maybe needed later
-	void ChangeAtomID(int idx, int NewID);
-	void ChangeAtomID(int start, int end, int NewID);
-	
-	virtual void PrintContainerInfo(ostream& ost);
-	virtual void PrintGadgetInfo(ostream& ost);
-	virtual void PrintSystemInfo(ostream& ost);
-	virtual void PrintInfo(ostream& ost);
-	virtual void PrintInfo(string fname);
-	
-	bool OnTime(double tm);
-	bool OnStep(int step);
-	
-	virtual void PrintTime(ostream& ost);
-	virtual void PrintHeader(ostream& ost);
-	virtual void ExecuteConditioners(int contype);
-	virtual void ExecuteDetectors();
-
-	virtual AtomContainer* Save(string binname, string mode="a"); // mode is not applicable...
-	virtual string GetBinaryFilename();
-	virtual void   SetBinaryFilename(string filename);
-	virtual void   SaveVariables(FILE* fl);
-	virtual void   LoadVariables(FILE* fl);
-	virtual void   SaveSimulationConfig(string binfile);
-	virtual void   SaveSimulation(string binfile="");
-	virtual void   LoadSimulation(string LoadFromFile);
-
-	virtual void BorderOffset(double dx, double dy, double dz);
-	virtual void BorderOffset(double dr){BorderOffset(dr,dr,dr);}
-	virtual void SetBox(double x0, double y0, double z0, double x1, double y1, double z1);
-	virtual MDIterator* GetIterator(){return Iterator;}
-	virtual MDIntegrator* GetIntegrator(){return Integrator;}
-
-	/** synchronizing data **/
-	virtual void SyncData(int syncmode){}
+    virtual int Run(int mode=NORMAL_MODE);
+    
+    MDIntegrator* SetIntegrator(MDIntegrator* itg);
+    Detector* AddDetector(Detector* Detc);
+    Conditioner* AddConditioner(Conditioner* Cond);
+    AtomContainer* AddAtom(AtomContainer* Atm);
+    AtomGroup* AddAtomGroup(string group_name);
+    
+    class ForceKernel* AddForce(class ForceKernel* Force);
+    class ForceKernel* AddForce(class ForceKernel* Force, const char* from, const char* to);
+    
+    class ForceKernel* AddForce(class ForceKernel* Force, const char* target){
+      return AddForce(Force, target, target);
+    }
+    
+    void InsertDataHeader(ofstream& fl) {} // Maybe needed later
+    void ChangeAtomID(int idx, int NewID);
+    void ChangeAtomID(int start, int end, int NewID);
+    
+    virtual void PrintContainerInfo(ostream& ost);
+    virtual void PrintGadgetInfo(ostream& ost);
+    virtual void PrintSystemInfo(ostream& ost);
+    virtual void PrintInfo(ostream& ost);
+    virtual void PrintInfo(string fname);
+    
+    bool OnTime(double tm);
+    bool OnStep(int step);
+    
+    virtual void PrintTime(ostream& ost);
+    virtual void PrintHeader(ostream& ost);
+    virtual void ExecuteConditioners(int contype);
+    virtual void ExecuteDetectors();
+    
+    virtual AtomContainer* Save(string binname, string mode="a"); // mode is not applicable...
+    virtual string GetBinaryFilename();
+    virtual void   SetBinaryFilename(string filename);
+    virtual void   SaveVariables(FILE* fl);
+    virtual void   LoadVariables(FILE* fl);
+    virtual void   SaveSimulationConfig(string binfile);
+    virtual void   SaveSimulation(string binfile="");
+    virtual void   LoadSimulation(string LoadFromFile);
+    
+    virtual void BorderOffset(double dx, double dy, double dz);
+    virtual void BorderOffset(double dr){BorderOffset(dr,dr,dr);}
+    virtual void SetBox(double x0, double y0, double z0, double x1, double y1, double z1);
+    virtual MDIterator* GetIterator(){return Iterator;}
+    virtual MDIntegrator* GetIntegrator(){return Integrator;}
+    
+    /** synchronizing data **/
+    virtual void SyncData(int syncmode){}
 		
-	virtual double GetMaxCutRadius();
-	virtual double GetMaxVelocity();
-	virtual double GetMass(int idx);
-	virtual double GetMass(Atom& a);
-	virtual double GetMass(Atom* a);
-	virtual double GetZ(int idx);
-	
-	virtual void MeasurePotential();
-	virtual void MeasureKinetic();
-
-	virtual void CheckBoundary();
-
-	/** Corrects distances according to the boundary condition. **/
-	virtual void BoundaryCorrectDistances(double& dx, double& dy, double& dz);
-	
-	virtual void ErrorHandler(const char* errst);
-	virtual int  ClaimFlagBit(MDClass* user, string sinfo="");
-	virtual int  ClaimAuxVariable(MDClass* user, bool printable=false, const char* tag=NULL, const char* sformat=NULL);
-	                             
-	virtual int GetFlagBitMask(const char* usagecode);
-	virtual int GetTotalAtom(){return GetNAtom();}
-
-	void SetUnit(
-		const char* stime, const char* slength, const char* smass, 
-        const char* sforce, const char* senergy, 
-        const char* stemp, const char* spress)
-	{
-		if(!Unit) Unit=new MDUnit;
-		Unit->SetUnit(stime,slength,smass,sforce,senergy,stemp,spress);
-	}
-	
-	void SetUnit(MDUnit* unit){if(Unit)delete Unit; Unit=unit;}
-	
-	// compatibility reason...
-	void SetArgument(int &argc, char** &argv);
+    virtual double GetMaxCutRadius();
+    virtual double GetMaxVelocity();
+    virtual double GetMass(int idx);
+    virtual double GetMass(Atom& a);
+    virtual double GetMass(Atom* a);
+    virtual double GetZ(int idx);
+    
+    virtual void MeasurePotential();
+    virtual void MeasureKinetic();
+    
+    virtual void CheckBoundary();
+    
+    /** Corrects distances according to the boundary condition. **/
+    virtual void BoundaryCorrectDistances(double& dx, double& dy, double& dz);
+    
+    virtual void ErrorHandler(const char* errst);
+    virtual int  ClaimFlagBit(MDClass* user, string sinfo="");
+    virtual int  ClaimAuxVariable(MDClass* user, bool printable=false, const char* tag=NULL, const char* sformat=NULL);
+    
+    virtual int GetFlagBitMask(const char* usagecode);
+    virtual int GetTotalAtom(){return GetNAtom();}
+    
+    void SetUnit(
+                 const char* stime, const char* slength, const char* smass, 
+                 const char* sforce, const char* senergy, 
+                 const char* stemp, const char* spress)
+    {
+      if(!Unit) Unit=new MDUnit;
+      Unit->SetUnit(stime,slength,smass,sforce,senergy,stemp,spress);
+    }
+    
+    void SetUnit(MDUnit* unit){if(Unit)delete Unit; Unit=unit;}
+    
+    // compatibility reason...
+    void SetArgument(int &argc, char** &argv);
 		
-	// react to this signal
-	void AcceptSignal(int signo);	
-	
-	// parameter filename. call only before run()
-	void SetParameterFile(string cfgfile) {
-		ParameterFilename=cfgfile;
-	}
+    // react to this signal
+    void AcceptSignal(int signo);	
+    
+    // parameter filename. call only before run()
+    void SetParameterFile(string cfgfile) {
+      ParameterFilename=cfgfile;
+    }
 		
-	// output directory
-	void SetOutputDirectory(const string outdir) {
-		OutputDirectory.assign(outdir);
-	}
-	
-	string GetOutputDirectory(){
-		return OutputDirectory;
-	}
-	
-	DataSlot* GetMessageSlot(string slotlabel);
-	
-	virtual void ArrangeMessageSlots();
-	int GetContainerID(string name);	
-
-	/** search gadget class by its name (Conditioner/Detector) **/
-	virtual MDGadget* SearchGadget(string name);
-	bool GadgetExist(MDGadget* gad);
-
-  void DeleteContainer(string name);
-	virtual AtomContainer* SearchContainer(string name);
-	virtual AtomContainer* Import(string fname);
-
-	int GetMode(){return Mode;}
+    // output directory
+    void SetOutputDirectory(const string outdir) {
+      OutputDirectory.assign(outdir);
+    }
+    
+    string GetOutputDirectory(){
+      return OutputDirectory;
+    }
+    
+    DataSlot* GetMessageSlot(string slotlabel);
+    
+    virtual void ArrangeMessageSlots();
+    int GetContainerID(string name);	
+    
+    /** search gadget class by its name (Conditioner/Detector) **/
+    virtual MDGadget* SearchGadget(string name);
+    bool GadgetExist(MDGadget* gad);
+    
+    void DeleteContainer(string name);
+    virtual AtomContainer* SearchContainer(string name);
+    virtual AtomContainer* Import(string fname);
+    
+    int GetMode(){return Mode;}
 		
-	void ResetSimulationTime(){Step=0; ElapsedTime=0;}
-
-	/** sets MaxTime only when it is not already done previously **/
-	void SetMaxTime(double maxtime) {if(MaxTime<0)MaxTime=maxtime;}
-
-	/** sets boundary condition only when is not already done previously **/
-	void SetBoundaryCondition(int pbc, bool force=false) {
-		if(force) PBoundary=pbc;
-		else if(PBoundary<0) PBoundary=pbc;
-	}
-
-	virtual int GetLocalAtomNumber(){return GetNAtom();}
-	virtual int GetTotalAtomNumber(){return GetNAtom();}
-	
-	double GetBasePotential() {return BasePotential;}
-	void ActivateGadget(string gname);
-	void DeactivateGadget(string gname);
-	void Stop(){stopped=true;}
-	
-	// short cuts...
-	AtomContainer* AddAtom(string name, AtomContainer* Atm){return AddAtom(Atm)->SetName(name);}
-
-};
-
+    void ResetSimulationTime(){Step=0; ElapsedTime=0;}
+    
+    /** sets MaxTime only when it is not already done previously **/
+    void SetMaxTime(double maxtime) {if(MaxTime<0)MaxTime=maxtime;}
+    
+    /** sets boundary condition only when is not already done previously **/
+    void SetBoundaryCondition(int pbc, bool force=false) {
+      if(force) PBoundary=pbc;
+      else if(PBoundary<0) PBoundary=pbc;
+    }
+    
+    virtual int GetLocalAtomNumber(){return GetNAtom();}
+    virtual int GetTotalAtomNumber(){return GetNAtom();}
+    
+    double GetBasePotential() {return BasePotential;}
+    void ActivateGadget(string gname);
+    void DeactivateGadget(string gname);
+    void Stop(){stopped=true;}
+    
+    // short cuts...
+    AtomContainer* AddAtom(string name, AtomContainer* Atm){return AddAtom(Atm)->SetName(name);}
+    
+  };
+  
 }
 
 #endif
