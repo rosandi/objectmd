@@ -260,6 +260,7 @@ class MDIterator;
     virtual ~MDSystem();
     void SystemInit();
     virtual void Init() {}; // reserved for user initialization (before Initiate())
+                            // after ReadParameter
     
     virtual void ReadParameter();
     virtual int Run(int mode=NORMAL_MODE);
@@ -271,9 +272,9 @@ class MDIterator;
     AtomGroup* AddAtomGroup(string group_name);
     
     class ForceKernel* AddForce(class ForceKernel* Force);
-    class ForceKernel* AddForce(class ForceKernel* Force, const char* from, const char* to);
+    class ForceKernel* AddForce(class ForceKernel* Force, string from, string to);
     
-    class ForceKernel* AddForce(class ForceKernel* Force, const char* target){
+    class ForceKernel* AddForce(class ForceKernel* Force, string target){
       return AddForce(Force, target, target);
     }
     

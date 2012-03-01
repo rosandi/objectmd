@@ -76,11 +76,11 @@ public:
 	}
 	
 	void ReadParameter() {
-		energy=SysParam->double_value("source.energy"); // energy per atom...
-		SysParam->peek("source.start", start_time, 0.0);
-		SysParam->peek("source.mode", smode, "pulse");
-		SysParam->peek("source.width", width, -1.0);
-		SysParam->peek("source.function", sfunc, "-");
+		energy=SysParam->double_value(mytag("energy")); // energy per atom...
+		SysParam->peek(mytag("start"), start_time, 0.0);
+		SysParam->peek(mytag("mode"), smode, "pulse");
+		SysParam->peek(mytag("width"), width, -1.0);
+		SysParam->peek(mytag("function"), sfunc, "-");
 	}
 	
 	bool CheckParameter() {

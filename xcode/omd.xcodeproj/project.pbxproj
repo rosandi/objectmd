@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		4C6B20F514FF7552003875DE /* omd-parameter */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "omd-parameter"; sourceTree = "<group>"; };
 		4C760EFC1497E522002C9E27 /* compiler-list */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "compiler-list"; path = "../compiler-list"; sourceTree = SOURCE_ROOT; };
 		4C760EFD1497E522002C9E27 /* config.make */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = config.make; path = ../config.make; sourceTree = SOURCE_ROOT; };
 		4C760EFE1497E522002C9E27 /* install.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = install.sh; path = ../install.sh; sourceTree = SOURCE_ROOT; };
@@ -77,7 +78,6 @@
 		4CCD1BCF14FD760200E27319 /* RangeLimiter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RangeLimiter.h; sourceTree = "<group>"; };
 		4CCD1BD014FD760200E27319 /* TempController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TempController.h; sourceTree = "<group>"; };
 		4CCD1BD114FD760200E27319 /* TTM_Diffusion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTM_Diffusion.h; sourceTree = "<group>"; };
-		4CCD1BD214FD760200E27319 /* TTM_Homogen_F.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTM_Homogen_F.h; sourceTree = "<group>"; };
 		4CCD1BD314FD760200E27319 /* TTM_Homogen_SC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTM_Homogen_SC.h; sourceTree = "<group>"; };
 		4CCD1BD414FD760200E27319 /* VerletList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VerletList.h; sourceTree = "<group>"; };
 		4CCD1BD514FD760200E27319 /* VerletListFull.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VerletListFull.h; sourceTree = "<group>"; };
@@ -287,6 +287,7 @@
 		4C86023B14FD19D900F6D500 /* omd-con */ = {
 			isa = PBXGroup;
 			children = (
+				4C6B20F514FF7552003875DE /* omd-parameter */,
 				4C86023C14FD19D900F6D500 /* omd.cpp */,
 			);
 			path = "omd-con";
@@ -323,7 +324,6 @@
 				4CCD1BCF14FD760200E27319 /* RangeLimiter.h */,
 				4CCD1BD014FD760200E27319 /* TempController.h */,
 				4CCD1BD114FD760200E27319 /* TTM_Diffusion.h */,
-				4CCD1BD214FD760200E27319 /* TTM_Homogen_F.h */,
 				4CCD1BD314FD760200E27319 /* TTM_Homogen_SC.h */,
 				4CCD1BD414FD760200E27319 /* VerletList.h */,
 				4CCD1BD514FD760200E27319 /* VerletListFull.h */,

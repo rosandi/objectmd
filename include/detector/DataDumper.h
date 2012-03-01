@@ -61,8 +61,8 @@ public:
         else FileMax=int(pow(10, XLength+1));
         MainDumper=NULL;
         
-        set_name("DATA DUMPER");
-        register_class(get_name());
+        set_name("dump");
+        register_class("DATA DUMPER");
         
     }
     
@@ -109,9 +109,9 @@ public:
 	virtual void Init(MDSystem* WorkSys) {
 		Detector::Init(WorkSys);
 
-		SysParam->peek("dump.sample", TSample);
-		SysParam->peek("dump.filename", Filename);
-		SysParam->peek("dump.xlength", XLength);
+		SysParam->peek(mytag("sample"), TSample);
+		SysParam->peek(mytag("filename"), Filename);
+		SysParam->peek(mytag("xlength"), XLength);
 		
 		if(MainDumper!=NULL){
 			mdassert(Target==MainDumper->Target,

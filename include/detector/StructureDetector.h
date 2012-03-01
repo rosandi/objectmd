@@ -31,7 +31,7 @@ class StructureDetector: public DataDumper {
 public:
 	StructureDetector(double tm=0.0, string fn="Data"):
 	DataDumper("",tm,fn,3) {
-		set_name("STRUCTURE DETECTOR");
+		set_name("cstr");
 		register_class("STRUCTURE_DETECTOR");
 		neig=NULL;
 	}

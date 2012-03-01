@@ -69,22 +69,22 @@ void MDSystem::SystemInit(){
 	Argc=NULL;Argv=NULL;
 	Unit=NULL;
 	stopped=false;
-    Potential  = BasePotential =
-    Virial     = Kinetic       = 
-    Energy     = ElapsedTime   = 
+  Potential  = BasePotential =
+  Virial     = Kinetic       = 
+  Energy     = ElapsedTime   = 
  	SqrMaxVelocity = 0.0;
 	Step   = 0;
-    MaxTime    = -1.0;
+  MaxTime    = -1.0;
 	SimWallTime = 0.0;
 	AtomID=GroupID=ConditionerID=DetectorID=0; // Creation counter
 	PBoundary= -1;
-    Integrator  = NULL;
-    Iterator    = NULL;
+  Integrator  = NULL;
+  Iterator    = NULL;
 	Unificated=false;
 	Enumerated=false;
 	InterruptFlag=0;
 	Mode=NORMAL_MODE;
-
+  
 	FlagBitUsed=0;
 	AuxVariableUsed=0;
 	ClaimFlagBit(this, "FLAG_ACTIVE");
@@ -262,6 +262,8 @@ void MDSystem::ReadParameter() {
 		}
     log_flagset(loglev);
   }
+  
+  if(param.exist("mode.static")) Mode=STATIC_MODE;
 
 }
 
@@ -328,9 +330,9 @@ void MDSystem::PrintGadgetInfo(ostream& ost) {
 
 void MDSystem::PrintSystemInfo(ostream& ost) {
 
-	OMD_FLOAT volume=Box.lx*Box.ly*Box.lz;
-	OMD_FLOAT tempe=Kinetic/((OMD_FLOAT)TotalAtom);
-	OMD_FLOAT press=(Virial/(3.0*volume)+Kinetic/(1.5*volume));
+	double volume=Box.lx*Box.ly*Box.lz;
+	double tempe=Kinetic/((double)TotalAtom);
+	double press=(Virial+2.0*Kinetic)/(3.0*volume);
 	
 	Unit->SetFormat("%0.3f");
 	ost
@@ -554,6 +556,9 @@ void MDSystem::InitGadgets() {
 	// insert forces and initiate integrator
 	for(int i=0;i<(int)force_reg.size();i++) Integrator->AddForce(force_reg[i]);
 	Integrator->Init(this);	
+  
+  if(Mode!=STATIC_MODE)	
+    mdassert(Integrator->MaxCutRadius>0.0, "bad cut radius: "+as_string(Integrator->MaxCutRadius));
 
 	// Initiate all gadgets
 	for (int i=0;i<(int)Conditioners.size();i++) Conditioners[i]->Init(this);
@@ -651,12 +656,12 @@ void MDSystem::SaveVariables(FILE* fl){
 	fwrite(&SimBeginTime, sizeof(time_t), 1, fl);
 	fwrite(&Step, sizeof(int), 1, fl);
 	fwrite(&PBoundary, sizeof(int), 1, fl);
-	fwrite(&Energy, sizeof(OMD_FLOAT), 1, fl);
-	fwrite(&Kinetic, sizeof(OMD_FLOAT), 1, fl);
-	fwrite(&Virial, sizeof(OMD_FLOAT), 1, fl);
-	fwrite(&Potential, sizeof(OMD_FLOAT), 1, fl);
-	fwrite(&BasePotential, sizeof(OMD_FLOAT), 1, fl);
-	fwrite(&ElapsedTime, sizeof(OMD_FLOAT), 1, fl);
+	fwrite(&Energy, sizeof(double), 1, fl);
+	fwrite(&Kinetic, sizeof(double), 1, fl);
+	fwrite(&Virial, sizeof(double), 1, fl);
+	fwrite(&Potential, sizeof(double), 1, fl);
+	fwrite(&BasePotential, sizeof(double), 1, fl);
+	fwrite(&ElapsedTime, sizeof(double), 1, fl);
 	fwrite(&Box, sizeof(SysBox), 1, fl);
 	fwrite(&write_mode, sizeof(int), 1, fl);	
 }
@@ -665,12 +670,12 @@ void MDSystem::LoadVariables(FILE* fl){
 	fread(&SimBeginTime, sizeof(time_t), 1, fl);
 	fread(&Step, sizeof(int), 1, fl);
 	fread(&PBoundary, sizeof(int), 1, fl);
-	fread(&Energy, sizeof(OMD_FLOAT), 1, fl);
-	fread(&Kinetic, sizeof(OMD_FLOAT), 1, fl);
-	fread(&Virial, sizeof(OMD_FLOAT), 1, fl);
-	fread(&Potential, sizeof(OMD_FLOAT), 1, fl);
-	fread(&BasePotential, sizeof(OMD_FLOAT), 1, fl);
-	fread(&ElapsedTime, sizeof(OMD_FLOAT), 1, fl);
+	fread(&Energy, sizeof(double), 1, fl);
+	fread(&Kinetic, sizeof(double), 1, fl);
+	fread(&Virial, sizeof(double), 1, fl);
+	fread(&Potential, sizeof(double), 1, fl);
+	fread(&BasePotential, sizeof(double), 1, fl);
+	fread(&ElapsedTime, sizeof(double), 1, fl);
 	fread(&Box, sizeof(SysBox), 1, fl);
 	fread(&write_mode, sizeof(int), 1, fl);
 }
@@ -826,7 +831,7 @@ void MDSystem::LoadSimulation(string LoadFromFile) {
  of the atom coordinates.
  */
 
-void MDSystem::BorderOffset(OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz) {
+void MDSystem::BorderOffset(double dx, double dy, double dz) {
 	AtomContainer::CalcBox();
 	Box.x0-=dx;	Box.y0-=dy;	Box.z0-=dz;
 	Box.x1+=dx;	Box.y1+=dy;	Box.z1+=dz;
@@ -840,7 +845,7 @@ void MDSystem::BorderOffset(OMD_FLOAT dx, OMD_FLOAT dy, OMD_FLOAT dz) {
 	Box.hlz=Box.lz/2.0;
 }	
 
-void MDSystem::SetBox(OMD_FLOAT x0, OMD_FLOAT y0, OMD_FLOAT z0, OMD_FLOAT x1, OMD_FLOAT y1, OMD_FLOAT z1) {
+void MDSystem::SetBox(double x0, double y0, double z0, double x1, double y1, double z1) {
 	Box.x0=x0; Box.y0=y0; Box.z0=z0;
 	Box.x1=x1; Box.y1=y1; Box.z1=z1;
 	Box.lx=fabs(x1-x0);
@@ -880,6 +885,7 @@ void MDSystem::ExecuteDetectors() {
 }
 
 void MDSystem::PrintMessages(ostream& ost) {
+  if(!Step) return;
 	int printed=0;
 	for(int i=0;i<(int)MessageSlots.size();i++){
 		if(MessageSlots[i]->IsPrintable()) {
@@ -925,7 +931,7 @@ void MDSystem::PrintHeader(ostream& ost) {
 
 /**
  * The function takes command line arguments in to the parameter keeper.
- * Some environtment parameters are loaded as well:
+ * Some environment parameters are loaded as well by MDClass:
  *  - OMD_LIB: the path of OMD library
  *  - OMD_CLASS: the path the OMD class collection
  *  - OMD_TABLE: the path to the tables (potentials, etc)
@@ -1061,12 +1067,13 @@ void MDSystem::MeasurePotential() {
 			Potential+=a->potential;
 			Virial+=a->virial;
 		}
-	}	
+	}
+	Virial/=2.0;
 }
 
 void MDSystem::MeasureKinetic() {
-    OMD_FLOAT ValTmp=0.0;
-    OMD_FLOAT sqrv;
+    double ValTmp=0.0;
+    double sqrv;
     Kinetic=0.0;
     SqrMaxVelocity=0.0;
     
@@ -1128,7 +1135,7 @@ void MDSystem::CheckBoundary() {
  * 
  */
 
-void MDSystem::BoundaryCorrectDistances(OMD_FLOAT& dx, OMD_FLOAT& dy, OMD_FLOAT& dz){
+void MDSystem::BoundaryCorrectDistances(double& dx, double& dy, double& dz){
 
     	if (PBoundary) {
     		if (PBoundary&PERIODIC_X){
@@ -1167,7 +1174,7 @@ ForceKernel* MDSystem::AddForce(ForceKernel* force) {
 	return force;
 }
 
-ForceKernel* MDSystem::AddForce(ForceKernel* force, const char* from, const char* to) {
+ForceKernel* MDSystem::AddForce(ForceKernel* force, string from, string to) {
 	force->set_logger(logger);
 	force->SetAtomID(GetContainerID(from), GetContainerID(to));
 	force_reg.push_back(force);
@@ -1238,14 +1245,14 @@ void MDSystem::ChangeAtomID(int start, int end, int NewID)
 	for (int i=start;i<=end;i++) Atoms(i).tid=NewID;
 }
 
-OMD_FLOAT MDSystem::GetMaxCutRadius(){return Integrator->MaxCutRadius;}
-OMD_FLOAT MDSystem::GetMaxVelocity(){return sqrt(SqrMaxVelocity);}
+double MDSystem::GetMaxCutRadius(){return Integrator->MaxCutRadius;}
+double MDSystem::GetMaxVelocity(){return sqrt(SqrMaxVelocity);}
 
-OMD_FLOAT MDSystem::GetMass(int idx){return SystemAtoms[Atoms(idx).tid]->M;}
-OMD_FLOAT MDSystem::GetMass(Atom* a){return SystemAtoms[a->tid]->M;}
-OMD_FLOAT MDSystem::GetMass(Atom& a){return SystemAtoms[a.tid]->M;}
+double MDSystem::GetMass(int idx){return SystemAtoms[Atoms(idx).tid]->M;}
+double MDSystem::GetMass(Atom* a){return SystemAtoms[a->tid]->M;}
+double MDSystem::GetMass(Atom& a){return SystemAtoms[a.tid]->M;}
 
-OMD_FLOAT MDSystem::GetZ(int idx){return SystemAtoms[Atoms(idx).tid]->Z;}
+double MDSystem::GetZ(int idx){return SystemAtoms[Atoms(idx).tid]->Z;}
 
 int MDSystem::ClaimFlagBit(MDClass* user,string sinfo) {
 	int a=1<<FlagBitUsed;
@@ -1358,7 +1365,7 @@ int MDSystem::GetContainerID(string name){
 	return 0;
 }
 
-bool MDSystem::OnTime(OMD_FLOAT tm) {
+bool MDSystem::OnTime(double tm) {
 	if((tm>(ElapsedTime-0.5*Integrator->TimeStep))
 		&&(tm<(ElapsedTime+0.5*Integrator->TimeStep))) 
 		return true;

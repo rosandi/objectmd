@@ -30,7 +30,7 @@ class LocalOrderParameter: public DataDumper {
 public:
 	LocalOrderParameter(string fn, double lconst, double rcut, bool enumerate_fn=true):
 	DataDumper("", 0.0, fn, 3){
-		set_name("local order parameter");
+		set_name("lop");
 		register_class(get_name());		
 		lc=lconst;
 		cutsqr=rcut*rcut;

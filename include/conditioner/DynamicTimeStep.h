@@ -38,9 +38,9 @@ public:
 	}
 	
 	void ReadParameter() {
-		SysParam->peek("timestep.maxpath", maxp);
-		SysParam->peek("timestep.max", maxdt);
-		SysParam->peek("timestep.update", upd);
+		SysParam->peek(mytag("maxpath"), maxp);
+		SysParam->peek(mytag("max"), maxdt);
+		SysParam->peek(mytag("update"), upd);
 	}
 	
 	void Init(MDSystem *WorkSys) {

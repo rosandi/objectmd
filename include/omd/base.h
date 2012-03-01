@@ -34,7 +34,7 @@ using std::ostream;
 
 namespace omd {
 
-#define ROOT 0
+#define MDROOT 0
 
 /**
  * @ingroup basestruct

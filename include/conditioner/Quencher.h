@@ -51,11 +51,9 @@ public:
 	}
 	
 	void ReadParameter() {
-		// so... many quencher can be used...
-		string tag=lower_case(replace_char(get_name(),' ','_'));
-		SysParam->peek(tag+".factor", Factor);
-		SysParam->peek(tag+".every", Period);
-		SysParam->peek(tag+".minimize", minimize);
+		SysParam->peek(mytag("factor"), Factor);
+		SysParam->peek(mytag("every"), Period);
+		SysParam->peek(mytag("minimize"), minimize);
 		
 		mdassert(Factor>=0.0, 
 			   "the quench factor ("+get_name()+

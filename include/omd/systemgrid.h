@@ -163,7 +163,7 @@ public:
 	
 	virtual void PrintInfo(string fname);
 	
-	virtual void PrintTime(ostream& ost){if(GetRank()==ROOT) MDSystem::PrintTime(ost);}
+	virtual void PrintTime(ostream& ost){if(GetRank()==MDROOT) MDSystem::PrintTime(ost);}
 	
 	virtual AtomContainer* DumpAtoms(AtomKeeper& ak, 
 	                       string fname,

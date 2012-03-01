@@ -4,11 +4,6 @@
 // main class
 #include <omd/systemgrid.h>
 
-// potential
-#include <potential/team.h>
-#include <potential/tpair.h>
-#include <potential/DummyForce.h>
-
 // atom container
 #include <crystal/FCC.h>
 #include <crystal/FCC100.h>
@@ -35,6 +30,12 @@
 #include <conditioner/VerletList.h>
 #include <conditioner/VerletListFull.h>
 #include <conditioner/NonReflecting.h>
+
+// potential
+#include <potential/team.h>
+#include <potential/tpair.h>
+#include <potential/sw.h>
+#include <potential/DummyForce.h>
 
 // detector
 #include <detector/DataDumper.h>

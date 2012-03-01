@@ -78,7 +78,7 @@ CommunicationHandler::~CommunicationHandler() {
 	std::cerr.flush();	
 	std::cerr << std::fixed << std::setprecision(4);
 	
-	if(GetRank()==ROOT){
+	if(GetRank()==MDROOT){
 		if(!System->param.exist("--silent"))
       std::cerr << "\n(Root) Waiting for child processes to finish\n"
       << "[\n ElapsedTime: " << System->ElapsedTime
@@ -92,7 +92,7 @@ CommunicationHandler::~CommunicationHandler() {
 	tmsg.append(as_string(walltime)+
               " commtime: "+as_string(comtime)+" ("+as_string(comtime/walltime)+") (seconds)");
   
-	if(GetRank()==ROOT) {
+	if(GetRank()==MDROOT) {
 		for(int r=1;r<NProc;r++) {
 			RawReceive(r,st,DEFAULT_TRANSFER_LENGTH);
 			if(strncmp(st,"FINISHED",8)==0)
@@ -105,7 +105,7 @@ CommunicationHandler::~CommunicationHandler() {
 		}
 	} else {
 		sprintf(st, "FINISHED: PROC %d",Rank);
-		RawSend(ROOT,st,DEFAULT_TRANSFER_LENGTH);
+		RawSend(MDROOT,st,DEFAULT_TRANSFER_LENGTH);
 	}
 	
 	blog(tmsg);

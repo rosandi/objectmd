@@ -45,7 +45,7 @@ public:
 		TempSet=temp;
 		Tau=tau;
 		temp_detector=NULL;
-		set_name("Temperature controller");
+		set_name("tcontrol");
 		mdassert(Tau>0.0, "zero coupling factor!");
 	}
 	

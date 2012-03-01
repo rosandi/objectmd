@@ -1,3 +1,19 @@
+
+create:
+  target fcc 100 16 16 132 aluminum
+end
+
+group:
+  hot gt 0 0 -20
+#  nrb lt inf inf {z0+4*zml}
+end
+
+prerun:
+  dump target
+  quit
+end
+
+
 dir.output output
 dir.binary pomd
 comm.arch  2 2 1

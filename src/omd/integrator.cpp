@@ -112,8 +112,6 @@ void MDIntegrator::Init(MDSystem* WorkSys) {
 			MaxCutRadius=ActForces[i]->CutRadius;
 	}
 
-	mdassert(MaxCutRadius>0.0, "bad cut radius: "+as_string(MaxCutRadius));
-
 	// fetch parameters...
 	SysParam->peek("time.step", TimeStep);
 	// ------------------

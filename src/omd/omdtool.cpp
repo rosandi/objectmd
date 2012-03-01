@@ -97,6 +97,7 @@ namespace omd {
     double dd;
     istringstream ss(val);
     if(val=="inf") return DBL_MAX;
+    if(val=="-inf") return -DBL_MAX;
     if(!(ss>>dd)) throw (string("conversion error: ")+val).c_str();
     return dd;
   }
@@ -138,16 +139,24 @@ namespace omd {
   }
   
   string trim(string str) {
-    char st[str.size()+1];
-    bool take=false;
-    int i;
+    int i,j;
     for(i=0;i<(int)str.size();i++){
-      if(!take) if(str[i]!=' ') continue;
-      take=true;
-      st[i]=str[i];        
+      if(str[i]==' ') continue;
+      if(str[i]=='\t') continue;
+      if(str[i]=='\r') continue;
+      if(str[i]=='\n') continue;
+      break;
     }
-    st[i]=0x0;
-    return string(st);
+    
+    for(j=(int)str.size()-1;j>=0;j--){
+      if(str[j]==' ') continue;
+      if(str[j]=='\t') continue;
+      if(str[j]=='\r') continue;
+      if(str[j]=='\n') continue;
+      break;
+    }
+    return str.substr(i,j+1);
+    
   }
   
   bool char_exist(string& str, char ch) {

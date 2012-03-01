@@ -92,28 +92,9 @@ public:
 	virtual ~TTM_Homogen(){}
 	
 	void ReadParameter(){
-		SysParam->peek("ttm.energy_density", E0, -1.0); // energy / Volume (A^3)
-		SysParam->peek("ttm.temperature_input", E0, -1.0);
-		SysParam->peek("ttm.atom_volume", atom_volume, -1.0);
-		SysParam->peek("ttm.pulse_width", pulse_width, -1.0);
-		SysParam->peek("ttm.pulse_offset", pulse_offset, 0.0);
-
-		if(SysParam->exist("ttm.electron_init_energy"))
-			electron_energy=SysParam->double_value("ttm.electron_init_energy");
-		else
-			SysParam->peek("ttm.electron_init_temperature", electron_temperature, -1.0);
-
-		SysParam->peek("ttm.balance_electron_lattice", balance_el_lattice, false);
-		SysParam->peek("ttm.stop_at", stop_time, -1.0);
-		SysParam->peek("ttm.stop_equ", stop_equ, false);
 	}
 
 	bool CheckParameter(){
-		blog("two-temperature-model: checking parameters...", LOGCREATE);
-		if(SysParam->exist("ttm.source_function_file")) source_type=function;
-		else if(SysParam->exist("ttm.temperature_input")) source_type=pulsetemp;
-		else if(pulse_width>0.0) source_type=pulse;
-		return true;
 	}
 
 	// requires temperature and pressure detector
@@ -143,8 +124,8 @@ public:
 
 		fd_time_step=WorkSys->Integrator->TimeStep;
 		
-		temp_detector=dynamic_cast<ThermoDetector*>(SearchGadgetType("thermo_detector",false));
-		mdassert(temp_detector, "TempPressDetector is needed by "+get_name());
+		temp_detector=dynamic_cast<ThermoDetector*>(SearchGadgetType("thermo",false));
+		mdassert(temp_detector, "ThermoDetector is needed by "+get_name());
 		temp_detector->SetIntensive();
 		
 		int_Een=0.0;
@@ -172,7 +153,7 @@ private:
 
 	void find_temperature(double eng) {
 
-		if(GetRank()==ROOT) {
+		if(GetRank()==MDROOT) {
 			blog("finding temperature...");
 			double tn=eng/3.0/MD_BOLTZMANN;
 			double en=0.5*C0*Ce.read(tn)*tn*atom_volume;

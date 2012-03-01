@@ -437,14 +437,14 @@ void MDSystemGrid::SyncVariable() {
 			char l[128];char v[128];
 		} rvar;
 		
-		if(GetRank()==ROOT) {
+		if(GetRank()==MDROOT) {
 			RestartVars[i]->GetLabel().copy(rvar.l,128);
 			RestartVars[i]->AsString().copy(rvar.v,128);
 		}
 		
 		Communicator->Broadcast(&rvar, sizeof(rvar));
 		
-		if(GetRank()!=ROOT) {
+		if(GetRank()!=MDROOT) {
 			DataSlot *m=new DataSlot(rvar.l);
 			m->SetDefaultData(rvar.v);
 			RestartVars.push_back(m);
@@ -640,7 +640,9 @@ void MDSystemGrid::FirstRun() {
 
 void MDSystemGrid::ErrorHandler(const char* errst) {
 	MDSystem::ErrorHandler(errst);
-	Communicator->Abort();
+  if(Communicator->GetRank()==MDROOT) std::cerr<<errst<<std::endl<<std::endl;
+	if(Communicator->GetSize()>1) Communicator->Abort();
+  Communicator->Close();
 }
 
 string MDSystemGrid::GetGridConfiguration() {
@@ -724,13 +726,13 @@ void MDSystemGrid::PrintInfo(ostream& ost) {
 		PrintContainerInfo(outst);
 		outst << "\n*** Neighbor processors rank map ***\n" << GetGridConfiguration() <<"\n\n";
 		strcpy(buf, outst.str().c_str());
-		Communicator->RawSend(ROOT,buf,strlen(buf)+1);
+		Communicator->RawSend(MDROOT,buf,strlen(buf)+1);
 	}
 	ost << std::scientific << std::setprecision(4);	
 }
 
 void MDSystemGrid::PrintInfo(string fname){
-	if(GetRank()==ROOT) {
+	if(GetRank()==MDROOT) {
 		ofstream fout(fname.c_str());
 		PrintInfo(fout);
 		fout.close();
@@ -821,7 +823,7 @@ AtomContainer* MDSystemGrid::Save(string binname, string mode) {
 		ac.GetAtomStorage().Copy(SystemAtoms[i]->GetAtomStorage());
 
 		Communicator->SyncProcesses();		
-		if(GetRank()==ROOT) {
+		if(GetRank()==MDROOT) {
 			for(int p=1;p<GetGridSize();p++) {
 				AtomKeeper ak;
 				ak.Allocate(asz[p]);
@@ -833,7 +835,7 @@ AtomContainer* MDSystemGrid::Save(string binname, string mode) {
 			ac.Save(binname.c_str(), "a");
 		} else {
 			if(sz>0)
-				Communicator->RawSend(ROOT, ac.GetAtomStorage().GetArrayPtr(), sz*sizeof(Atom));
+				Communicator->RawSend(MDROOT, ac.GetAtomStorage().GetArrayPtr(), sz*sizeof(Atom));
 		}
 	}
 	
@@ -844,12 +846,12 @@ AtomContainer* MDSystemGrid::Save(string binname, string mode) {
 void MDSystemGrid::SaveSimulation(string binfile) {
 	if(binfile=="")
 		binfile.assign(replace_char(lower_case(get_name()), ' ', '_'));
-	if(GetRank()==ROOT) SaveSimulationConfig(binfile);
+	if(GetRank()==MDROOT) SaveSimulationConfig(binfile);
 	Save(binfile);
 }
 
 void MDSystemGrid::PrintMessages(ostream& ost) {
-	if(GetRank()==ROOT) MDSystem::PrintMessages(ost);
+	if(GetRank()==MDROOT) MDSystem::PrintMessages(ost);
 }
 
 void MDSystemGrid::ReadParameter() {

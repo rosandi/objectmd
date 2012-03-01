@@ -1,7 +1,7 @@
 # why not like this:
 # can be read directly by paramhandler
 
-atom: 
+create: 
   target fcc 100 16 16 132 aluminum
 end
 
@@ -19,16 +19,30 @@ interaction:
 #  target projectile pair.ar-pt.zbl
 end
 
-cond: verlet border.nrb end
-detect: monitor thermo watch.proj watch.adatom end
+cond: 
+  verlet
+  nrb.up
+  nrb.low
+end
+
+detect: 
+  monitor
+  thermo
+  watch.proj
+  watch.adatom
+end
 
 prerun:
   dump hot hot.dat
   info info.out
 end
 
-border.nrb.target nrb
-border.nrb.impedance 0.0818213
-border.nrb.force 0.143938
-border.nrb.layer 10
+nrb.upper.target nrb
+nrb.upper.impedance 0.0818213
+nrb.upper.force 0.143938
+nrb.upper.layer 10
 
+nrb.lower.target nrb
+nrb.lower.impedance 0.0818213
+nrb.lower.force 0.143938
+nrb.lower.layer 10

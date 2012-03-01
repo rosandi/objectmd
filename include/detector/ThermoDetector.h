@@ -43,7 +43,7 @@ class ThermoDetector: public DataDumper, public ParallelGadget {
 public:
 	ThermoDetector(double tm=-1.0, double rcut=-1.0, string fn="Data", int extlen=3)
 	:DataDumper("", tm, fn, extlen){
-		set_name("THERMO DETECTOR");
+		set_name("thermo");
 		register_class(get_name());
 		system_temperature=0.0;
 		avg_temp=0.0;
@@ -145,7 +145,7 @@ public:
 		sumvx[idx]+= masat*a->vx;
 		sumvy[idx]+= masat*a->vy;
 		sumvz[idx]+= masat*a->vz;			
-		ek=0.5*masat*(a->vx*a->vx+a->vy*a->vy+a->vz*a->vz);
+		ek=masat*(a->vx*a->vx+a->vy*a->vy+a->vz*a->vz);
 		sumek[idx]+=ek;
 		return true;
 	}
@@ -167,7 +167,7 @@ public:
 			sumvy[at]+=masto*b->vy;
 			sumvz[at]+=masto*b->vz;                
 			sumek[to]+=ek;
-			sumek[at]+=0.5*masto*(b->vx*b->vx+b->vy*b->vy+b->vz*b->vz);
+			sumek[at]+=masto*(b->vx*b->vx+b->vy*b->vy+b->vz*b->vz);
 		}
 	}
 
@@ -183,9 +183,8 @@ public:
 			sumvx[i]/=sumas[i]; 
 			sumvy[i]/=sumas[i];
 			sumvz[i]/=sumas[i];
-			sumek[i]-=0.5*sumas[i]*
-				      (sumvx[i]*sumvx[i]+sumvy[i]*sumvy[i]+sumvz[i]*sumvz[i]);				      
-			a->aux[tidx]=Unit->Temperature(sumek[i]/(double)nneig[i]);
+			sumek[i]-=sumas[i]*(sumvx[i]*sumvx[i]+sumvy[i]*sumvy[i]+sumvz[i]*sumvz[i]);			      
+			a->aux[tidx]=Unit->Temperature(0.5*sumek[i]/(double)nneig[i]);
 			a->aux[nidx]=(double)nneig[i]/volcut;
 
 			if(nneig[i]<2) continue;
@@ -230,7 +229,7 @@ public:
 			a->aux[pidx]=(nneig[i]==0)?0.0:
       // this is <sum f_ij.r_ij> /3.omega no double sum in half-loop iterator
       // for full-loop consider reimplement ReturnForce@ForceKernel
-			Unit->Pressure((sumvir[i]/(6.0*volcut))+(sumek[i]/(1.5*volcut)));
+			Unit->Pressure((sumvir[i]/2.0+sumek[i])/(3.0*volcut));
 			if(a->flag&FLAG_GHOST) continue;
 			if(a->flag&FLAG_ACTIVE) {
 				avg_pres+=a->aux[pidx];
@@ -354,7 +353,7 @@ public:
 		double ly=may-miy;
 		double lz=maz-miz;
 		double totvol=(lx>0.0?lx:1.0)*(ly>0.0?ly:1.0)*(lz>0.0?lz:1.0);
-		system_pressure=Unit->Pressure((System->Virial+temp)/3.0/totvol);
+		system_pressure=Unit->Pressure((System->Virial+temp)/(3.0*totvol));
 		
 	}
 

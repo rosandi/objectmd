@@ -35,9 +35,8 @@ public:
 	}
 	
 	void ReadParameter() {
-		string tag=lower_case(replace_char(get_name(),' ','_'));
-		SysParam->peek(tag+".axis", saxis);
-		SysParam->peek(tag+".target", TargetName);
+		SysParam->peek(mytag("axis"), saxis);
+		SysParam->peek(mytag("target"), TargetName);
 	}
 		
 	void Init(MDSystem* WorkSys){

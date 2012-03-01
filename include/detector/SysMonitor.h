@@ -58,9 +58,9 @@ public:
 	}
 	
 	void ReadParameter() {
-		SysParam->peek("monitor.filename", Filename);
-    if(SysParam->exist("monitor.nofile")) usefile=false;
-		SysParam->peek("monitor.sample", every);
+		SysParam->peek(mytag("filename"), Filename);
+    if(SysParam->exist(mytag("nofile"))) usefile=false;
+		SysParam->peek(mytag("sample"), every);
 		if(every<1) every=1;
 	}
   
@@ -68,31 +68,31 @@ public:
     Detector::Init(WorkSys);
     ParallelGadget::Init(WorkSys);
     
-    if(GetRank()==ROOT) {
+    if(GetRank()==MDROOT) {
       if(usefile)fout.open(GetFilename().c_str(), ios::trunc);
       
       RegisterMessageSlot(new DataSlot("@",0))
       ->SetFormat("%d")
       ->SetData(System->Step);
       
-      RegisterMessageSlot(new DataSlot("t",0))
-      ->SetFormat("%0.3E")
+      RegisterMessageSlot(new DataSlot("t:",0))
+      ->SetFormat("%0.6E")
       ->SetData(System->ElapsedTime);
 			
-      RegisterMessageSlot(new DataSlot("dt",0))
+      RegisterMessageSlot(new DataSlot("dt:",0))
       ->SetFormat("%0.3E")
       ->SetData(System->Integrator->TimeStep);
       
-			RegisterMessageSlot(new DataSlot("Ek",0))
-      ->SetFormat("%0.5E")
+			RegisterMessageSlot(new DataSlot("Ek:",0))
+      ->SetFormat("%0.10E")
       ->SetData(System->Kinetic);
       
-      RegisterMessageSlot(new DataSlot("Ep",0))
-      ->SetFormat("%0.5E")
+      RegisterMessageSlot(new DataSlot("Ep:",0))
+      ->SetFormat("%0.10E")
       ->SetData(RelPotential);
       
-      RegisterMessageSlot(new DataSlot("E",0))
-      ->SetFormat("%0.5E")
+      RegisterMessageSlot(new DataSlot("E:",0))
+      ->SetFormat("%0.10E")
       ->SetData(MechanicEnergy);
       
 		}
@@ -100,7 +100,8 @@ public:
   }
   
 	virtual void Measure() {
-		if(GetRank()==ROOT){
+		if(GetRank()==MDROOT){
+      if(!System->Step) return;
 			RelPotential=System->Potential-System->BasePotential;
 			MechanicEnergy=System->Kinetic+System->Potential-System->BasePotential;
 			

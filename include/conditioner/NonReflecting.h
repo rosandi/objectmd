@@ -1,8 +1,10 @@
 #ifndef _NON_REFLECTING_HPP_
 #define _NON_REFLECTING_HPP_
 
+#include <mpi.h>
 #include <omd/conditioner.h>
 #include <omd/comhandler.h>
+
 using namespace omd;
 
 
@@ -16,6 +18,7 @@ class NonReflecting: public Conditioner, private ParallelGadget {
 	int    n_layer;
 	int    bot_force;
 	int    top_force;
+  int    ter_layer;
 	bool   printforce;
 	bool   evaluating;
 	
@@ -25,7 +28,7 @@ class NonReflecting: public Conditioner, private ParallelGadget {
 public:
   
 	NonReflecting() {
-		set_name("boundary.nrb");
+		set_name("nrb");
 		register_class("non_reflecting_boundary");		
 		SetConditionerType(COND_PRE_CALCULATION|COND_FORCE_MODIFIER);
 		evaluating=false;
@@ -37,10 +40,10 @@ public:
 	}
 	
 	void ReadParameter() {
-    TargetName=SysParam->string_value("boundary.nrb.target");
-		imp=SysParam->double_value("boundary.nrb.impedance");
-		fconst=SysParam->double_value("boundary.nrb.force");
-		gridthick=SysParam->double_value("boundary.nrb.layer");
+    TargetName=SysParam->string_value(mytag("target"));
+		imp=SysParam->double_value(mytag("impedance"));
+		fconst=SysParam->double_value(mytag("force"));
+		gridthick=SysParam->double_value(mytag("layer"));
 	}
   	
 	void Init(MDSystem* WorkSys){
@@ -84,7 +87,7 @@ public:
     // to all system atoms...
 		int na=System->GetNAtom();   
     for(int i=0; i<na; i++){
-      Atom* A=System->AtomPtr(i);
+      Atom* a=System->AtomPtr(i);
       a->aux[top_force]=0.0;
       a->aux[bot_force]=0.0;
     }

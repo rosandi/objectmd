@@ -42,7 +42,7 @@ namespace omd {
 class DataSlot {
 
 	string *StrData;
-	OMD_FLOAT *DblData;
+	double *DblData;
 	int    *IntData;
 	int priority;
 
@@ -88,10 +88,10 @@ public:
 		return 0; // avoids warning
 	}
 		
-	OMD_FLOAT  AsDouble(){
+	double  AsDouble(){
 		switch(DataType) {
 			case m_int:
-				return (OMD_FLOAT)(*IntData);
+				return (double)(*IntData);
 			case m_float:
 				return *DblData;
 			case m_string:
@@ -143,7 +143,7 @@ public:
 	DataSlot* SetFormat(const char* fmt){Format.assign(fmt);return this;}
 	DataSlot* SetPrintable(bool p){Printable=p;return this;}
 	DataSlot* SetData(int& dat) {IntData=&dat;DataType=m_int;return this;}
-	DataSlot* SetData(OMD_FLOAT& dat) {DblData=&dat;DataType=m_float;return this;}
+	DataSlot* SetData(double& dat) {DblData=&dat;DataType=m_float;return this;}
 	DataSlot* SetData(string& dat){StrData=&dat;DataType=m_string;return this;}
 	DataSlot* SetLabel(const char* dat){Label.assign(dat);return this;}
 	
@@ -157,7 +157,7 @@ public:
 	char* GetFormattedText() {
 		string st;
 		if(Label.empty())st.assign(AsString());
-		else st.assign(Label+":"+AsString());		
+		else st.assign(Label+AsString());		
 		memset(FormattedText,0,512);
 		st.copy(FormattedText,511);
 		return FormattedText;

@@ -15,8 +15,8 @@
  * ObjectMD header file
  */
 
-#ifndef _VERLET_LIST_HPP_
-#define _VERLET_LIST_HPP_
+#ifndef _VERLET_LIST_FULL_HPP_
+#define _VERLET_LIST_FULL_HPP_
 
 #include <omd/iterator.h>
 using namespace omd;

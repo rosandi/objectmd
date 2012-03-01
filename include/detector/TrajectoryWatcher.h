@@ -29,7 +29,7 @@ class TrajectoryWatcher: public Detector, public ParallelGadget {
 public:
 	
 	TrajectoryWatcher(string TargetAtom, string fname) {
-		set_name("TRAJECTORY WATCHER");
+		set_name("watch");
 		SetTag("watch");
 		register_class(get_name());
 		TargetName=TargetAtom;

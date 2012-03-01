@@ -32,9 +32,8 @@ public:
 	}
 
 	void ReadParameter() {
-		string par=lower_case(replace_char(get_name(),' ','_'));
-		Factor=SysParam->double_value(par+".factor");
-    TargetName=SysParam->string_value(par+".target");
+		Factor=SysParam->double_value(mytag("factor"));
+    TargetName=SysParam->string_value(mytag("target"));
 	}
 
 	void ForceModifier() {

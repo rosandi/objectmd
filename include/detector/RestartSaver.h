@@ -32,7 +32,7 @@ class RestartSaver:public Detector, public ParallelGadget {
 	
 public:
 	RestartSaver(double speriod=-1.0, string tunit="second") {
-		set_name("RESTART FILE SAVER");
+		set_name("restart");
 		saving_period=speriod;
 		time_unit=tunit;
 		overwrite=true;
@@ -50,6 +50,11 @@ public:
 		else ost << "(no overwrite)";
 		ost <<std::endl;
 	}
+  
+  void ReadParameter() {
+    SysParam->peek(mytag("every"),saving_period);
+    SysParam->peek(mytag("unit"),time_unit);
+  }
 	
 	void Init(MDSystem* WorkSys) {
 		Detector::Init(WorkSys);
@@ -89,7 +94,7 @@ public:
 
 	void Detect() {
 		int a=0;
-		if(GetRank()==ROOT) {
+		if(GetRank()==MDROOT) {
 			time(&current_time);
 			double dt=difftime(current_time, previous_time);
 			if(dt>saving_period) {
