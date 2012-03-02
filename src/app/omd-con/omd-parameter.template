@@ -26,7 +26,15 @@ end
 
 interaction:
   target target eam.aluminum eval border.nrb
-#  target projectile pair.ar-pt.zbl
+  target projectile pair.ar-pt.zbl
+end
+
+schedule:
+  # when object operation options...
+  0.1 target temperature 2000.0
+  0.3 target velocity add 0 0 200
+  0.3 projectile velocity set 0 0 100
+  0.2 nrb deactivate
 end
 
 cond: 

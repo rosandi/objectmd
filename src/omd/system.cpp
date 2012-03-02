@@ -155,6 +155,7 @@ int MDSystem::Run(int mode) {
 	Mode=mode;
 		
 	try {
+    LoadParameterFile();
 		ReadParameter();
 		Init(); // user initialization
 		switch(Mode) {
@@ -175,13 +176,11 @@ int MDSystem::Run(int mode) {
 	return ExitCode;
 }
 
-
-void MDSystem::ReadParameter() {
-	
-	if(param.exist("--param")) {
+void MDSystem::LoadParameterFile() {
+	if(param.exist("--param")) { // this is from command line
 		ParameterFilename=param.string_value("--param");
 		mdassert(file_exist(ParameterFilename),
-		       "can not find parameter file "+param.string_value("--param"));
+             "can not find parameter file "+param.string_value("--param"));
 		blog("reading parameters from ("+ParameterFilename+")");
 		param.read(ParameterFilename);
 	} else {
@@ -190,7 +189,10 @@ void MDSystem::ReadParameter() {
 			param.read(ParameterFilename);
 		}
 	}
-	
+}
+
+void MDSystem::ReadParameter() {
+		
 	if(param.exist("--version")) {
 		std::cerr << VERSION_INDICATOR << std::endl;
 		exit(0);
@@ -213,8 +215,6 @@ void MDSystem::ReadParameter() {
 	// TODO: other system settings??
 	param.peek("dir.output", OutputDirectory);
 	param.peek("time.max", MaxTime);
-	param.peek("monitor.sample", print_every);
-	if(print_every<1) print_every=1;
 	
 	if(param.exist("continue")) {
 		SetBinaryFilename(param.string_value("continue"));
@@ -411,19 +411,19 @@ void MDSystem::EnumerateAtoms(bool force) {
 */
 
 void MDSystem::UnificateAtoms() {
-    int na=0;
-    
-    for (int i=0;i<(int)SystemAtoms.size();i++) na+=SystemAtoms[i]->GetNAtom();
-    mdassert(na>0, "no atom to simulate (NAtom=0)");
-   
-    AtomStorage.Allocate(na);
-    AtomStorage.Clear();
-
-    for (int i=0;i<(int)SystemAtoms.size();i++) {
-    	mdassert(SystemAtoms[i]->M>0.0&&SystemAtoms[i]->Z>0.0,
+  int na=0;
+  
+  for (int i=0;i<(int)SystemAtoms.size();i++) na+=SystemAtoms[i]->GetNAtom();
+  mdassert(na>0, "no atom to simulate (NAtom=0)");
+  
+  AtomStorage.Allocate(na);
+  AtomStorage.Clear();
+  
+  for (int i=0;i<(int)SystemAtoms.size();i++) {
+    mdassert(SystemAtoms[i]->M>0.0&&SystemAtoms[i]->Z>0.0,
     	       "uninitialized atom properties (mass and number)",
     	       SystemAtoms[i]->get_name());
-
+    
 		SystemAtoms[i]->SetMaster(this);
 		AtomKeeper* ak=&(SystemAtoms[i]->GetAtomStorage());
 		int n=AtomStorage.GetNAtom();
@@ -432,15 +432,15 @@ void MDSystem::UnificateAtoms() {
 		ak->Release();
 		ak->Allocate(na,AtomKeeper::Referral);
 		for(int i=n;i<AtomStorage.GetNAtom();i++)ak->Attach(AtomStorage[i]);
-    }
-    TotalAtom=GetNAtom();
+  }
+  TotalAtom=GetNAtom();
 	
 	for (int i=0; i<TotalAtom; i++) {
 		Atoms(i).potential=0.0;
 		Atoms(i).virial=0.0;
 	}
 	created=true;
-    Unificated=true;
+  Unificated=true;
 }
 
 /**
@@ -524,6 +524,7 @@ void MDSystem::InitGadgets() {
 	for(int i=0;i<(int)SystemAtomGroups.size();i++) {
 		if(!(SystemAtomGroups[i]->created)) SystemAtomGroups[i]->Commit();
 		SystemAtomGroups[i]->SyncAtomGroupMask();
+    SystemAtomGroups[i]->SetMaster(this);
 	}
 	
 	MeasureKinetic(); // needed in some initializations

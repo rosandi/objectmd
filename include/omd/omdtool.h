@@ -17,6 +17,9 @@
 */
 
 #include <string>
+#ifdef OMD_WITH_MUPARSER
+#include <muParser.h>
+#endif
 
 using std::string;
 
@@ -34,8 +37,8 @@ namespace omd {
   string as_string(int val, const char* format=NULL);
   string as_string(double val, const char* format=NULL);
   string as_string(void* val);
-  int    as_int(string,void* parser=NULL);
-  double as_double(string, void* parser=NULL);
+  int    as_int(string);
+  double as_double(string);
   string lower_case(string str);
   string trim(string str);
   string replace_char(string str, char cold, char cnew);
@@ -44,6 +47,11 @@ namespace omd {
   string remove_char(string, string);
   bool char_exist(string&, char);
 
+#ifdef OMD_WITH_MUPARSER
+  int    as_int(string, mu::Parser* parser);
+  double as_double(string, mu::Parser* parser);
+#endif
+  
 }
 
 #endif

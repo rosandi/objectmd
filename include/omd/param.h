@@ -95,7 +95,7 @@ public:
 	void set_pair(string p, string val);
   
 #ifdef OMD_WITH_MUPARSER
-  void SetParset(mu::Parser* pars){parser=pars;}
+  void SetParser(mu::Parser* pars){parser=pars;}
 #endif
   
 };

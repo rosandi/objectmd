@@ -6,9 +6,7 @@
 
 // atom container
 #include <crystal/FCC.h>
-#include <crystal/FCC100.h>
-#include <crystal/FCC111.h>
-#include <crystal/BCC100.h>
+#include <crystal/BCC.h>
 #include <crystal/Diamond.h>
 #include <crystal/FreeAtom.h>
 #include <crystal/Projectile.h>

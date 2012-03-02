@@ -23,7 +23,7 @@
 #define VERSION_INDICATOR "OBJECT-MD V.03.02 CALLSIGN CHIRP"
 
 #define MAXATOMTYPE     8
-#define MAXAUXVAR       6
+#define MAXAUXVAR       16
 #define MAXPROC         512
 #define DEFAULT_CONFIG_FILENAME "omd-parameter"
 #define EDGE_TOLE       0.1

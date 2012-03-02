@@ -44,111 +44,113 @@ using namespace omd;
 
 class DataDumper: public Detector {
 protected:
-    int FileSeq, FileMax;
-    int XLength;
-    string FieldsDef;
-    DataDumper* MainDumper;
-
+  int FileSeq, FileMax;
+  int XLength;
+  string FieldsDef;
+  DataDumper* MainDumper;
+  
 public:
-    
-   	DataDumper(string TargetAtom="",double tm=-1.0,string fn="Data",int extlen=3):
-   	Detector(tm) {
-        TargetName=TargetAtom;
+  
+  DataDumper(string TargetAtom="",double tm=-1.0,string fn="Data",int extlen=3):
+  Detector(tm) {
+    TargetName=TargetAtom;
 		SetFilename(fn);
-        FileSeq=0;
-        XLength=(extlen<EXLN)?extlen:EXLN;
-        if (XLength==0) FileMax=100000;
-        else FileMax=int(pow(10, XLength+1));
-        MainDumper=NULL;
-        
-        set_name("dump");
-        register_class("DATA DUMPER");
-        
-    }
+    FileSeq=0;
+    XLength=(extlen<EXLN)?extlen:EXLN;
+    if (XLength==0) FileMax=100000;
+    else FileMax=int(pow(10, XLength+1));
+    MainDumper=NULL;
     
-    /** 
-     * Join is used to define the main data dumper.
-     * By joining to other data dumper, the class will not take responsible
-     * to write the output file. Only the ones which have MainDumper==NULL, will
-     * create output files. In order to use join capability, the data must be 
-     * store in the aux variable of atoms.
-     * 
-     */
-
-    Detector* Join(MDGadget* det){
-
-    	mdassert(det, "Can not find DataDumper to join");
-    	mdassert(det->type_of("data_dumper"), "Gadget "+det->get_name()+
+    set_name("dump");
+    register_class("DATA DUMPER");
+    
+  }
+  
+  /** 
+   * Join is used to define the main data dumper.
+   * By joining to other data dumper, the class will not take responsible
+   * to write the output file. Only the ones which have MainDumper==NULL, will
+   * create output files. In order to use join capability, the data must be 
+   * store in the aux variable of atoms.
+   * 
+   */
+  
+  Detector* Join(MDGadget* det){
+    
+    mdassert(det, "Can not find DataDumper to join");
+    mdassert(det->type_of("data_dumper"), "Gadget "+det->get_name()+
     	       " is not a data dumper. can not join.");
-    	       
-    	MainDumper=dynamic_cast<DataDumper*>(det);
-    	return this;
+    
+    MainDumper=dynamic_cast<DataDumper*>(det);
+    return this;
 	}
- 
-    virtual string GetFilename() {
-        int i=0,j;
-        char st[64];
+  
+  virtual string GetFilename() {
+    int i=0,j;
+    char st[64];
 		
 		if (XLength==0)	return (FilenamePrefix+Filename);
-			
-        SetFilenamePostfix("00000");
-        FileSeq+=1;
-        sprintf(st, "%d", FileSeq);
-        if (FileSeq<FileMax) {
-	        if (XLength==0) SetFilenamePostfix(st);
-		    else {
-            	while (st[i]!=0x0) i++;
-            	for (j=1;j<=i;j++) FilenamePostfix[XLength-j]=st[i-j];
-            	FilenamePostfix[XLength]=0x0;
-        	}
-        } else SetFilenamePostfix("---");
-        
-    	return (FilenamePrefix+Filename+"."+FilenamePostfix);
+    
+    SetFilenamePostfix("00000");
+    FileSeq+=1;
+    sprintf(st, "%d", FileSeq);
+    if (FileSeq<FileMax) {
+      if (XLength==0) SetFilenamePostfix(st);
+      else {
+        while (st[i]!=0x0) i++;
+        for (j=1;j<=i;j++) FilenamePostfix[XLength-j]=st[i-j];
+        FilenamePostfix[XLength]=0x0;
+      }
+    } else SetFilenamePostfix("---");
+    
+    return (FilenamePrefix+Filename+"."+FilenamePostfix);
 	}
+  
+  void ReadParameter() {
+    SysParam->peek(mytag("sample"), TSample);
+		SysParam->peek(mytag("filename"), Filename);
+		SysParam->peek(mytag("xlength"), XLength);
+  }
 	
 	virtual void Init(MDSystem* WorkSys) {
 		Detector::Init(WorkSys);
-
-		SysParam->peek(mytag("sample"), TSample);
-		SysParam->peek(mytag("filename"), Filename);
-		SysParam->peek(mytag("xlength"), XLength);
-		
+    		
 		if(MainDumper!=NULL){
 			mdassert(Target==MainDumper->Target,
-			       "joining data dumpers with with different target");
+               "joining data dumpers with with different target");
 			TSample=MainDumper->GetSampleTime();
 			NextSample=TSample;
 			Target->SetWriteMode(WM_VELOCITY);
 		}
 		
 		if(MainDumper==NULL) RestartVariable("file_sequence", FileSeq);
-
+    
 	}
-
+  
 	virtual void PrintInfo(ostream& ost) {
 		ost<<"id."<<id<<" "<<get_name()<<" -- target: "<<Target->get_name();
 		ost << "; sample_time="<<TSample<<"; filename="<<Filename<<"; extension_length="<<XLength<<std::endl;
 	}
-
-    virtual bool Check(){
-    	if(MainDumper==NULL){
+  
+  virtual bool Check(){
+    if(MainDumper==NULL){
 			for(int a=0;a<MAXAUXVAR;a++)
 				if(System->PrintableAux[a])
 					FieldsDef.append(" "+System->AuxNameTag.at(a));
 		}
 		return true;
 	}
-
-    virtual void Measure() {
-    	if(MainDumper==NULL){
-    		Target->PushInfo("$ Time "+as_string(System->ElapsedTime,"%0.5e"));
-        	Target->DumpAtoms(GetFilename(),0,
-        		System->PrintableAux,
-        		System->AuxFormat,
-        		FieldsDef);
-        	Target->PopInfo();
+  
+  virtual void Measure() {
+    if(MainDumper==NULL){
+      Target->PushInfo("$ Time "+as_string(System->ElapsedTime,"%0.5e"));
+      Target->DumpAtoms(GetFilename(),0,
+                        System->PrintableAux,
+                        System->AuxFormat,
+                        FieldsDef);
+      Target->PopInfo();
 		}
-    }
+  }
 };
 
 #endif

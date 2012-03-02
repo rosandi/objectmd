@@ -38,7 +38,7 @@ class ThermoDetector: public DataDumper, public ParallelGadget {
 	int    nalloc;
 	int    tidx,pidx,nidx;
 	bool   intensive_mode; // measure every timestep
-	enum {tempe,press} process;
+	enum {cm,tempe,press} process;
 
 public:
 	ThermoDetector(double tm=-1.0, double rcut=-1.0, string fn="Data", int extlen=3)
@@ -99,13 +99,13 @@ public:
 		ParallelGadget::Init(WorkSys);
 
 		if(GetRank()==0) {
-			RegisterMessageSlot(new DataSlot("temp"))
+			RegisterMessageSlot(new DataSlot("temp:"))
 				->SetFormat("%0.3E")->SetData(system_temperature);
-			RegisterMessageSlot(new DataSlot("avtemp"))
+			RegisterMessageSlot(new DataSlot("avtemp:"))
 				->SetFormat("%0.3E")->SetData(avg_temp);
-			RegisterMessageSlot(new DataSlot("pres"))
+			RegisterMessageSlot(new DataSlot("pres:"))
 				->SetFormat("%0.3E")->SetData(system_pressure);
-			RegisterMessageSlot(new DataSlot("avpres"))
+			RegisterMessageSlot(new DataSlot("avpres:"))
 				->SetFormat("%0.3E")->SetData(avg_pres);
 		}
 
@@ -141,11 +141,13 @@ public:
 		Atom* a=AtomPtr(idx);
 		nneig[idx]++;
 		masat=GetMass(a);
-		sumas[idx]+=masat;
-		sumvx[idx]+= masat*a->vx;
-		sumvy[idx]+= masat*a->vy;
-		sumvz[idx]+= masat*a->vz;			
-		ek=masat*(a->vx*a->vx+a->vy*a->vy+a->vz*a->vz);
+    
+    double vx=a->vx-sumvx[idx];
+    double vy=a->vy-sumvy[idx];
+    double vz=a->vz-sumvz[idx];
+
+		ek=masat*(vx*vx + vy*vy + vz*vz);
+
 		sumek[idx]+=ek;
 		return true;
 	}
@@ -158,32 +160,67 @@ public:
 			masto=GetMass(b);	
 			nneig[to]++;
 			nneig[at]++;
-			sumas[to]+=masat;
-			sumas[at]+=masto;
-			sumvx[to]+=masat*a->vx;
-			sumvy[to]+=masat*a->vy;
-			sumvz[to]+=masat*a->vz;                
-			sumvx[at]+=masto*b->vx;
-			sumvy[at]+=masto*b->vy;
-			sumvz[at]+=masto*b->vz;                
+
+      double vx=b->vx-sumvx[to];
+      double vy=b->vy-sumvy[to];
+      double vz=b->vz-sumvz[to];
+      
 			sumek[to]+=ek;
-			sumek[at]+=masto*(b->vx*b->vx+b->vy*b->vy+b->vz*b->vz);
+			sumek[at]+=masto*(vx*vx + vy*vy + vz*vz);
 		}
 	}
-
+  
+  virtual bool CheckLoopCMV(int idx) {    
+    Atom* a=AtomPtr(idx);
+		masat=GetMass(a);
+    sumas[idx]+= masat;
+		sumvx[idx]+= masat*a->vx;
+		sumvy[idx]+= masat*a->vy;
+		sumvz[idx]+= masat*a->vz;
+    return true;
+  }
+  
+  virtual void IterationNodeCMV(int at, int to) {
+		double d=CalcDistance(at,to);
+		Atom* a=AtomPtr(at);
+		Atom* b=AtomPtr(to);
+		if (d<=ercut) {
+			masto=GetMass(b);	
+      sumas[to]+=masat;
+      sumas[at]+=masto;
+      
+      sumvx[to]+=masat*a->vx;
+      sumvy[to]+=masat*a->vy;
+      sumvz[to]+=masat*a->vz;
+      
+      sumvx[at]+=masto*b->vx;
+      sumvy[at]+=masto*b->vy;
+      sumvz[at]+=masto*b->vz;                
+    }
+  }
+  
 	virtual void ExtractTemperature() {
+		int na=GetNAtom();
+
+    process=cm;
+    Iterator->IterateHalf(this);
+    
+    for(int i=0;i<na;i++) {
+			sumvx[i]/=sumas[i]; 
+			sumvy[i]/=sumas[i];
+			sumvz[i]/=sumas[i];
+    }
+    
 		process=tempe;
 		Iterator->IterateHalf(this);
-		int na=GetNAtom();
+    
 		int navg=0;
 		avg_temp=0.0;
 		
 		for (int i=0;i<na;i++) {
 			Atom* a=AtomPtr(i);
-			sumvx[i]/=sumas[i]; 
-			sumvy[i]/=sumas[i];
-			sumvz[i]/=sumas[i];
-			sumek[i]-=sumas[i]*(sumvx[i]*sumvx[i]+sumvy[i]*sumvy[i]+sumvz[i]*sumvz[i]);			      
+      if(nneig[i]<=0.0) die("why...");
+      
 			a->aux[tidx]=Unit->Temperature(0.5*sumek[i]/(double)nneig[i]);
 			a->aux[nidx]=(double)nneig[i]/volcut;
 
@@ -226,11 +263,13 @@ public:
 		avg_pres=0.0;
 		for (int i=0;i<na;i++) {
 			Atom* a=AtomPtr(i);
-			a->aux[pidx]=(nneig[i]==0)?0.0:
+
       // this is <sum f_ij.r_ij> /3.omega no double sum in half-loop iterator
       // for full-loop consider reimplement ReturnForce@ForceKernel
+			a->aux[pidx]=(nneig[i]==0)?0.0:
 			Unit->Pressure((sumvir[i]/2.0+sumek[i])/(3.0*volcut));
-			if(a->flag&FLAG_GHOST) continue;
+			
+      if(a->flag&FLAG_GHOST) continue;
 			if(a->flag&FLAG_ACTIVE) {
 				avg_pres+=a->aux[pidx];
 				navg++;
@@ -358,13 +397,34 @@ public:
 	}
 
 	bool PreIterationNode(int idx) {
-		if(process==tempe) return CheckLoopTemp(idx);
-		else return CheckLoopPressure(idx);
+    switch(process) {
+      case cm:
+        CheckLoopCMV(idx);
+        break;
+        
+      case tempe: 
+        CheckLoopTemp(idx);
+        break;
+        
+      case press:
+        CheckLoopPressure(idx);
+    }
 	}
 	
 	void IterationNode(int at, int to) {
-		if(process==tempe) IterationNodeTemp(at,to);
-		else IterationNodePressure(at,to);		
+    switch(process) {
+      case cm:
+        IterationNodeCMV(at,to);
+        break;
+        
+      case tempe: 
+        IterationNodeTemp(at,to);
+        break;
+        
+      case press:
+        IterationNodePressure(at,to);
+    }
+    
 	}
 	
 	void Detect(){

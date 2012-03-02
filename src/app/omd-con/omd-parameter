@@ -2,7 +2,15 @@
 
 var:
   lc 4.032
+  ttime 0.5
 end
+
+# system variables:
+# x0,y0,z0,x1,y1,z1 : system dimension calculated in initialization stage.
+#                     can not be used in create section.
+#
+# constants: Pi, kb
+#
 
 create:
   target fcc 100 16 16 132 aluminum
@@ -45,5 +53,5 @@ comm.arch  1 1 1
 comm.refresh 5
 dump.field nid
 boundary.periodic no
-time.max 0.5
+time.max {ttime/4}
 monitor.filename par.md

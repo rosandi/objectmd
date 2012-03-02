@@ -30,7 +30,45 @@ class MySim:public MDSystemGrid {
   double eval(string equ) {
     equ=trim(equ);
     if(equ.empty()) return 0.0;
-    return as_double(equ,(void*)(&parser));
+    return as_double(equ,&parser);
+  }
+  
+  vector<double> schedule;
+  vector<string> job;
+  
+  void ExecWipe(int jobid) {
+    istringstream ss(job[jobid]);
+    string obj,op;
+    ss>>obj>>op;
+    
+    if(op=="temperature") {
+      string tem; ss>>tem;
+      SearchContainer(obj)->SetTemperature(eval(tem));
+      blog("temperature of "+obj+"set to "+tem);
+    }
+    
+    else if(op=="velocity") {
+      string how,vx,vy,vz;
+      ss>>how>>vx>>vy>>vz;
+      if(how=="set") SearchContainer(obj)->SetVelocity(eval(vx),eval(vy),eval(vz));
+      else if(how=="add") SearchContainer(obj)->AddVelocity(eval(vx),eval(vy),eval(vz));
+      blog("altering velocity of "+obj);
+    }
+                                                            
+    else if(op=="kinetic") {
+      string kine; ss>>kine;
+      SearchContainer(obj)->SetKineticEnergy(eval(kine));
+      blog("kinetic energy of "+obj+"set to "+kine);
+    }
+
+    else if(op=="deactivate") SearchGadget(obj)->Deactivate();
+    
+    else if(op=="activate") SearchGadget(obj)->Activate();
+    
+    // wipe job
+    job.erase(job.begin()+jobid);
+    schedule.erase(schedule.begin()+jobid);
+    
   }
 
 	void CreateSystem() {
@@ -172,9 +210,11 @@ class MySim:public MDSystemGrid {
         }
         
         else if(op=="velocity") {
-          string vx,vy,vz;
-          mdassert(ss>>vx>>vy>>vz, "velocity vector required");
-          SearchContainer(snm)->SetVelocity(eval(vx),eval(vy),eval(vz));
+          string how,vx,vy,vz;
+          mdassert(ss>>how>>vx>>vy>>vz, "velocity vector required");
+          if(how=="set") SearchContainer(snm)->SetVelocity(eval(vx),eval(vy),eval(vz));
+          else if(how=="add") SearchContainer(snm)->AddVelocity(eval(vx),eval(vy),eval(vz));
+          else die("invalid velocity modify");
         }
         
         else if(op=="kinetic") {
@@ -299,7 +339,7 @@ class MySim:public MDSystemGrid {
         if(cmd=="dump") {
           string cnm,fnm;
           ss>>cnm>>fnm;
-          SearchContainer(cnm)->DumpAtoms(fnm);
+          DumpAtoms(SearchContainer(cnm)->GetAtomStorage(), fnm);
         }
         
         else if(cmd=="info") {
@@ -310,57 +350,109 @@ class MySim:public MDSystemGrid {
         
         else if(cmd=="quit") die("quit");
         
-        
         else die("command not implemented: "+cmd);
       }
                        
     }
 	}
   
-  void Init() {
+  void ReadParameter() {
     
     // variable initialization
     // if already exist->reassign
-    
-    if(param.exist("var:")) {
-      istringstream ss(param.raw_string("var:","end"));
-      string vname,vval;
-      int fnd;
-      while(ss>>vname>>vval) {
-        int iv=(int)eqvarname.size();
-        bool found=false;
-        
-        for(fnd=0;fnd<iv;fnd++) {
-          if(vname==eqvarname[fnd]) {
-            found=true;
-            break;
+    try {
+      if(param.exist("var:")) {
+        istringstream ss(param.raw_string("var:","end"));
+        string vname,vval;
+        int fnd;
+        while(ss>>vname>>vval) {
+          int iv=(int)eqvarname.size();
+          bool found=false;
+          
+          for(fnd=0;fnd<iv;fnd++) {
+            if(vname==eqvarname[fnd]) {
+              found=true;
+              break;
+            }
           }
+          
+          if(found) eqvar[fnd]=eval(vval);
+          else {  
+            int idx=(int)eqvarname.size();
+            eqvar[idx]=eval(vval);
+            eqvarname.push_back(vname);
+            parser.DefineVar(vname,eqvar+idx);
+          }
+          
+        }
+      }
+    
+      MDSystemGrid::ReadParameter();
+    }
+    
+    catch (const char* errst) {die(errst);}
+    catch (...) {die("undefined error@ReadParameter");}
+  
+  }
+  
+  void Init() {
+  
+    if(param.exist("schedule:")) {
+      istringstream ss(param.raw_string("schedule:","end"));
+      string sctime,obj,op;
+     
+      while(ss>>sctime>>obj>>op) {
+        
+        schedule.push_back(eval(sctime));
+                
+        if(op=="temperature") {
+          string tem; ss>>tem;
+          op.append(" "+tem);
+        }
+
+        if(op=="kinetic") {
+          string kine; ss>>kine;
+          op.append(" "+kine);
         }
         
-        if(found) eqvar[fnd]=eval(vval);
-        else {  
-          int idx=(int)eqvarname.size();
-          eqvar[idx]=eval(vval);
-          eqvarname.push_back(vname);
-          parser.DefineVar(vname,eqvar+idx);
+        else if(op=="velocity") {
+          string how,vx,vy,vz;
+          ss>>how>>vx>>vy>>vz;
+          op.append(" "+how+" "+vx+" "+vy+" "+vz);
         }
+        
+        job.push_back(obj+" "+op);
         
       }
-    }
+      
+    }    
   }
+  
+  void Scheduler() {
+    int nsc=(int)schedule.size();
+    for(int i=nsc-1;i>=0;i--) if(OnTime(schedule[i])) ExecWipe(i);        
+  }  
   
 public:
   MySim(int &argc, char** &argv) {
     SetArgument(argc,argv);
-    param.SetParser(parser);
+    param.SetParser(&parser);
     parser.DefineConst("Pi",M_PI);
     parser.DefineConst("kb",8.6173324E-5); // eV/K
+    parser.DefineConst("inf",DBL_MAX);
     parser.DefineVar("x0",&Box.x0);
     parser.DefineVar("y0",&Box.y0);
     parser.DefineVar("z0",&Box.z0);
     parser.DefineVar("x1",&Box.x1);
     parser.DefineVar("y1",&Box.y1);
     parser.DefineVar("z1",&Box.z1);
+    parser.DefineVar("t",&ElapsedTime);
+    parser.DefineVar("Et",&Energy);
+    parser.DefineVar("Ek",&Kinetic);
+    parser.DefineVar("Ep",&Potential);
+    parser.DefineVar("Ep0",&BasePotential);
+    parser.DefineVar("V",&Virial);
+    parser.DefineVar("v2max",&SqrMaxVelocity);
   }
     
 };

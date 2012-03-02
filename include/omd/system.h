@@ -357,6 +357,8 @@ class MDIterator;
     void SetParameterFile(string cfgfile) {
       ParameterFilename=cfgfile;
     }
+    
+    void LoadParameterFile();
 		
     // output directory
     void SetOutputDirectory(const string outdir) {

@@ -12,9 +12,7 @@ class NonReflecting: public Conditioner, private ParallelGadget {
 	
 	double fconst;
 	double imp;
-	double termzone;
 	double gridthick;
-	
 	int    n_layer;
 	int    bot_force;
 	int    top_force;
@@ -43,7 +41,7 @@ public:
     TargetName=SysParam->string_value(mytag("target"));
 		imp=SysParam->double_value(mytag("impedance"));
 		fconst=SysParam->double_value(mytag("force"));
-		gridthick=SysParam->double_value(mytag("layer"));
+		n_layer=SysParam->int_value(mytag("layer"));
 	}
   	
 	void Init(MDSystem* WorkSys){
@@ -68,9 +66,8 @@ public:
 		zmax=TakeMAX(zmax);
 		zmin=TakeMIN(zmin);
 		
-		termzone=zmax+0.5*gridthick;
-		n_layer=(int)((termzone-zmin)/gridthick);
-		
+    gridthick=(zmax-zmin)/(double)n_layer;
+    
 		MemAlloc(force_layer_average, sizeof(double)*n_layer);
 		MemAlloc(layer_population, sizeof(int)*n_layer);
 		
@@ -134,8 +131,11 @@ public:
     
   }
 	
-	void EvaluateForce
-  (Atom &a, Atom &b, double dx, double dy, double dz, double fr, double pot)
+	void EvaluateForce(
+                     Atom& a, Atom& b, 
+                     double dx, double dy, double dz, 
+                     double fr, double pot, 
+                     ForceKernel* fkernel)
 	{
 		evaluating=true;
     if(!(Target->Member(a) || Target->Member(b))) return;

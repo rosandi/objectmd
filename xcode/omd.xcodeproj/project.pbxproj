@@ -17,8 +17,6 @@
 		4C760F021497E522002C9E27 /* select-compiler */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = "select-compiler"; path = "../select-compiler"; sourceTree = SOURCE_ROOT; };
 		4C760F031497E522002C9E27 /* upload_doc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = upload_doc; path = ../upload_doc; sourceTree = SOURCE_ROOT; };
 		4C760F201497E54C002C9E27 /* FCC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FCC.cpp; sourceTree = "<group>"; };
-		4C760F211497E54C002C9E27 /* FCC100.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FCC100.cpp; sourceTree = "<group>"; };
-		4C760F221497E54C002C9E27 /* FCC111.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FCC111.cpp; sourceTree = "<group>"; };
 		4C760F231497E54C002C9E27 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		4C760F241497E54C002C9E27 /* StructureDetector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StructureDetector.cpp; sourceTree = "<group>"; };
 		4C760F251497E54C002C9E27 /* sw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sw.cpp; sourceTree = "<group>"; };
@@ -169,8 +167,6 @@
 			isa = PBXGroup;
 			children = (
 				4C760F201497E54C002C9E27 /* FCC.cpp */,
-				4C760F211497E54C002C9E27 /* FCC100.cpp */,
-				4C760F221497E54C002C9E27 /* FCC111.cpp */,
 				4C760F231497E54C002C9E27 /* Makefile */,
 				4C760F241497E54C002C9E27 /* StructureDetector.cpp */,
 				4C760F251497E54C002C9E27 /* sw.cpp */,

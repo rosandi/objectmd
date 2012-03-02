@@ -118,16 +118,16 @@ public:
 		PreConditioner::Init(WorkSys);
 		ParallelGadget::Init(WorkSys);
 		
-		RegisterMessageSlot(new DataSlot("e_temp",2))
+		RegisterMessageSlot(new DataSlot("e_temp:",2))
 			->SetFormat("%0.3E")->SetData(electron_temperature);
 
-		RegisterMessageSlot(new DataSlot("e_source",2))
+		RegisterMessageSlot(new DataSlot("e_source:",2))
 				->SetFormat("%0.3E")->SetData(e_source);
 
-		RegisterMessageSlot(new DataSlot("int_Een",2))
+		RegisterMessageSlot(new DataSlot("int_Een:",2))
 			->SetFormat("%0.5E")->SetData(int_Een); // total energy given from electron
 
-		RegisterMessageSlot(new DataSlot("int_Aen",2))
+		RegisterMessageSlot(new DataSlot("int_Aen:",2))
 		->SetFormat("%0.5E")->SetData(int_Aen); // total average energy given to lattice
 
 		G.open(SysParam->string_value("ttm.electron-phonon_file"), "ELECTRON_PHONON_COUPLING");

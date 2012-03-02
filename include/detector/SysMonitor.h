@@ -60,13 +60,14 @@ public:
 	void ReadParameter() {
 		SysParam->peek(mytag("filename"), Filename);
     if(SysParam->exist(mytag("nofile"))) usefile=false;
-		SysParam->peek(mytag("sample"), every);
+		SysParam->peek(mytag("every"), every);
 		if(every<1) every=1;
 	}
   
   void Init(MDSystem* WorkSys) {
     Detector::Init(WorkSys);
     ParallelGadget::Init(WorkSys);
+    System->print_every=every;
     
     if(GetRank()==MDROOT) {
       if(usefile)fout.open(GetFilename().c_str(), ios::trunc);

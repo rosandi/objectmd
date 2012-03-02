@@ -41,7 +41,7 @@ using std::ostream;
 using std::istringstream;
 
 namespace omd {
-  
+    
   string msg;
   
   void die(string message) {
@@ -87,42 +87,52 @@ namespace omd {
     sprintf(st,"%lX",(long int)val);
     return string(st);
   }
-  
-  int as_int(string val, void* parser) {
+
+  int as_int(string val) {
     int ii;
-#ifdef OMD_WITH_MUPARSER
-    if(val[0]=='{') {
-      mu::Parser* pars=dynamic_cast<mu::Parser*>parser;
-      val=remove_char(val,"{ }");
-      pars->SetExpr(val);
-      ii=(int)pars->Eval();
-    } else 
-#endif
-    {
-      istringstream ss(val);
-      if(!(ss>>ii)) throw (string("conversion error: ")+val).c_str();
-    }
+    istringstream ss(val);
+    if(!(ss>>ii)) throw (string("conversion error: ")+val).c_str();
     return ii;
   }
   
-  double as_double(string val, void* parser) {
+  double as_double(string val) {
     double dd;
-#ifdef OMD_WITH_MUPARSER
-    if(val[0]=='{') {
-      mu::Parser* pars=dynamic_cast<mu::Parser*>parser;
-      val=remove_char(val,"{ }");
-      pars->SetExpr(val);
-      dd=pars->Eval();
-    } else 
-#endif
-    {
-      istringstream ss(val);
-      if(val=="inf") return DBL_MAX;
-      if(val=="-inf") return -DBL_MAX;
-      if(!(ss>>dd)) throw (string("conversion error: ")+val).c_str();
-    }
+    istringstream ss(val);
+    if(val=="inf") return DBL_MAX;
+    if(val=="-inf") return -DBL_MAX;
+    if(!(ss>>dd)) throw (string("conversion error: ")+val).c_str();
     return dd;
   }
+  
+#ifdef OMD_WITH_MUPARSER
+  int as_int(string val, mu::Parser* parser) {
+    int ii;
+    if(val[0]=='{') {
+      val=remove_char(val,"{ }");
+      try {
+        parser->SetExpr(val);
+        ii=(int)parser->Eval();
+      } catch (mu::Parser::exception_type &e){
+        throw (string("parser error: "+e.GetMsg()+" eq:"+val).c_str());
+      }
+    } else ii=as_int(val);
+    return ii;
+  }
+
+  double as_double(string val, mu::Parser* parser) {
+    double dd;
+    if(val[0]=='{') {
+      val=remove_char(val,"{ }");
+      try {
+        parser->SetExpr(val);
+        dd=parser->Eval();
+      } catch (mu::Parser::exception_type &e){
+        throw (string("parser error: "+e.GetMsg()+" eq:"+val).c_str());
+      }
+    } else dd=as_double(val);
+    return dd;
+  }
+#endif
   
   string lower_case(string str){
     for(int i=0;i<(int)str.size();i++)str[i]=tolower(str[i]);

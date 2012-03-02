@@ -206,7 +206,8 @@ namespace omd {
     
     AtomContainer*         Shift(double dx, double dy, double dz);
     AtomContainer*         AddVelocity(double vx, double vy, double vz){
-      for(int i=0;i<GetNAtom();i++){
+      int na=GetNAtom();
+      for(int i=0;i<na;i++){
         Atoms(i).vx+=vx;
         Atoms(i).vy+=vy;
         Atoms(i).vz+=vz;

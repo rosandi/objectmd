@@ -1,17 +1,5 @@
 #!/bin/bash
 
-make clean
-
-cat << endt > mach
-$(hostname)
-$(hostname)
-$(hostname)
-$(hostname)
-endt
-
-EXE=terminating
-
 if [[ -z $OMD_TABLE ]]; then echo no table path in environment; exit; fi
-make -j 4 && 
-#nohup $OMD_MPI/bin/mpirun -machinefile mach -np 4 ./$EXE 2>err &
-$HOME/mpi/bin/mpirun -machinefile mach -np 4 ./$EXE 
+
+$OMD_MPI/bin/mpirun -np 6 $HOME/bin/omd comm.arch 1 2 3

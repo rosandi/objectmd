@@ -640,9 +640,11 @@ void MDSystemGrid::FirstRun() {
 
 void MDSystemGrid::ErrorHandler(const char* errst) {
 	MDSystem::ErrorHandler(errst);
-  if(Communicator->GetRank()==MDROOT) std::cerr<<errst<<std::endl<<std::endl;
-	if(Communicator->GetSize()>1) Communicator->Abort();
-  Communicator->Close();
+  if(Communicator) {
+    if(Communicator->GetRank()==MDROOT) std::cerr<<errst<<std::endl<<std::endl;
+	  if(Communicator->GetSize()>1) Communicator->Abort();
+    Communicator->Close();
+  } else std::cerr<<errst<<std::endl<<std::endl;
 }
 
 string MDSystemGrid::GetGridConfiguration() {
