@@ -61,6 +61,7 @@ public:
 	}
 	
 	void ReadParameter() {
+	  DataDumper::ReadParameter();
 	  SysParam->peek(mytag("intensive"),intensive_mode);
 	}
 	

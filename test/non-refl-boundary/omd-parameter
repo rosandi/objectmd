@@ -44,7 +44,7 @@ dir.binary pomd
 comm.arch  2 2 1
 comm.refresh 5
 dump.field nid
-thermo.sample 0.1
+thermo.every 0.1
 #thermo.intensive yes
 boundary.periodic xy
 time.max 10.0

@@ -108,6 +108,7 @@ public:
   
   void ReadParameter() {
     SysParam->peek(mytag("sample"), TSample);
+    SysParam->peek(mytag("every"), TSample);
 		SysParam->peek(mytag("filename"), Filename);
 		SysParam->peek(mytag("xlength"), XLength);
   }
