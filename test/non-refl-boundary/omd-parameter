@@ -10,7 +10,7 @@ end
 
 group:
   hot gt -inf -inf {z1-10*ml}
-  nrb lt inf inf {z0+4*ml}
+  nrb lt inf inf {z0+10*ml}
 end
 
 interaction:
@@ -29,7 +29,7 @@ detect:
 end
 
 schedule:
-  1.0 hot temperature 1000
+  1.0 hot temperature 2000
 end
 
 prerun:
@@ -45,11 +45,13 @@ comm.arch  2 2 1
 comm.refresh 5
 dump.field nid
 thermo.sample 0.1
+#thermo.intensive yes
 boundary.periodic xy
 time.max 10.0
-monitor.every 10
+
+monitor.every 50
 
 nrb.target nrb
-nrb.impedance 0.0818213
+nrb.impedance -0.0818213
 nrb.force 0.143938
-nrb.layer 2
+nrb.layer 5

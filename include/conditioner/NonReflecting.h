@@ -121,8 +121,7 @@ public:
     delete[] dtmp;
     delete[] itmp;
 
-    for(int i=0;i<n_layer;i++)
-      force_layer_average[i]/=layer_population[i];
+    for(int i=0;i<n_layer;i++) force_layer_average[i]/=layer_population[i];
     
     for(int i=0;i<na;i++) {
       Atom* a=AtomPtr(i);
@@ -137,10 +136,10 @@ public:
                      double fr, double pot, 
                      ForceKernel* fkernel)
 	{
-		evaluating=true;
+    evaluating=true;
     if(!(Target->Member(a) || Target->Member(b))) return;
     
-		if(a.z<=b.z) {
+    if(a.z<=b.z) {
       a.aux[top_force]+=fr*dz;
       b.aux[bot_force]-=fr*dz;
     } else {

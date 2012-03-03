@@ -29,7 +29,7 @@
 class ThermoDetector: public DataDumper, public ParallelGadget {
 
 	double *sumas,*sumek,*sumvir;
-	double *sumvx,*sumvy,*sumvz;
+	double *sumvx,*sumvy,*sumvz,*sumvk;
 	double ek,masat,masto,ercut,volcut;
 	double system_temperature,system_pressure; // System's temperature and pressure
 	double avg_temp; // average of atom temperature
@@ -58,6 +58,10 @@ public:
 		intensive_mode=inten;
 		if(inten) blog("intensive mode: true");
 		else blog("intensive mode: false");
+	}
+	
+	void ReadParameter() {
+	  SysParam->peek(mytag("intensive"),intensive_mode);
 	}
 	
 	void SetTemperature(int idx, double t) {Atoms(idx).aux[tidx]=t;}
@@ -119,6 +123,7 @@ public:
 		MemAlloc(sumvy,sizeof(double)*nalloc);
 		MemAlloc(sumvz,sizeof(double)*nalloc);
 		MemAlloc(sumvir,sizeof(double)*nalloc);
+		MemAlloc(sumvk,sizeof(double)*nalloc);
 		MemAlloc(nneig,sizeof(int)*nalloc);
 		if(ercut<0.0) ercut=System->GetMaxCutRadius();
 		mdassert(ercut>0.0, "cut radius is zero... static mode?");
@@ -134,6 +139,7 @@ public:
 		MemFree(sumvx);
 		MemFree(sumvy);
 		MemFree(sumvz);
+		MemFree(sumvk);
 		MemFree(nneig);
 	}
 
@@ -241,33 +247,17 @@ public:
 		
 	}
 
-	virtual bool CheckLoopPressure(int idx) {
-		sumvir[idx]+=Atoms(idx).virial;  // my self
-		return true;
-	}
-
-	virtual void IterationNodePressure(int at, int to) {
-		double d=CalcDistance(at,to);
-		if(d<=ercut){
-			sumvir[at]+=Atoms(to).virial;
-			sumvir[to]+=Atoms(at).virial;
-		}
-    // from this we get: N.<sum f_ij.r_ij> = sum_k (f_ij.r_ij)_k 
-	}
-	
 	virtual void ExtractPressure() {
 		process=press;
-		Iterator->IterateHalf(this);
 		int na=GetNAtom();
 		int navg=0;
 		avg_pres=0.0;
 		for (int i=0;i<na;i++) {
 			Atom* a=AtomPtr(i);
 
-      // this is <sum f_ij.r_ij> /3.omega no double sum in half-loop iterator
       // for full-loop consider reimplement ReturnForce@ForceKernel
 			a->aux[pidx]=(nneig[i]==0)?0.0:
-			Unit->Pressure((sumvir[i]/2.0+sumek[i])/(3.0*volcut));
+			Unit->Pressure( a->aux[nidx]*a->virial/6.0 + sumek[i]/(3.0*volcut) );
 			
       if(a->flag&FLAG_GHOST) continue;
 			if(a->flag&FLAG_ACTIVE) {
@@ -293,6 +283,7 @@ public:
 			MemRealloc(sumvy,sizeof(double)*nalloc);
 			MemRealloc(sumvz,sizeof(double)*nalloc);
 			MemRealloc(sumvir,sizeof(double)*nalloc);
+			MemRealloc(sumvk,sizeof(double)*nalloc);
 			MemRealloc(nneig,sizeof(int)*nalloc);
 		}
 
@@ -304,6 +295,7 @@ public:
 		memset(sumvz,0,nnn);
 		memset(sumek,0,nnn);
 		memset(sumvir,0,nnn);
+		memset(sumvk,0,nnn);
 		memset(nneig,0,sizeof(int)*na);
 
 		ExtractTemperature();
@@ -406,8 +398,6 @@ public:
         CheckLoopTemp(idx);
         break;
         
-      case press:
-        CheckLoopPressure(idx);
     }
 	}
 	
@@ -421,8 +411,6 @@ public:
         IterationNodeTemp(at,to);
         break;
         
-      case press:
-        IterationNodePressure(at,to);
     }
     
 	}
