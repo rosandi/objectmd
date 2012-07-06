@@ -130,13 +130,13 @@ public:
 		RegisterMessageSlot(new DataSlot("int_Aen:",2))
 		->SetFormat("%0.5E")->SetData(int_Aen); // total average energy given to lattice
 
-		G.open(SysParam->string_value("ttm.electron-phonon_file"), "ELECTRON_PHONON_COUPLING");
+		G.open(SysParam->string_value(mytag("electron-phonon_file")), "ELECTRON_PHONON_COUPLING");
 		G0=G.param.double_value("Constant");
-		Ce.open(SysParam->string_value("ttm.electron-phonon_file"), "ELECTRON_HEAT_CAPACITY");
+		Ce.open(SysParam->string_value(mytag("electron-phonon_file")), "ELECTRON_HEAT_CAPACITY");
 		C0=Ce.param.double_value("Constant");
 		
 		if(source_type==function)
-			Ft.open(SysParam->string_value("ttm.source_function_file"));
+			Ft.open(SysParam->string_value(mytag("source_function_file")));
 
 		fd_time_step=WorkSys->Integrator->TimeStep;
 		
