@@ -34,6 +34,7 @@ class ThermoDetector: public DataDumper, public ParallelGadget {
 	double system_temperature,system_pressure; // System's temperature and pressure
 	double avg_temp; // average of atom temperature
 	double avg_pres; // average of atom pressure
+	double avg_dens; // average of atom density
 	int    *nneig;
 	int    nalloc;
 	int    tidx,pidx,nidx;
@@ -46,7 +47,7 @@ public:
 		set_name("thermo");
 		register_class(get_name());
 		system_temperature=0.0;
-		avg_temp=0.0;
+		avg_temp=avg_pres=avg_dens=0.0;
 		system_pressure=0.0;
 		intensive_mode=false;
 		sumas=sumek=sumvx=sumvy=sumvz=NULL;
@@ -75,9 +76,20 @@ public:
 	 */
 
 	double GetTemperatureAvg(){
-		mdassert(intensive_mode, "attempt to invoke GetTemperatureAvg in non-intensive mode!");
+	    if(!intensive_mode) die("attempt to invoke GetTemperatureAvg in non-intensive mode!");
 		return avg_temp;
 	}
+
+	double GetPressureAvg(){
+	    if(!intensive_mode) die("attempt to invoke GetTemperatureAvg in non-intensive mode!");
+		return avg_press;
+	}
+
+	double GetDensityAvg(){
+	    if(!intensive_mode) die("attempt to invoke GetTemperatureAvg in non-intensive mode!");
+		return avg_dens;
+	}
+	
 	
 	double GetPressure(int idx) {return Atoms(idx).aux[pidx];}
 	double GetPressure(){return system_pressure;}
@@ -223,10 +235,10 @@ public:
     
 		int navg=0;
 		avg_temp=0.0;
+		avg_dens=0.0;
 		
 		for (int i=0;i<na;i++) {
 			Atom* a=AtomPtr(i);
-      if(nneig[i]<=0.0) die("why...");
       
 			a->aux[tidx]=Unit->Temperature(0.5*sumek[i]/(double)nneig[i]);
 			a->aux[nidx]=(double)nneig[i]/volcut;
@@ -236,16 +248,24 @@ public:
 			
 			if(a->flag&FLAG_ACTIVE) {
 				avg_temp+=Atoms(i).aux[tidx];
+				avg_dens+=Atoms(i).aux[nidx];
 				navg++;
 			}
 
 		}
 
 		avg_temp=TakeSUM(avg_temp);
+		avg_dens=TakeSUM(avg_dens);
 		navg=TakeSUM(navg);
-		if(navg>0) avg_temp/=(double)navg;
-		else avg_temp=0.0;
-		
+
+		if(navg>0) {
+		  avg_temp/=(double)navg;
+		  avg_dens/=(double)navg;
+		else {
+		  avg_temp=0.0;
+		  avg_dens=0.0; // check this! should it be 1?
+        }
+
 	}
 
 	virtual void ExtractPressure() {
