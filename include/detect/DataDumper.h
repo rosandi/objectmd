@@ -107,10 +107,11 @@ public:
 	}
   
   void ReadParameter() {
-    SysParam->peek(mytag("sample"), TSample);
-    SysParam->peek(mytag("every"), TSample);
-		SysParam->peek(mytag("filename"), Filename);
-		SysParam->peek(mytag("xlength"), XLength);
+    // use fix name "dump"
+    SysParam->peek("dump.sample", TSample);
+    SysParam->peek("dump.every", TSample);
+    SysParam->peek("dump.filename"), Filename);
+    SysParam->peek("dump.xlength"), XLength);
   }
 	
 	virtual void Init(MDSystem* WorkSys) {

@@ -54,6 +54,7 @@ class TTM_Homogen: public PreConditioner, public ParallelGadget {
 	double stop_time;
 	
 	bool use_density;
+	double n_zero;
 	double low_density;
 	double low_density_factor;
 	
@@ -89,6 +90,7 @@ public:
 		source_type=none;
 		stopped=false;
 		use_density=false;
+		n_zero=0;
 	}
 
 	virtual ~TTM_Homogen(){}
@@ -108,7 +110,7 @@ public:
 		SysParam->peek(mytag("balance_electron_lattice"), balance_el_lattice, false);
 		SysParam->peek(mytag("stop_at"), stop_time, -1.0);
 		SysParam->peek(mytag("stop_equ"), stop_equ, false);
-		SysParam->peek(mytag("low_density"), density_limit, -1.0);
+		SysParam->peek(mytag("low_density"), low_density, -1.0);
 		if(low_density>0) {
 		    use_density=true;
 		    SysParam->peek(mytag("low_density_factor"), low_density_factor, 1.0);
@@ -169,6 +171,17 @@ public:
 			ost<< "electron initial temperature = " << electron_temperature << "K\n";
 		else if(electron_energy>0.0)
 			ost<< "electron initial energy = " << electron_energy << "eV\n";
+        
+        if(use_density) {
+            ost<<"low density limit = " << low_density << "\n"
+               <<"low density factor = " << low_density_factor <<"\n";
+        } else {
+          ost << "low density limit is not used!\n";
+        }
+        
+        if(stop_equ) {
+            ost<<"TTM stopped if T_e<T_a\n";
+        }
 
 		ost << "pulse offset = " << pulse_offset << " ps\n";
 	}
@@ -196,6 +209,7 @@ private:
 				en=0.5*C0*Ce.read(tm)*tm*atom_volume;
 				d0=eng-en;
 			}
+			
 		    electron_temperature=tm;
 		    blog("electron temperature = "+as_string(electron_temperature));
 		}
@@ -221,13 +235,14 @@ private:
 
 			int_Aen=(2.0*System->Kinetic)/System->GetTotalAtom();
 			firstfd=false;
+			n_zero=temp_detector->GetDensityAvg();
 		}
 
 		// Te
 		double de=-G0*G.read(electron_temperature)*(electron_temperature-atomtemp)*fd_time_step;
 		
 		if(use_density) {
-		    if(atomdens<low_density) de*=low_density_factor;
+		    if(atomdens<(low_density*n_zero)) de*=low_density_factor;
 		}
 		
 		int_Een+=de*atom_volume;
@@ -248,7 +263,7 @@ private:
 		double coup=G0*G.read(electron_temperature);
 		
 		if(use_density) {
-		    if(temp_detector->GetDensityAvg()<low_density) coup*=low_density_factor;
+		    if(temp_detector->GetDensityAvg()<(low_density*n_zero)) coup*=low_density_factor;
 		}
 
 		// \Delta t_FD = \Delta t_MD
