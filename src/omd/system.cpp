@@ -33,7 +33,7 @@
 #include <omd/gadget.h>
 #include <omd/integrator.h>
 #include <omd/iterator.h>
-#include <omd/conditioner.h>
+#include <omd/modify.h>
 #include <omd/detector.h>
 #include <omd/dataslot.h>
 
@@ -76,7 +76,7 @@ void MDSystem::SystemInit(){
 	Step   = 0;
   MaxTime    = -1.0;
 	SimWallTime = 0.0;
-	AtomID=GroupID=ConditionerID=DetectorID=0; // Creation counter
+	AtomID=GroupID=ModifyID=DetectorID=0; // Creation counter
 	PBoundary= -1;
   Integrator  = NULL;
   Iterator    = NULL;
@@ -117,8 +117,8 @@ MDSystem::~MDSystem() {
 	for (int i=0; i<(int)Detectors.size(); i++) {
 		delete Detectors[i];
 	}
-	for (int i=0; i<(int)Conditioners.size(); i++) {
-		delete Conditioners[i];
+	for (int i=0; i<(int)Modifies.size(); i++) {
+		delete Modifies[i];
 	}
 	for (int i=0; i<(int)SystemAtoms.size(); i++) {
 		delete SystemAtoms[i];
@@ -141,9 +141,9 @@ MDSystem::~MDSystem() {
  * process until the elapsed simulation time reaches the maximum value.
  *
  * The sequence in one loop is:
- *   - Call PreIntegration conditioners
+ *   - Call PreIntegration
  *   - Do force integration
- *   - Call PostIntegration conditioners
+ *   - Call PostIntegration
  *   - Measure the system by calling all Detectors
  *   - Increase simulation time
  *
@@ -317,9 +317,9 @@ void MDSystem::PrintGadgetInfo(ostream& ost) {
 	ost << "\n*** Integrator ***\n"; 
 	Integrator->PrintInfo(ost);
 	
-	ost << "\n*** Conditioners ***\n";
-	for (int i=0; i<(int)Conditioners.size(); i++) {
-		ost << "=>"; Conditioners[i]->PrintInfo(ost);
+	ost << "\n*** Modifies ***\n";
+	for (int i=0; i<(int)Modifies.size(); i++) {
+		ost << "=>"; Modifies[i]->PrintInfo(ost);
 	}
 	ost << "\n*** Detectors ***\n";
 	for (int i=0; i<(int)Detectors.size(); i++) {
@@ -530,14 +530,14 @@ void MDSystem::InitGadgets() {
 	MeasureKinetic(); // needed in some initializations
 	
 	// Search for the Iterator. Add if not found.
-   	for (int i=0; i<(int)Conditioners.size(); i++) {
-		if(Conditioners[i]->type_of("iterator"))
-			Iterator=dynamic_cast<MDIterator*>(Conditioners[i]);
+   	for (int i=0; i<(int)Modifies.size(); i++) {
+		if(Modifies[i]->type_of("iterator"))
+			Iterator=dynamic_cast<MDIterator*>(Modifies[i]);
 	}
 	
 	if(!Iterator){
 		warn("using default iterator: MDIterator, half-loop....");
-		AddConditioner(Iterator=new MDIterator());
+		AddModify(Iterator=new MDIterator());
 		Iterator->EnableHalfLoop();
 	}
 
@@ -562,7 +562,7 @@ void MDSystem::InitGadgets() {
     mdassert(Integrator->MaxCutRadius>0.0, "bad cut radius: "+as_string(Integrator->MaxCutRadius));
 
 	// Initiate all gadgets
-	for (int i=0;i<(int)Conditioners.size();i++) Conditioners[i]->Init(this);
+	for (int i=0;i<(int)Modifies.size();i++) Modifies[i]->Init(this);
 	for (int i=0;i<(int)Detectors.size();i++) Detectors[i]->Init(this);
 
 	// Convert aux format string to array of string
@@ -606,9 +606,9 @@ void MDSystem::ArrangeMessageSlots() {
  then call all initialization functions, Init(), from the contained classes, 
  in the following  sequence:
 <ul>
-<li> Forces initialization
-<li> Conditioners initialization
-<li> Detectors initialization
+<li> Force initialization
+<li> Modify initialization
+<li> Detector initialization
 </ul>
 */
 
@@ -861,9 +861,9 @@ void MDSystem::FirstRun() {
 	
 	//---------------Run one---------------------
 	SyncData(SYNC_ALL); // synchronize data first
-	ExecuteConditioners(COND_PRE_INTEGRATION);
+	ExecuteModifies(MODIFY_PRE_INTEGRATION);
 	Integrator->Iterate();
-	ExecuteConditioners(COND_POST_INTEGRATION);
+	ExecuteModifies(MODIFY_POST_INTEGRATION);
 	//-------------------------------------------
 	
 	MeasurePotential();
@@ -872,10 +872,10 @@ void MDSystem::FirstRun() {
 	for(int i=0;i<GetNAtom();i++){Atoms(i).fx=Atoms(i).fy=Atoms(i).fz=0.0;}
 }
 
-void MDSystem::ExecuteConditioners(int contype) {
-	int consize=Conditioners.size();
+void MDSystem::ExecuteModifies(int contype) {
+	int consize=Modifies.size();
 	for(int i=0;i<consize;i++){
-		Conditioners[i]->Execute(contype);
+		Modifies[i]->Execute(contype);
 	}
 }
 
@@ -909,8 +909,8 @@ void MDSystem::CheckBeforeRun() {
 	// Check all gadgets
 	mdassert(Integrator->Check(), "force integrator is not ready");
 
-	for (int i=0;i<(int)Conditioners.size();i++)
-		mdassert(Conditioners[i]->Check(), "conditioner not ready", Conditioners[i]->get_name());
+	for (int i=0;i<(int)Modifies.size();i++)
+		mdassert(Modifies[i]->Check(), "modify not ready", Modifies[i]->get_name());
 
 	for (int i=0;i<(int)Detectors.size();i++)
 		mdassert(Detectors[i]->Check(), "detector not ready",Detectors[i]->get_name());
@@ -950,9 +950,9 @@ void MDSystem::SetArgument(int &argc, char** &argv) {
  * The sequence of processes done in this function is the following:
  *    # Execution of scheduller function, Scheduler(). If implemented in the 
  *      descendant, this is a general purpose function reserved for schedulled processes.
- *    # The pre integration conditioners are executed.
+ *    # The pre integration modifies are executed.
  *    # The integration loop is invoked.
- *    # The post integration conditioners are executed.
+ *    # The post integration modifies are executed.
  *    # The inline function is called. By default, this function is doing nothing.
  *      The descendant may reimplement the function when a special process need to
  *      be inserted inside the main loop.
@@ -964,12 +964,12 @@ void MDSystem::SetArgument(int &argc, char** &argv) {
 void MDSystem::RunKernel() {
 	while(CheckRun()) {
 		Scheduler();
-		ExecuteConditioners(COND_PRE_INTEGRATION);
+		ExecuteModifies(MODIFY_PRE_INTEGRATION);
 		Integrator->Integrate();
 		InlineFunction();
 		MeasurePotential(); MeasureKinetic();
 		Energy=Kinetic+Potential-BasePotential;
-		ExecuteConditioners(COND_POST_INTEGRATION);
+		ExecuteModifies(MODIFY_POST_INTEGRATION);
 		ExecuteDetectors();
 		CheckBoundary();
 		
@@ -1021,7 +1021,7 @@ void MDSystem::RunRestart() {
 /**
  * @brief Runs a molecular static simulation
  * 
- * This function executes only one run of all conditioners and detectors 
+ * This function executes only one run of all modifies and detectors 
  * (no loop). If an integrator and force kernel are assigned in creation
  * time, one force iteration will be executed. The detectors takes place
  * at the end, the stage after the forces and energies are calculated.
@@ -1043,9 +1043,9 @@ void MDSystem::RunStatic() {
 		a->fx=a->fy=a->fz=a->virial=a->potential=0.0;		
 	}
 
-	ExecuteConditioners(COND_PRE_INTEGRATION);
+	ExecuteModifies(MODIFY_PRE_INTEGRATION);
 	Integrator->Iterate();
-	ExecuteConditioners(COND_POST_INTEGRATION);
+	ExecuteModifies(MODIFY_POST_INTEGRATION);
 	MeasurePotential();
 	MeasureKinetic();
 	BasePotential=Potential;
@@ -1192,12 +1192,12 @@ Detector* MDSystem::AddDetector(Detector* Detc)
 	return Detc;
 }
 
-Conditioner* MDSystem::AddConditioner(Conditioner* Cond) {
+Modify* MDSystem::AddModify(Modify* Cond) {
 	Cond->SetSystem(this);
 	Cond->set_logger(this);
-	Cond->set_id(ConditionerID++); 
+	Cond->set_id(ModifyID++); 
 	Cond->SetUnit(Unit);
-	Conditioners.push_back(Cond); 
+	Modifies.push_back(Cond); 
 	return Cond;
 }
 
@@ -1346,8 +1346,8 @@ int MDSystem::GetFlagBitMask(const char* usagecode) {
 }
 
 MDGadget* MDSystem::SearchGadget(string name) {
-	for(int i=0;i<(int)Conditioners.size();i++) {
-		if(Conditioners[i]->get_name()==name) return Conditioners[i];
+	for(int i=0;i<(int)Modifies.size();i++) {
+		if(Modifies[i]->get_name()==name) return Modifies[i];
 	}
 
 	for(int i=0;i<(int)Detectors.size();i++) {
@@ -1382,8 +1382,8 @@ bool MDSystem::GadgetExist(MDGadget* gad){
 	for(int i=0;i<(int)Detectors.size();i++){
 		if(Detectors[i]==gad) return true;
 	}
-	for(int i=0;i<(int)Conditioners.size();i++){
-		if(Conditioners[i]==gad) return true;
+	for(int i=0;i<(int)Modifies.size();i++){
+		if(Modifies[i]==gad) return true;
 	}
 	return false;
 }

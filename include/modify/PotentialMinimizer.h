@@ -4,19 +4,20 @@
 #define _POTENTIAL_MINIMIZER_HPP_
 
 #include <iostream>
-#include <omd/conditioner.h>
-using namespace omd;
+#include <omd/modify.h>
+
+namespace omd {
 
 
 /**
- * @ingroup conditioner
+ * @ingroup modify
  * @brief Minimize the potential energy of the system.
  * 
  * The atom velocity is quenched if the potential is increased.
  * 
 */
 
-class PotentialMinimizer:public PostConditioner {
+class PotentialMinimizer:public PostModify {
 protected:
 	double factor;
 	double last_pot;
@@ -47,5 +48,7 @@ public:
 	 	last_pot=System->Potential;
 	}
 };
+
+}
 
 #endif

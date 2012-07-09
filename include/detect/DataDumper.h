@@ -6,7 +6,8 @@
 #include <omd/detector.h>
 
 using std::string;
-using namespace omd;
+
+namespace omd {
 
 #define EXLN 5
 
@@ -110,8 +111,8 @@ public:
     // use fix name "dump"
     SysParam->peek("dump.sample", TSample);
     SysParam->peek("dump.every", TSample);
-    SysParam->peek("dump.filename"), Filename);
-    SysParam->peek("dump.xlength"), XLength);
+    SysParam->peek("dump.filename", Filename);
+    SysParam->peek("dump.xlength", XLength);
   }
 	
 	virtual void Init(MDSystem* WorkSys) {
@@ -154,5 +155,7 @@ public:
 		}
   }
 };
+
+}
 
 #endif

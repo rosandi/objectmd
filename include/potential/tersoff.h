@@ -24,10 +24,10 @@
 #include <cstdio>
 #include <cmath>
 #include <omd/forcekernel.h>
-#include <omd/conditioner.h>
+#include <omd/modify.h>
 #include <omd/iterator.h>
 
-class ClassNeighborList: public Calc_Conditioner {
+class ClassNeighborList: public Calc_Modify {
 friend class Tersoff;
 
 	int **list;
@@ -56,7 +56,7 @@ public:
 	}
 
 	void Init(MDSystem* WorkSys) {
-		Calc_Conditioner::Init(WorkSys);
+		Calc_Modify::Init(WorkSys);
 	}
 
 	void realloc_array(int size) {
@@ -183,7 +183,7 @@ public:
 		d2*=d2;
 		CutRadius=De+Re;
 		NeighborList=new ClassNeighborList(CutRadius);
-		System->AddConditioner(NeighborList);
+		System->AddModify(NeighborList);
 
 		double z1=System->SystemAtoms.at(A)->Z;
 		double z2=System->SystemAtoms.at(B)->Z;

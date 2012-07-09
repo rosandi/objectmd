@@ -24,19 +24,20 @@
 #include <vector>
 #include <string>
 #include <omd/forcekernel.h>
-#include <omd/conditioner.h>
+#include <omd/modify.h>
 #include <omd/treader.h>
 
 using std::vector;
 using std::string;
-using namespace omd;
+
+namespace omd {
 
 // A rather overestimated length. But safe!
 // Use even number of MAX_ALLOWED_SPECIES!!
 
 #define MAX_ALLOWED_SPECIES 4
 
-class TEmbedding: public Conditioner {
+class TEmbedding: public Modify {
 	friend class TForceEAM;
 	int id_size;
 	int NAlloc;
@@ -97,5 +98,7 @@ public:
 	virtual void ComputeHalf(Atom &at, Atom &to);
 	virtual void PrintInfo(ostream& ost);
 };
+
+}
 
 #endif

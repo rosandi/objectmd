@@ -17,8 +17,10 @@
 */
 
 #include <omd/system.h>
-#include <conditioner/VerletListFull.h>
+#include <modify/VerletListFull.h>
 #include <potential/sw.h>
+
+using namespace omd;
 
 OMD_FLOAT onethird;
 

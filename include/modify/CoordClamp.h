@@ -1,11 +1,11 @@
 
-#include <omd/conditioner.h>
+#ifndef _COORD_CLAMP_H_
+#define _COORD_CLAMP_H_
 
-using namespace omd;
-
+#include <omd/modify.h>
 
 /**
- * @ingroup conditioner
+ * @ingroup modify
  * @brief Atom Coordinate Clamper
  *
  * This class clamps atoms in the chosen coordinate axis.
@@ -16,11 +16,13 @@ using namespace omd;
  * 
 */
 
+namespace omd {
+
 #define CLAMP_X 1
 #define CLAMP_Y 2
 #define CLAMP_Z 4
 
-class CoordClamp: public ForceConditioner {
+class CoordClamp: public ForceModify {
 	string saxis;
 	int axis;
 	
@@ -40,13 +42,13 @@ public:
 	}
 		
 	void Init(MDSystem* WorkSys){
-		ForceConditioner::Init(WorkSys);
+		ForceModify::Init(WorkSys);
 		if(saxis.find('x')) axis|=CLAMP_X;
 		if(saxis.find('y')) axis|=CLAMP_Y;
 		if(saxis.find('z')) axis|=CLAMP_Z;
 	}
 	
-	void ForceModifier() {
+	void PostForce() {
 		int na=GetNAtom();
 		for (int i=0;i<na;i++) {
 			if (axis&CLAMP_X) Atoms(i).fx=Atoms(i).vx=0.0;
@@ -60,3 +62,7 @@ public:
 		    <<" -- clamping ("<<Target->get_name()<<"); axis="<<saxis<<"\n";
 	}
 };
+
+}
+
+#endif

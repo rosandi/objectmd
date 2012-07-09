@@ -4,13 +4,14 @@
 #define _RANGE_LIMITER_HPP_
 
 #include <iostream>
-#include <omd/conditioner.h>
+#include <omd/modify.h>
 #include <omd/container.h>
-using namespace omd;
+
+namespace omd {
 
 
 /**
- * ingroup conditioner
+ * ingroup modify
  * @brief Range limiter
  *
  * The class to limit the movement range of atoms inside the AtomContainer, pointed by
@@ -21,7 +22,7 @@ using namespace omd;
  * 
 */
 
-class RangeLimiter: public PostConditioner {
+class RangeLimiter: public PostModify {
 	double StopBorder, lW, lE, lN, lS, lT, lB;	
 public:
 	
@@ -33,7 +34,7 @@ public:
 	}
 	
 	void Init(MDSystem* WorkSys) {
-		Conditioner::Init(WorkSys);
+		Modify::Init(WorkSys);
 		SysBox Box=WorkSys->GetBox();
 		lW = Box.x0-StopBorder;
 		lE = Box.x1+StopBorder;
@@ -63,5 +64,7 @@ public:
 		}
 	}
 };
+
+}
 
 #endif

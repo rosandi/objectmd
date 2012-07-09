@@ -22,7 +22,7 @@
 #ifndef _ITERATOR_H_
 #define _ITERATOR_H_
 
-#include <omd/conditioner.h>
+#include <omd/modify.h>
 
 namespace omd {
 
@@ -37,7 +37,7 @@ namespace omd {
  * 
  */
 
-class MDIterator:public Conditioner {
+class MDIterator:public Modify {
 protected:
 	OMD_FLOAT RadiusTolerance;
 	int   RebuildPeriod;
@@ -74,7 +74,7 @@ public:
 	/** 
 	 Preserved for recreating/recalculating the neighbor cell, for instance
 	 upon box size change, etc. This function is activated by activating the
-	 COND_PRE_CALCULATION conditioner type, SetConditionerType().
+	 MODIFY_PRE_CALCULATION type, SetModifyType().
 	 */
 	
 	virtual void Refresh(){}

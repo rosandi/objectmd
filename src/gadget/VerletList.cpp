@@ -15,10 +15,11 @@
  *
 */
 
-#include <conditioner/VerletList.h>
+#include <modify/VerletList.h>
 
 using std::cerr;
 using std::ofstream;
+using namespace omd;
 
 // FIXME! make a note on VerletRadius and Radius tolerance. CommHandler alter these
 // variable. What is the effect? ...
@@ -26,7 +27,7 @@ using std::ofstream;
 VerletList::VerletList() {
 	set_name("VERLET LIST");
 	register_class(get_name());
-	SetConditionerType(COND_PRE_INTEGRATION|COND_PRE_CALCULATION);
+	SetModifyType(MODIFY_PRE_INTEGRATION|MODIFY_PRE_CALCULATION);
 	NeighSize=0;
 	AllocSize=0;
 	Link=NULL;
@@ -60,7 +61,7 @@ bool VerletList::CheckParameter() {
 }
 
 void VerletList::Init(MDSystem* WorkSys) {
-	Conditioner::Init(WorkSys);
+	Modify::Init(WorkSys);
 	
 	if (System->PBoundary) {
 		mdassert(System->type_of("simulation_system_grid"), 
@@ -211,7 +212,7 @@ void VerletList::PreIntegration() {
 	MemRealloc(NeighborIndex, (AllocSize+1)*sizeof(int));
 	MemRealloc(NeighborList,NeighSize*sizeof(int));
 	Refresh();
-	SetConditionerType(COND_PRE_CALCULATION);
+	SetModifyType(MODIFY_PRE_CALCULATION);
 }
 
 void VerletList::GetNeighborIndex(int ni, int &start, int &end) {

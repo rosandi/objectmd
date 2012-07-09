@@ -4,12 +4,13 @@
 #define _QUENCHER_HPP_
 
 #include <iostream>
-#include <omd/conditioner.h>
-using namespace omd;
+#include <omd/modify.h>
+
+namespace omd {
 
 
 /**
- * @ingroup conditioner
+ * @ingroup modify
  * @brief Quench the system
  *
  * This class quench the velocity of all atoms in the system by
@@ -25,7 +26,7 @@ using namespace omd;
  * - @e quench.every (step) : the period of quenching in step
 */
 
-class Quencher:public PostConditioner {
+class Quencher:public PostModify {
 protected:
 	int Period;
 	double Factor;
@@ -91,5 +92,7 @@ public:
 	}
 
 };
+
+}
 
 #endif

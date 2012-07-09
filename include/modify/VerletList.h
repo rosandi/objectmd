@@ -19,8 +19,6 @@
 #define _VERLET_LIST_HPP_
 
 #include <omd/iterator.h>
-using namespace omd;
-
 
 /**
  @ingroup iterator
@@ -41,6 +39,8 @@ using namespace omd;
  - @e verlet.nmean : the estimate value of number of neighbors of an atom. The default is 120. 
 
 **/
+
+namespace omd {
 
 class VerletList: public MDIterator {
 	int U, V, W;
@@ -83,5 +83,7 @@ public:
 	void PrintInfo(ostream& ost);
 
 };
+
+}
 
 #endif

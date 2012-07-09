@@ -3,7 +3,9 @@
 #include <cmath>
 #include <algorithm>
 #include <omd/iterator.h>
-#include <detector/StructureDetector.h>
+#include <detect/StructureDetector.h>
+
+using namespace omd;
 
 #define STRUCT_NON 0.0
 #define STRUCT_FCC 1.0

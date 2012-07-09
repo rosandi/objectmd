@@ -4,13 +4,14 @@
 #ifndef _TEMP_CONTROLLER_HPP_
 #define _TEMP_CONTROLLER_HPP_
 
-#include <omd/conditioner.h>
-#include <detector/ThermoDetector.h>
-using namespace omd;
+#include <omd/modify.h>
+#include <detect/ThermoDetector.h>
+
+namespace omd {
 
 
 /**
- * @ingroup conditioner
+ * @ingroup modify
  * @brief Temperature controller
  *
  * The class that controls crystal temperature by scalling the velocity 
@@ -34,7 +35,7 @@ using namespace omd;
  * 
 */
 
-class TempController: public PostConditioner {
+class TempController: public PostModify {
 	double TempSet, Tau;
 	ThermoDetector* temp_detector;
 
@@ -52,7 +53,7 @@ public:
 	void SetTemperature(double temp){TempSet=temp;}
 		
 	void Init(MDSystem *WorkSys) {
-		PostConditioner::Init(WorkSys);		
+		PostModify::Init(WorkSys);		
 		temp_detector=dynamic_cast<ThermoDetector*>(SearchGadgetType("thermo detector",false));
 		if(!temp_detector) warn("using systems Kinetic variable for temperature measurement");
 	}
@@ -90,6 +91,8 @@ public:
 	}
 
 };
+
+}
 
 #endif
 

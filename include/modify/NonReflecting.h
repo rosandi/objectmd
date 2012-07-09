@@ -2,13 +2,12 @@
 #define _NON_REFLECTING_HPP_
 
 #include <mpi.h>
-#include <omd/conditioner.h>
+#include <omd/modify.h>
 #include <omd/comhandler.h>
 
-using namespace omd;
+namespace omd {
 
-
-class NonReflecting: public Conditioner, private ParallelGadget {
+class NonReflecting: public Modify, private ParallelGadget {
 	
 	double fconst;
 	double imp;
@@ -28,7 +27,7 @@ public:
 	NonReflecting() {
 		set_name("nrb");
 		register_class("non_reflecting_boundary");		
-		SetConditionerType(COND_PRE_CALCULATION|COND_FORCE_MODIFIER);
+		SetModifyType(MODIFY_PRE_CALCULATION|MODIFY_POST_FORCE);
 		evaluating=false;
 	}
 	
@@ -49,7 +48,7 @@ public:
 		mdassert(WorkSys->type_of("SIMULATION SYSTEM GRID"),
            "this class requires SIMULATION SYSTEM GRID");
     
-		Conditioner::Init(WorkSys);
+		Modify::Init(WorkSys);
 		ParallelGadget::Init(WorkSys);
     
 		top_force=ClaimAuxVariable(printforce, "ftop");
@@ -90,7 +89,7 @@ public:
     }
 	}
   
-	void ForceModifier(){
+	void PostForce(){
     if(!evaluating) die("not evaluating force!");
     
     int na=GetNAtom();
@@ -151,5 +150,6 @@ public:
   
 };
 
+}
 
 #endif

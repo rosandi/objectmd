@@ -5,9 +5,9 @@
 
 #include <omd/dataslot.h>
 #include <omd/iterator.h>
-#include <detector/DataDumper.h>
+#include <detect/DataDumper.h>
 
-using namespace omd;
+namespace omd {
 
 /**
   @ingroup detector
@@ -128,5 +128,7 @@ public:
 	}
 
 };
+
+}
 
 #endif

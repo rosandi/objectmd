@@ -22,7 +22,7 @@
 /**
  * @class CommunicationHandler
  * @ingroup essential
- * @brief A conditioner to handle communication between processors
+ * @brief A modify to handle communication between processors
  * 
  * This class handles message passing between processors in a parallel MD
  * application. It implements basic data transfer functions used by 
@@ -35,8 +35,8 @@
  * functions needed by Object-MD are implemented: i.e. send and receive, data
  * gathering, broadcast, reduce, and process synchronizing. The main function is 
  * SendReceive function, that sends and receives all data to/from the neigboring
- * cells (27 cell). Exchanging data is performed using conditioner functions 
- * PreIntegration() and ForceModifier().
+ * cells (27 cell). Exchanging data is performed using modify functions 
+ * PreIntegration() and PostForce().
  * 
  * The class must be instantiated prior to the creation of simulation system, in
  * MDSystemGrid::CreateSystem(). If any of parallel environment information is 
@@ -51,7 +51,7 @@
 // funny: these directives must be comment out to let the file scanned
 // by doxigen
 
-#include <omd/conditioner.h>
+#include <omd/modify.h>
 
 namespace omd {
 

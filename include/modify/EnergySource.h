@@ -19,9 +19,9 @@
 #define _ENERGY_INPUT_HPP_
 
 #include <omd/paragadget.h>
-#include <omd/conditioner.h>
+#include <omd/modify.h>
 
-using namespace omd;
+namespace omd {
 
 
 #define INPUT_PULSE    1
@@ -54,7 +54,7 @@ using namespace omd;
  
 **/
 
-class EnergySource: public PreConditioner, public ParallelGadget {
+class EnergySource: public PreModify, public ParallelGadget {
 	int input_mode;
 	double e_tally; // total energy/atom...
 	double delta;
@@ -103,7 +103,7 @@ public:
 	}
 	
 	void Init(MDSystem* WorkSys) {
-		Conditioner::Init(WorkSys);
+		Modify::Init(WorkSys);
 		ParallelGadget::Init(WorkSys);
 
 		if(SearchGadgetType("dynamic time step", false)&&smode!="sudden")
@@ -154,5 +154,7 @@ public:
 	}
 
 };
+
+}
 
 #endif

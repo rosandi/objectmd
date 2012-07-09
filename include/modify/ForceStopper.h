@@ -2,16 +2,18 @@
 #ifndef _FORCE_STOPPER_HPP_
 #define _FORCE_STOPPER_HPP_
 
-#include <conditioner/ForceDamper.h>
+#include <modify/ForceDamper.h>
+
+namespace omd {
 
 /**
- * @ingroup conditioner
+ * @ingroup modify
  * @brief Stops the atom at given region
  *
  * This class it stops atoms in a defined region.
 */
 
-class ForceStopper: public ForceConditioner {
+class ForceStopper: public ForceModify {
 	double dWest, dEast, dNorth, dSouth, dTop, dBottom;
 	int fixflag;
 
@@ -30,7 +32,7 @@ public:
 	}
 
 	void Init(MDSystem* WorkSys){
-		Conditioner::Init(WorkSys);
+		Modify::Init(WorkSys);
 		SysBox Box=System->GetBox();
 		dWest  =Box.x0+dWest;
 		dEast  =Box.x1-dEast;
@@ -51,7 +53,7 @@ public:
 		}
 	}
 
-	void ForceModifier(){
+	void PostForce(){
 		double na=GetNAtom();
 		for(int i=0;i<na;i++) {
 			if(CheckFlag(i,fixflag)) {
@@ -75,5 +77,7 @@ public:
 	}
 
 };
+
+}
 
 #endif

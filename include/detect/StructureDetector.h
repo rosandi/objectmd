@@ -4,7 +4,9 @@
 #define _STRUCTURE_DETECTOR_HPP_
 
 #include <vector>
-#include <detector/DataDumper.h>
+#include <detect/DataDumper.h>
+
+namespace omd {
 
 struct struct_neig {int idx; double rsq;};
 
@@ -42,5 +44,7 @@ public:
 	void IterationNode(int at, int to);
 	void FindStructure();
 };
+
+}
 
 #endif

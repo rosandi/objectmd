@@ -22,6 +22,7 @@
 #include <omd/forcekernel.h>
 
 // VerletList required...
+namespace omd {
 
 class StillingerWeber: public ForceKernel {
 
@@ -85,5 +86,7 @@ public:
 	void PrintInfo(ostream& ost);
 
 };
+
+}
 
 #endif

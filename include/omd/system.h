@@ -76,7 +76,7 @@ class MDGadget;
 class DataSlot;
 class MDIntegrator;
 class Detector;
-class Conditioner;
+class Modify;
 class MDIterator;
 
 //----------------------MDSystem-----------------------------//
@@ -129,7 +129,7 @@ class MDIterator;
  * are gathered by MDSystem on the initialization stage (InitGadget). So, a
  * gadget may register slots before or in its Init() function. (FIXME!)
  * 
- * MDSystem will add a default iterator conditioner, if none is added in CreateGadget()
+ * MDSystem will add a default iterator, if none is added in CreateGadget()
  * function. The default iterator is of type MDIterator (a slow, traditional iteration
  * loop).
  *
@@ -149,7 +149,7 @@ class MDIterator;
     
     int AtomID;
     int GroupID;
-    int ConditionerID;
+    int ModifyID;
     int DetectorID;
     bool Unificated;
     bool Enumerated;
@@ -181,7 +181,7 @@ class MDIterator;
     MDUnit* Unit;
     
     MDIntegrator*          Integrator;
-    vector<Conditioner*>   Conditioners;
+    vector<Modify*>        Modifies;
     vector<Detector*>      Detectors;
     vector<AtomContainer*> SystemAtoms;
     vector<AtomGroup*>     SystemAtomGroups;
@@ -267,7 +267,7 @@ class MDIterator;
     
     MDIntegrator* SetIntegrator(MDIntegrator* itg);
     Detector* AddDetector(Detector* Detc);
-    Conditioner* AddConditioner(Conditioner* Cond);
+    Modify* AddModify(Modify* Cond);
     AtomContainer* AddAtom(AtomContainer* Atm);
     AtomGroup* AddAtomGroup(string group_name);
     
@@ -293,7 +293,7 @@ class MDIterator;
     
     virtual void PrintTime(ostream& ost);
     virtual void PrintHeader(ostream& ost);
-    virtual void ExecuteConditioners(int contype);
+    virtual void ExecuteModifies(int modype);
     virtual void ExecuteDetectors();
     
     virtual AtomContainer* Save(string binname, string mode="a"); // mode is not applicable...
@@ -374,7 +374,7 @@ class MDIterator;
     virtual void ArrangeMessageSlots();
     int GetContainerID(string name);	
     
-    /** search gadget class by its name (Conditioner/Detector) **/
+    /** search gadget class by its name (Modify/Detector) **/
     virtual MDGadget* SearchGadget(string name);
     bool GadgetExist(MDGadget* gad);
     

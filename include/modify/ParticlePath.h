@@ -3,16 +3,16 @@
 
 #include <vector>
 #include <fstream>
-#include <omd/conditioner.h>
+#include <omd/modify.h>
 #include <omd/treader.h>
-using namespace omd;
-
 
 using std::vector;
 using std::ifstream;
 
+namespace omd {
+
 /**
- * @ingroup conditioner
+ * @ingroup modify
  * @brief Moves a particle in a defined path
  *
  * This class reads particle path from a file, contains x,y,z series of
@@ -28,7 +28,7 @@ using std::ifstream;
  *  The name of the class by default is "Path". if no new name is given, this is the name used in parameter file. 
 */
 
-class ParticlePath: public CalcConditioner {	
+class ParticlePath: public CalcModify {	
 	int index, npath, current;
 	vector<double> x, y, z;
 	bool loop, finished, terminate;
@@ -90,5 +90,7 @@ public:
 		}
 	}
 };
+
+}
 
 #endif

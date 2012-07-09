@@ -23,7 +23,6 @@
 #include <modify/PotentialMinimizer.h>
 #include <modify/Quencher.h>
 #include <modify/RangeLimiter.h>
-#include <modify/TTM_Homogen_SC.h>
 #include <modify/TempController.h>
 #include <modify/VerletList.h>
 #include <modify/VerletListFull.h>

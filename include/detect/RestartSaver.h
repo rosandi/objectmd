@@ -6,7 +6,8 @@
 #include <iostream>
 #include <ctime>
 #include <omd/detector.h>
-using namespace omd;
+
+namespace omd {
 
 
 /**
@@ -108,5 +109,7 @@ public:
 		if(a==1) Measure();
 	}
 };
+
+}
 
 #endif

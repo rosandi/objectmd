@@ -23,7 +23,7 @@
 #define _FORCE_KERNEL_H_
 
 #include <omd/gadget.h>
-#include <omd/conditioner.h>
+#include <omd/modify.h>
 #include <omd/iterator.h>
 
 namespace omd {

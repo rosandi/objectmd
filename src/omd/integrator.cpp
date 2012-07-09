@@ -194,7 +194,7 @@ void MDIntegrator::IterationNode(int at, int to)
  * After the loop the Correction() functions of all active forces
  * are executed.
  * 
- * The iteration is bracketed by the two conditioners:
+ * The iteration is bracketed by the two modifies:
  * pre-calculation and force-modifier. This must be taken care when the function
  * is reimplemented.
  * 
@@ -202,7 +202,7 @@ void MDIntegrator::IterationNode(int at, int to)
 
 void MDIntegrator::Iterate() {
   SyncData(SYNC_SPACE);
-  System->ExecuteConditioners(COND_PRE_CALCULATION);
+  System->ExecuteModifies(MODIFY_PRE_CALCULATION);
   int na=GetNAtom();
   for(int i=0; i<na; i++){
     Atom* a=AtomPtr(i);
@@ -212,7 +212,7 @@ void MDIntegrator::Iterate() {
   Iterator->Iterate(this);
   for (int i=0; i<(int)ActForces.size(); i++) ActForces[i]->Correction();
   SyncData(SYNC_FORCE);
-  System->ExecuteConditioners(COND_FORCE_MODIFIER);
+  System->ExecuteModifies(MODIFY_POST_FORCE);
 }
 
 /**

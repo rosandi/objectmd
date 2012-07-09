@@ -5,10 +5,10 @@
 
 #include <iostream>
 #include <omd/comhandler.h>
-#include <omd/conditioner.h>
+#include <omd/modify.h>
 #include <omd/tablereader.h>
 #include <omd/paramhandler.h>
-#include <detector/TempPressDetector.h>
+#include <detect/TempPressDetector.h>
 using namespace omd;
 
 
@@ -17,7 +17,7 @@ using namespace omd;
  */
 
 /**
- * @ingroup conditioner
+ * @ingroup modify
  * \brief Homogen Two Temperature Model to transfer energy 
  *        from electronic system to the lattice
  * 
@@ -29,7 +29,7 @@ using namespace omd;
 
 // explain: table file format, pulse function file, unity
 
-class TTM_Homogen: public ForceConditioner {
+class TTM_Homogen: public ForceModify {
 	
 	CommunicationHandler* Communicator;
 	string parfile;
@@ -68,7 +68,7 @@ class TTM_Homogen: public ForceConditioner {
 	
 public:
 	
-	TTM_Homogen(string parf=""):Force_Conditioner(){
+	TTM_Homogen(string parf=""):Force_Modify(){
 		set_name("Homogen two temperature model");
 		register_class("TWO_TEMPERATURE_MODEL");
 		parfile=parf;
@@ -106,7 +106,7 @@ public:
 
 	// requires temperature and pressure detector
 	void Init(MDSystem* WorkSys) {
-		Force_Conditioner::Init(WorkSys);
+		Force_Modify::Init(WorkSys);
 		
 		mdassert(WorkSys->type_of("simulation_system_grid"), "MDSystemGrid required!");
 		Communicator=dynamic_cast<MDSystemGrid*>(WorkSys)->GetCommunicator();

@@ -17,8 +17,13 @@
  * 
  * ref: Zhibin Lin, L. V. Zhigilei, Phys. Rev. B, 2006, 73, 184113
  */
+
+#ifndef _STRUCTURE_FACTOR_
+#define _STRUCTURE_FACTOR_
  
-#include <detector/DataDumper.h>
+#include <detect/DataDumper.h>
+
+namespace omd {
 
 class StructureFactor: public DataDumper {
 	double wbin;
@@ -185,3 +190,7 @@ public:
 		fout.close();
 	}
 };
+
+}
+
+#endif

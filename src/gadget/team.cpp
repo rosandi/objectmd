@@ -23,6 +23,8 @@
 #include <omd/iterator.h>
 #include <potential/team.h>
 
+using namespace omd;
+
 //--Electron-Density-------------------------------
 
 // AtomID Matrix format:
@@ -34,7 +36,7 @@
 
 TEmbedding::TEmbedding() {
 	id_size=0;
-	Active=ActiveCode=COND_PRE_CALCULATION|COND_FORCE_MODIFIER;
+	Active=ActiveCode=MODIFY_PRE_CALCULATION|MODIFY_POST_FORCE;
 	register_class("embedding_function");
 	set_name("TABLE_EMBEDDING_FUNCTION");
 	for (int i=0; i<MAX_ALLOWED_SPECIES; i++) 
@@ -64,7 +66,7 @@ void TEmbedding::AddTable(int aid_at, int aid_to, string tabfile) {
 }
 
 void TEmbedding::Init(MDSystem* WorkSys) {
-	Conditioner::Init(WorkSys);	
+	Modify::Init(WorkSys);	
 	
 	mdassert(MAX_ALLOWED_SPECIES>=WorkSys->SystemAtoms.size(),
 	       "atom type limit "+as_string(MAX_ALLOWED_SPECIES)+" exceeded");
@@ -182,11 +184,11 @@ bool TForceEAM::SearchAttachEmbeddingClass() {
 		return true;
 	}
 
-	// find first the Embedding energy handler in conditioner list
-	for (int i=0; i<(int)System->Conditioners.size(); i++) {
+	// find first the Embedding energy handler in modify list
+	for (int i=0; i<(int)System->Modifies.size(); i++) {
 			
-		if(System->Conditioners[i]->type_of("EMBEDDING_FUNCTION")){
-			emb=dynamic_cast<TEmbedding*>(System->Conditioners[i]);
+		if(System->Modifies[i]->type_of("EMBEDDING_FUNCTION")){
+			emb=dynamic_cast<TEmbedding*>(System->Modifies[i]);
 			emb->AddTable(AtomTypeA, AtomTypeB, phi.filename);
 			blog("using '"+emb->get_name()+"' "+
 			    "embedding function for "+as_string(AtomTypeA)+
@@ -198,8 +200,8 @@ bool TForceEAM::SearchAttachEmbeddingClass() {
 	return false;
 }
 
-// ForceKernel is initialized before Conditioners. 
-// Conditioner insertion is save here.
+// ForceKernel is initialized before Modifies. 
+// Modify insertion is save here.
 
 void TForceEAM::Init(MDSystem* WorkSys) {
 	ForceKernel::Init(WorkSys);
@@ -215,7 +217,7 @@ void TForceEAM::Init(MDSystem* WorkSys) {
 		emb = new TEmbedding();
 		emb->set_logger(logger);
 		emb->AddTable(AtomTypeA, AtomTypeB, phi.filename);
-		WorkSys->AddConditioner(emb);
+		WorkSys->AddModify(emb);
 	}
 }
 

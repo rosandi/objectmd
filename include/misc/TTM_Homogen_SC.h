@@ -7,15 +7,15 @@
 
 #include <iostream>
 #include <omd/paragadget.h>
-#include <omd/conditioner.h>
+#include <omd/modify.h>
 #include <omd/treader.h>
 #include <omd/param.h>
-#include <detector/ThermoDetector.h>
+#include <detect/ThermoDetector.h>
 using namespace omd;
 
 
 /**
- * @ingroup conditioner
+ * @ingroup modify
  * \brief Homogen Two Temperature Model to transfer energy 
  *        from electronic system to the lattice
  * 
@@ -32,7 +32,7 @@ using namespace omd;
 
 // explain: table file format, pulse function file, unity
 
-class TTM_Homogen: public PreConditioner, public ParallelGadget {
+class TTM_Homogen: public PreModify, public ParallelGadget {
 	
 	TableReader G;
 	TableReader Ce;
@@ -69,7 +69,7 @@ class TTM_Homogen: public PreConditioner, public ParallelGadget {
 	
 public:
 	
-	TTM_Homogen():PreConditioner(){
+	TTM_Homogen():PreModify(){
 		set_name("ttmsc");
 		register_class("TWO_TEMPERATURE_MODEL");
 		electron_temperature=-1.0; // undefined...
@@ -115,7 +115,7 @@ public:
 
 	// requires temperature and pressure detector
 	void Init(MDSystem* WorkSys) {
-		PreConditioner::Init(WorkSys);
+		PreModify::Init(WorkSys);
 		ParallelGadget::Init(WorkSys);
 		
 		RegisterMessageSlot(new DataSlot("e_temp:",2))

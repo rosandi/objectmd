@@ -19,6 +19,8 @@ using std::vector;
  * The tag "watch" may be altered using set_tag().
  */
 
+namespace omd {
+
 class TrajectoryWatcher: public Detector, public ParallelGadget {
 
 	ofstream fl;
@@ -90,5 +92,7 @@ public:
 	virtual void Detect() {Measure();}
 
 };
+
+}
 
 #endif

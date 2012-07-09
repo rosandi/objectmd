@@ -6,7 +6,7 @@
 #include <omd/dataslot.h>
 #include <omd/iterator.h>
 #include <omd/paragadget.h>
-#include <detector/DataDumper.h>
+#include <detect/DataDumper.h>
 
 /**
   @ingroup detector
@@ -25,6 +25,8 @@
   * Parameters: see DataDumper
   *
 **/
+
+namespace omd {
 
 class ThermoDetector: public DataDumper, public ParallelGadget {
 
@@ -82,7 +84,7 @@ public:
 
 	double GetPressureAvg(){
 	    if(!intensive_mode) die("attempt to invoke GetTemperatureAvg in non-intensive mode!");
-		return avg_press;
+		return avg_pres;
 	}
 
 	double GetDensityAvg(){
@@ -261,7 +263,7 @@ public:
 		if(navg>0) {
 		  avg_temp/=(double)navg;
 		  avg_dens/=(double)navg;
-		else {
+		} else {
 		  avg_temp=0.0;
 		  avg_dens=0.0; // check this! should it be 1?
         }
@@ -445,4 +447,5 @@ public:
 
 };
 
+}
 #endif

@@ -2,15 +2,15 @@
 #ifndef _T_FORCE_FIELD_HPP_
 #define _T_FORCE_FIELD_HPP_
 
-#include <omd/conditioner.h>
+#include <omd/modify.h>
 #include <omd/treader.h>
-using namespace omd;
 
+namespace omd {
 
 enum ForceFieldType {PointSource, LineSource, PlaneSource};
 
 /**
- * @ingroup conditioner
+ * @ingroup modify
  * @brief Interaction with point, line, or surface potential source
  *
  * This class read potential function from a table.
@@ -28,7 +28,7 @@ enum ForceFieldType {PointSource, LineSource, PlaneSource};
  * (name) represent the name of the gadget (see SetName()).
 */
 
-class Field: public ForceConditioner {
+class Field: public ForceModify {
 	double ox,oy,oz;
 	double ax,ay,az;
 	double bx,by,bz;
@@ -114,7 +114,7 @@ public:
 		}
 	}
 			
-	void ForceModifier(){
+	void PostForce(){
 		double r, pot,drpot,ff,dx,dy,dz;
 		int na=Target->GetNAtom();
 		for(int i=0;i<na;i++) {
@@ -132,5 +132,7 @@ public:
 		}		
 	}
 };
+
+}
 
 #endif

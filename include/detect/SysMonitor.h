@@ -30,6 +30,8 @@ using std::string;
 
 **/
 
+namespace omd {
+
 class SysMonitor:public Detector, public ParallelGadget {
   
 	ofstream fout;
@@ -130,5 +132,7 @@ public:
 	}
 	
 };
+
+}
 
 #endif

@@ -19,8 +19,8 @@
 #define _VERLET_LIST_FULL_HPP_
 
 #include <omd/iterator.h>
-using namespace omd;
 
+namespace omd {
 
 struct NeighborList {
 	// index=0 for accessing full neighbor list
@@ -91,5 +91,7 @@ public:
 	void PrintInfo(ostream& ost);
 
 };
+
+}
 
 #endif

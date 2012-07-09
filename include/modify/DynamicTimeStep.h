@@ -2,14 +2,14 @@
 #ifndef _DYNAMIC_TIME_STEP_HPP_
 #define _DYNAMIC_TIME_STEP_HPP_
 
-#include <omd/conditioner.h>
+#include <omd/modify.h>
 #include <omd/integrator.h>
 #include <omd/paragadget.h>
 
-using namespace omd;
+namespace omd {
 
 /**
-  @ingroup conditioner
+  @ingroup modify
   @brief Dynamic Time Step
 
   Parameters:
@@ -21,7 +21,7 @@ using namespace omd;
 
 **/
 
-class DynamicTimeStep: public PreConditioner, public ParallelGadget {
+class DynamicTimeStep: public PreModify, public ParallelGadget {
 	double maxp;
 	double maxdt;
 	int upd;
@@ -44,7 +44,7 @@ public:
 	}
 	
 	void Init(MDSystem *WorkSys) {
-		PreConditioner::Init(WorkSys);
+		PreModify::Init(WorkSys);
 		ParallelGadget::Init(WorkSys);
 		
 		// calculate timestep first time...
@@ -70,5 +70,7 @@ public:
 		}
 	}
 };
+
+}
 
 #endif

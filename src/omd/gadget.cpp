@@ -70,9 +70,9 @@ MDGadget* MDGadget::SearchGadget(string name, bool strict) {
 			return System->Detectors[i];
 	}
 	
-	for(int i=0;i<(int)System->Conditioners.size();i++) {
-		if(System->Conditioners[i]->get_name()==name)
-			return System->Conditioners[i];
+	for(int i=0;i<(int)System->Modifies.size();i++) {
+		if(System->Modifies[i]->get_name()==name)
+			return System->Modifies[i];
 	}
 	
 	if(strict) die("can not find gadget '"+name+"'");
@@ -86,9 +86,9 @@ MDGadget* MDGadget::SearchGadgetType(string type, bool strict) {
 		if(System->Detectors[i]->type_of(type))
 			return System->Detectors[i];
 
-	for(int i=0;i<(int)System->Conditioners.size();i++)
-		if(System->Conditioners[i]->type_of(type))
-			return System->Conditioners[i];
+	for(int i=0;i<(int)System->Modifies.size();i++)
+		if(System->Modifies[i]->type_of(type))
+			return System->Modifies[i];
 
 	if(strict) die("can not find gadget of type '"+type+"'");
 	return NULL;

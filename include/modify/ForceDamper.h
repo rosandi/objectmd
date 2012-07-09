@@ -3,25 +3,25 @@
 #ifndef _FORCE_DAMPER_HPP_
 #define _FORCE_DAMPER_HPP_
 
-#include <omd/conditioner.h>
-using namespace omd;
+#include <omd/modify.h>
+
+namespace omd {
 
 
 #define FREE_SURFACE -1.0
 
 /**
- * @ingroup conditioner
+ * @ingroup modify
  * @brief Implements the force dumping functionality
  * 
  * This class damps the force in the system with dumping coefficient defined as
  * "DFactor", the 2nd constructor's parameter. The function
  * works on the chosen target system (AtomContainer). 
- * This conditioner is the ForceModifier class, which operates
- * right after the forces are calculated.
+ * This modify is of PostForce type, operates after the forces calculation.
  *
 */
 
-class ForceDamper:public ForceConditioner {
+class ForceDamper:public ForceModify {
 	double Factor;
 	
 public:		
@@ -36,7 +36,7 @@ public:
     TargetName=SysParam->string_value(mytag("target"));
 	}
 
-	void ForceModifier() {
+	void PostForce() {
 		double na=GetNAtom();
 		for(int i=0;i<na;i++) {
 			Atoms(i).fx-=Factor*Atoms(i).vx;
@@ -50,5 +50,7 @@ public:
 			<<" -- damping ("<<Target->get_name()<<"); factor=" << Factor << "\n";
 	}
 };
+
+}
 
 #endif
