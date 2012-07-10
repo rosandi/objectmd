@@ -54,6 +54,7 @@ class TTM_Homogen: public PreModify, public ParallelGadget {
 	double stop_time;
 	
 	bool use_density;
+	bool linear_density;
 	double n_zero;
 	double low_density;
 	double low_density_factor;
@@ -90,6 +91,7 @@ public:
 		source_type=none;
 		stopped=false;
 		use_density=false;
+		linear_density=false;
 		n_zero=0;
 	}
 
@@ -110,10 +112,15 @@ public:
 		SysParam->peek(mytag("balance_electron_lattice"), balance_el_lattice, false);
 		SysParam->peek(mytag("stop_at"), stop_time, -1.0);
 		SysParam->peek(mytag("stop_equ"), stop_equ, false);
-		SysParam->peek(mytag("low_density"), low_density, -1.0);
-		if(low_density>0) {
-		    use_density=true;
-		    SysParam->peek(mytag("low_density_factor"), low_density_factor, 1.0);
+		if(SysParam->exist("interpolate_density")) {
+		  use_density=true;
+		  linear_density=true;
+		} else {
+		    SysParam->peek(mytag("low_density"), low_density, -1.0);
+		    if(low_density>0) {
+		        use_density=true;
+		        SysParam->peek(mytag("low_density_factor"), low_density_factor, 1.0);
+		    } 
         }
 	}
 
@@ -172,11 +179,15 @@ public:
 		else if(electron_energy>0.0)
 			ost<< "electron initial energy = " << electron_energy << "eV\n";
         
-        if(use_density) {
-            ost<<"low density limit = " << low_density << "\n"
-               <<"low density factor = " << low_density_factor <<"\n";
+        if(linear_density) {
+            ost<<"density factor linearly interpolated\n";
         } else {
-          ost << "low density limit is not used!\n";
+            if(use_density) {
+                ost<<"low density limit = " << low_density << "\n"
+                   <<"low density factor = " << low_density_factor <<"\n";
+            } else {
+                ost << "low density limit is not used!\n";
+            }
         }
         
         if(stop_equ) {
@@ -241,7 +252,9 @@ private:
 		// Te
 		double de=-G0*G.read(electron_temperature)*(electron_temperature-atomtemp)*fd_time_step;
 		
-		if(use_density) {
+		if(linear_density) {
+		    de*=atomdens/n_zero;
+		} else if(use_density) {
 		    if(atomdens<(low_density*n_zero)) de*=low_density_factor;
 		}
 		
@@ -262,7 +275,9 @@ private:
 		double volcut=temp_detector->GetDetectVolume();
 		double coup=G0*G.read(electron_temperature);
 		
-		if(use_density) {
+		if(linear_density) {
+		    coup*=temp_detector->GetDensityAvg()/n_zero;
+		} else if(use_density) {
 		    if(temp_detector->GetDensityAvg()<(low_density*n_zero)) coup*=low_density_factor;
 		}
 
