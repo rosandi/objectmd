@@ -112,7 +112,7 @@ public:
 		SysParam->peek(mytag("balance_electron_lattice"), balance_el_lattice, false);
 		SysParam->peek(mytag("stop_at"), stop_time, -1.0);
 		SysParam->peek(mytag("stop_equ"), stop_equ, false);
-		if(SysParam->exist("interpolate_density")) {
+		if(SysParam->exist(mytag("interpolate_density"))) {
 		  use_density=true;
 		  linear_density=true;
 		} else {
