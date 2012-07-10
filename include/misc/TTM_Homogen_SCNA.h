@@ -1,6 +1,7 @@
 // Homogen means: homogen electron temperature
 // SC means: scaling-corrected
-// N means: use density factor
+// N means: use density factor on coupling
+// A means: local density of atom is used in scalling
 
 #ifndef _TTM_HOMOGEN_HPP_
 #define _TTM_HOMOGEN_HPP_
@@ -275,12 +276,6 @@ private:
 		double volcut=temp_detector->GetDetectVolume();
 		double coup=G0*G.read(electron_temperature);
 		
-		if(linear_density) {
-		    coup*=temp_detector->GetDensityAvg()/n_zero;
-		} else if(use_density) {
-		    if(temp_detector->GetDensityAvg()<(low_density*n_zero)) coup*=low_density_factor;
-		}
-
 		// \Delta t_FD = \Delta t_MD
 		double sum_eng=0.0;
 		int neng=0;
@@ -295,6 +290,13 @@ private:
 
 			double m=GetMass(a);
 			double de=coup*(electron_temperature - a->aux[atemp])*atom_volume*fd_time_step;
+		    
+		    // here things happen...
+		    if(linear_density) {
+		      de*=a->aux[adens]/n_zero;
+		    } else if(use_density) {
+		      if(a->aux[adens]<(low_density*n_zero)) de*=low_density_factor;
+		    }
 
 			double cx=(a->vx-cmx[i]);
 			double cy=(a->vy-cmy[i]);
