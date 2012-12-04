@@ -132,7 +132,7 @@ OMD_FLOAT TEmbedding::GetRhoDeriv(OMD_FLOAT r, Atom &at) {
 }
 
 // The correction by electron density is done here.. 
-void TEmbedding::ForceModifier() {
+void TEmbedding::PostForce() {
 	int na=GetNAtom();
 	for(int i=0;i<na;i++) {
 		Atom* a=AtomPtr(i);

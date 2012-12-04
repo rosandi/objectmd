@@ -67,7 +67,7 @@ class TEmbedding: public Modify {
 		virtual void PreCalculation();
 		
 		// Force modifier is used to do correction of potential
-		virtual void ForceModifier();
+		virtual void PostForce();
 		virtual void PrintInfo(ostream& ost);
 };
 
