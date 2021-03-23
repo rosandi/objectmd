@@ -1,4 +1,4 @@
-CXX=$(OMD_CXX)
+CXX=mpicxx
 EXE=example
 LIBS=-L../../lib -I../../include -lm -lomd_object-$(shell uname -m) -lomd-$(shell uname -m) -lmuparser
 

@@ -155,7 +155,6 @@ class MDIterator;
     bool Enumerated;
     bool stopped;
     
-    MDIterator* Iterator;
     
     string ParameterFilename;
     string BinaryFilename;
@@ -180,6 +179,7 @@ class MDIterator;
     
     MDUnit* Unit;
     
+    MDIterator*            Iterator;
     MDIntegrator*          Integrator;
     vector<Modify*>        Modifies;
     vector<Detector*>      Detectors;

@@ -1,4 +1,4 @@
-CXX=$(OMD_CXX)
+CXX=mpicxx
 
 all: main
 

@@ -98,8 +98,8 @@ void MDGadget::Init(MDSystem* WorkSys){
 	if(!System)System=WorkSys;
 	if(!Unit)Unit=System->Unit;
 	SysParam=&(System->param);
-	Iterator=WorkSys->GetIterator();
-	Integrator=WorkSys->GetIntegrator();
+	if (!Iterator) Iterator=WorkSys->GetIterator();
+	if (!Integrator) Integrator=WorkSys->GetIntegrator();
 	ReadParameter();
 	mdassert(CheckParameter(), "check parameter failed");
 	

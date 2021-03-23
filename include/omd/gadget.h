@@ -126,6 +126,16 @@ namespace omd {
     Atom&  Atoms(int idx);
     Atom*  AtomPtr(int idx);
     int   GetNAtom();
+   
+    /**
+     * Allows a gadget to have its own iterator and integrator.
+     */
+     
+    MDIterator* GetIterator() {return Iterator;}
+    MDIntegrator* GetIntegrator() {return Integrator;}
+    void SetIterator(MDIterator* mi) {Iterator=mi;}
+    void SetIntegrator(MDIntegrator* mi) {Integrator=mi;}
+    
     double GetMass(int idx);
     double GetMass(Atom &a);
     double GetMass(Atom *a);
